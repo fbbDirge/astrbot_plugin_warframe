@@ -13,3 +13,4 @@
 /assets/icons/*.png export-ignore
 
 /core/data/fonts/NotoSansCJKsc-Subset-Bold.otf export-ignore
+/assets/readme export-ignore

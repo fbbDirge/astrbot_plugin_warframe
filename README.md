@@ -4,6 +4,18 @@
 
 完整原生整合版：SDJK v1.2.9 的 57 个主功能已进入本插件的业务模块，共用一个 AstrBot 入口、指令注册表、图片输出与配置系统。没有嵌套插件，没有 `sdjk` 转发命令。来源及指令清单见 [功能移植说明](MIGRATION.md)。
 
+## 功能截图
+
+以下截图使用测试数据，仅展示图片布局与图标效果，不代表当前任务、市场价格或实际紫卡数值。点击图片可查看原图；背景、字体大小和颜色支持自定义。
+
+| 世界状态 · 普通裂缝 | 仲裁 · 节点、派系与评级 |
+| --- | --- |
+| [![普通裂缝](assets/readme/fissures.png)](assets/readme/fissures.png) | [![当前仲裁](assets/readme/arbitration.png)](assets/readme/arbitration.png) |
+| **WM 市场 · 卖家、数量与白金报价** | **遗物 · 奖励图标与价格** |
+| [![WM 市场查询](assets/readme/market.png)](assets/readme/market.png) | [![遗物奖励查询](assets/readme/relic.png)](assets/readme/relic.png) |
+| **紫卡分析 · 词条与数值区间** | **回廊灵化 · 本周、下周与轮换表** |
+| [![紫卡数值分析](assets/readme/riven-analysis.png)](assets/readme/riven-analysis.png) | [![回廊灵化轮换](assets/readme/incarnon.png)](assets/readme/incarnon.png) |
+
 ## 安装或升级
 
 1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.20.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
