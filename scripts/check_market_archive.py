@@ -7,8 +7,12 @@ assert archive.stat().st_size<16_000_000,'Market archive exceeds 16 MB'
 with tempfile.TemporaryDirectory() as tmp:
  with zipfile.ZipFile(archive) as z:
   assert z.testzip() is None;z.extractall(tmp)
- sys.path.insert(0,tmp)
  root=Path(tmp)/'astrbot_plugin_warframe'
+ if not root.exists():
+  folders=[p for p in Path(tmp).iterdir() if p.is_dir()]
+  assert len(folders)==1,'Expected one repository root'
+  folders[0].rename(root)
+ sys.path.insert(0,tmp)
  render=importlib.import_module('astrbot_plugin_warframe.renderer')
  presentation=importlib.import_module('astrbot_plugin_warframe.presentation')
  theme=importlib.import_module('astrbot_plugin_warframe.theme')
