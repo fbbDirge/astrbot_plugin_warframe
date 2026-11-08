@@ -1,0 +1,1 @@
+Warframe artwork © Digital Extremes. Via WFCD/warframe-items, revision 23804b64bc248069ce39adb9f52e9f546d8f343e. Exact URLs in manifest.json. Resized to 128px. Category fallback icons are labeled in the manifest.

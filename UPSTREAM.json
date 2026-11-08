@@ -1,0 +1,19 @@
+{
+  "repository": "https://github.com/skyti1437/Warframe-SDJK-Bot",
+  "commit": "4fed72a68e80aa075b592367f5b7c3efcd9bdf4c",
+  "version": "1.2.9",
+  "license": "GPL-3.0",
+  "changes": [
+    "Business source, datasets and maintenance scripts moved into native core/ and scripts/ directories",
+    "Nested plugin entrypoint and sdjk forwarding modules removed; only main.WarframePlugin is registered",
+    "Domain lifecycle owned by GameRuntime; one direct command registry for all 57 canonical features",
+    "Native presentation model with semantic sections and typed market/fissure/relic/auction records; own Pillow rendering",
+    "Unified config under game; legacy sdjk settings read on upgrade and data directory migrated to game",
+    "Explicit OCR provider selection and image-only output retained; core test lifecycle fixture follows runtime.py",
+    "Community nicknames and misspellings integrated into WM resolution; strict riven multi-stat filters default, optional explicit approximate search",
+    "FlareSolverr fallback disabled; ordinary public APIs and available snapshots remain",
+    "Admin settings schema and native font selection integrated; reference test help, fixtures and image-host composition updated for moved code",
+    "Command overview and follow-up hints render together in a single image without pagination"
+  ],
+  "integration_version": "0.7.20"
+}

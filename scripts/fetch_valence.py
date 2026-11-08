@@ -1,0 +1,362 @@
+# -*- coding: utf-8 -*-
+"""刷新 Coda（终幕）/ Tenet（信条）的效价加成 —— wiki Reset 页 → rotations.json。
+
+为什么需要这个脚本
+------------------
+DE 不提供效价加成（Valence Bonus）的 API，唯一来源是 wiki 的 *Current Valence
+Bonuses* 玩家上报表。而插件侧直连 wiki.warframe.com 会被 Cloudflare 拦
+（index.php / api.php / rest.php 全 403），所以走同机 FlareSolverr。
+
+★ 时效性关键：Coda 的 A/B 两批每 4 天（00:00 UTC）交替（Tenet 同周期、锚点差 24h），
+  加成**每次换批重掷**。因此**每次换批后都要跑一次**，否则数据停在旧快照 ——
+  这正是「终幕卡片里元素与加成整段丢失」的根因（2026-09-17：B 批生效时
+  batches[1] 的 element/bonus 全为 null，卡片只能退化成一段说明文字）。
+
+用法
+----
+    # 在装有 FlareSolverr 的机器上（172.17.0.1:8191，走 docker0 网桥地址；本地开发需 SSH 隧道且目标同样写 172.17.0.1）
+    python3 scripts/fetch_valence.py                 # 抓源页并预览，默认不写文件
+    python3 scripts/fetch_valence.py --reset         # 旧路径：抓渲染后的 Reset 页
+    python3 scripts/fetch_valence.py --output /tmp/runtime/rotations.json  # 显式写运行期缓存
+    python3 scripts/fetch_valence.py --html /tmp/reset.json   # 离线：已存渲染页响应
+    python3 scripts/fetch_valence.py --wikitext coda.txt tenet.txt   # 离线：已存源页 wikitext
+
+★ 2026-10-03 为什么改抓源页 wikitext（Reset 路径保留仅作兼容）：
+  Reset 页对这两段是**跨页嵌入**（``{{#lst:Coda Weapons|eleanor_coda_timer}}`` /
+  ``{{#lst:Tenet Weapons|glast_tenet_melee_timer}}``），而渲染页走 MediaWiki
+  **解析缓存** ⇒ 换批后源页已更新、Reset 仍吐旧内容（实测 2026-10-03：Coda
+  换批到 B，源页 A/B 两表俱全，Reset 渲染页却只有 A 表 ⇒ 旧路径抓不到 B）。
+  源页 wikitext 是**真源、无解析缓存**，且 A/B 两批同页全量公布 ⇒ 一次抓取两批
+  齐全（旧文案「页面只展示当前批」仅对 Reset 渲染页成立，对源页不成立）。
+"""
+
+from __future__ import annotations
+
+import argparse
+import html as _html
+import json
+import re
+import sys
+import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+ROTATION_FILE = ROOT / "core" / "data" / "rotations.json"
+DEFAULT_FLARE = "http://172.17.0.1:8191/v1"
+WIKI_URL = "https://wiki.warframe.com/w/Reset"
+# ★ 2026-10-03：真源页（Reset 页的嵌入来源；wikitext 无解析缓存、两批全量）
+#   Coda/Tenet 主标题页都是 #REDIRECT ⇒ 直接抓带 "Weapons" 的目标页。
+WIKI_RAW_CODA = "https://wiki.warframe.com/w/Coda_Weapons?action=raw"
+WIKI_RAW_TENET = "https://wiki.warframe.com/w/Tenet_Weapons?action=raw"
+
+BATCH_IDX = {"A": 1, "B": 2}
+
+# ★ 2026-10-15：源页 wikitext 解析器已上移到 core/api_client.py（插件**运行期**也要用，
+#   而运行期不 import scripts/ —— 两处实现会漂移）。这里直接复用同一份。
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from core.api_client import WarframeClient as _WC  # noqa: E402
+
+parse_wikitext = _WC.parse_wikitext
+
+
+def fetch_html(flare: str, url: str = WIKI_URL, timeout: int = 120, min_len: int = 50_000) -> str:
+    """经 FlareSolverr 取回页面（直连会被 CF 拦）。
+
+    ``min_len``：渲染页要求整页（>50KB）；``?action=raw`` 只有十几 KB，
+    调用方传小阈值。
+    """
+    payload = json.dumps({"cmd": "request.get", "url": url, "maxTimeout": timeout * 1000}).encode(
+        "utf-8"
+    )
+    req = urllib.request.Request(flare, data=payload, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout + 60) as resp:
+        data = json.loads(resp.read().decode("utf-8", "replace"))
+    if data.get("status") != "ok":
+        raise SystemExit(f"FlareSolverr 返回失败：{data.get('message')}")
+    body = data.get("solution", {}).get("response") or ""
+    if len(body) < min_len:
+        raise SystemExit(f"页面疑似未渲染完全（{len(body)} 字节 < {min_len}）")
+    return body
+
+
+def _cells(row_html: str) -> list[str]:
+    """取 <tr> 里每个 <td>/<th> 的纯文本。"""
+    out = []
+    for td in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row_html, re.S):
+        txt = re.sub(r"<[^>]+>", " ", td)
+        out.append(re.sub(r"\s+", " ", _html.unescape(txt)).strip())
+    return out
+
+
+def _weapon_row(cells: list[str]) -> dict:
+    """``['Coda Tysis', 'Heat', '48.0%']`` → ``{en, element, bonus}``。"""
+    m = re.search(r"([\d.]+)", cells[2]) if len(cells) > 2 else None
+    return {
+        "en": cells[0].strip(),
+        "element": cells[1].strip() if len(cells) > 1 else "",
+        "bonus": float(m.group(1)) if m else None,
+    }
+
+
+def parse(src: str) -> dict:
+    """解析页面上的效价表。
+
+    Returns:
+        ``{"coda": {1: [...], 2: [...]}, "tenet": [...]}``
+        —— coda 的键是**批次号**（1=A、2=B），只含页面当前展示的那一批。
+    """
+    res: dict = {"coda": {}, "tenet": []}
+    for tm in re.finditer(r"<table[^>]*>", src):
+        start = tm.end()
+        end = src.find("</table>", start)
+        if end < 0:
+            continue
+        rows = [_cells(r) for r in re.findall(r"<tr[^>]*>(.*?)</tr>", src[start:end], re.S)]
+        rows = [r for r in rows if r and any(r)]
+        if not rows:
+            continue
+        head = rows[0][0].strip()
+        mb = re.match(r"Weapon\s*\(Batch\s*([AB])\)", head, re.I)
+        if mb:
+            idx = BATCH_IDX[mb.group(1).upper()]
+            res["coda"][idx] = [_weapon_row(r) for r in rows[1:] if len(r) >= 3]
+            continue
+        if head.lower() == "weapon":  # 无批次后缀的表 = Tenet（Ergo Glast）
+            items = [
+                _weapon_row(r) for r in rows[1:] if len(r) >= 3 and r[0].lower().startswith("tenet")
+            ]
+            if items:
+                res["tenet"] = items
+    return res
+
+
+# 源页 wikitext 解析器（原 ``_wt_plain`` / ``_weapon_row_wt`` / ``parse_wikitext``）
+# 已于 2026-10-15 上移到 ``core/api_client.py``，文件头已 import 复用（插件运行期也要用，
+# 运行期不 import scripts/，两处实现会漂移）。
+
+
+VALENCE_REVISION_API = (
+    "https://wiki.warframe.com/api.php?action=query&prop=revisions"
+    "&titles=Tenet_Weapons|Coda_Weapons&rvprop=timestamp&format=json"
+)
+
+
+def fetch_revisions(url: str = VALENCE_REVISION_API, timeout: int = 30) -> dict:
+    """两张源页的最近修订时刻 ``{"tenet": iso, "coda": iso}``（直连 wiki api.php；在本地 Mac 跑）。
+
+    取不到返回 ``{}``，由调用方决定是否拒绝写入（见 ``apply`` 的不变量）。
+    """
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "SDJKBOT-fetch-valence"})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            pages = (json.loads(r.read().decode("utf-8")).get("query") or {}).get("pages") or {}
+    except Exception as exc:  # noqa: BLE001 - 取不到修订时刻不让脚本崩，交给调用方判
+        print(f"⚠ 取不到 wiki 修订时刻：{exc!r}")
+        return {}
+    out: dict = {}
+    for page in pages.values():
+        title = str((page or {}).get("title") or "")
+        ts = (((page or {}).get("revisions") or [{}])[0] or {}).get("timestamp")
+        if not ts:
+            continue
+        iso = datetime.fromisoformat(ts.replace("Z", "+00:00")).isoformat()
+        if title.startswith("Tenet"):
+            out["tenet"] = iso
+        elif title.startswith("Coda"):
+            out["coda"] = iso
+    return out
+
+
+def apply(data: dict, parsed: dict, dry: bool = False, revs: dict | None = None) -> list[str]:
+    """把解析结果写进 rotations.json 结构，返回变更描述。
+
+    ★★ 不变量（2026-10-23 立，源于线上误报）：**改了 items 的数值，就必须同步改
+    「数值最早出现时刻」** —— 信条 ``tenet.valence_values_since``、终幕
+    ``coda.batch_values_since[批]``（每批各记各的），取值 = **源页那次改数值的修订时刻**
+    （不是 ``now``，也不是 ``valence_snapshot``）。
+
+    为什么：`core/api_client.py::valence_values_stale()` 拿这个时刻跟**本轮窗口起点**比，
+    早于窗口起点就判「数值仍是上一轮」，卡面会打上「数值疑似仍是上一轮：wiki 尚未完整更新」。
+    插件自己的 `refresh_valence()` 有 `_since()` 会正确维护它，但判据是「数值与本地相同就
+    **沿用旧记录**」（有意为之）⇒ **外部写坏之后插件也修不回来**。
+
+    实例：2026-10-22 手工把信条新值写进种子时只改了 items + ``valence_snapshot``，
+    ``valence_values_since`` 留在 ``2026-10-18T02:05:08`` ⇒ 信条卡从 10-22 起一直误报。
+    ★ 2026-10-23 补上：``revs`` = 源页修订时刻（``{"tenet": iso, "coda": iso}``，``fetch_revisions``
+    或 ``--since``）。某段数值**有变化**时同步写该段的 ``*_since``；有变化却没有该段修订时刻 ⇒
+    **抛 SystemExit 拒绝写入**（宁可不写，也不能再写出「数值新、时刻旧」的种子）。
+    """
+    changes: list[str] = []
+    now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    revs = revs or {}
+
+    def _since_for(section: str) -> str:
+        ts = revs.get(section)
+        if not ts:
+            raise SystemExit(
+                f"✗ {section} 数值有变化，但拿不到源页修订时刻 —— 拒绝写入（会写出「数值新、时刻旧」）。"
+                "\n  在本地 Mac 跑（wiki api.php 可直连），或用 --since 手动指定该页那次改数值的修订时刻"
+            )
+        return ts
+
+    def _merge(container: list[dict], src_items: list[dict], tag: str) -> int:
+        """按英文名对齐，更新 element/bonus；返回更新条数。"""
+        by_en = {(s.get("en") or "").lower(): s for s in src_items}
+        n = 0
+        for it in container:
+            src = by_en.get((it.get("en") or "").lower())
+            if not src:
+                if not it.get("bonus"):
+                    changes.append(f"  [缺口] {tag} {it.get('en')} 在 wiki 表中没有")
+                continue
+            if it.get("bonus") != src["bonus"] or it.get("element") != src["element"]:
+                changes.append(
+                    f"  {it.get('cn') or it.get('en')}: "
+                    f"{it.get('element')} {it.get('bonus')} → "
+                    f"{src['element']} {src['bonus']}"
+                )
+                if not dry:
+                    it["element"], it["bonus"] = src["element"], src["bonus"]
+                n += 1
+            elif not it.get("cn"):
+                pass
+        return n
+
+    coda = data.setdefault("coda", {})
+    batches = coda.get("batches") or []
+    for idx, items in sorted(parsed["coda"].items()):
+        if not (1 <= idx <= len(batches)):
+            changes.append(f"  [跳过] wiki 的 Batch {idx} 超出本地批次表")
+            continue
+        label = (
+            (coda.get("batch_label") or [])[idx - 1]
+            if isinstance(coda.get("batch_label"), list)
+            else str(idx)
+        )
+        n = _merge(batches[idx - 1], items, f"终幕批{label}")
+        changes.append(f"  · Batch {label}：{len(items)} 条来自 wiki，其中 {n} 条数值有变化")
+        if n:
+            since = _since_for("coda")
+            changes.append(f"  · Batch {label} 数值最早出现时刻 → {since}")
+            if not dry:
+                sinces = list(coda.get("batch_values_since") or [])
+                sinces += [None] * (len(batches) - len(sinces))
+                sinces[idx - 1] = since
+                coda["batch_values_since"] = sinces
+        if not dry:
+            coda["valence_snapshot"] = now
+
+    tenet = data.setdefault("tenet", {})
+    titems = tenet.get("items") or []
+    if parsed["tenet"]:
+        n = _merge(titems, parsed["tenet"], "信条")
+        changes.append(f"  · Tenet：{len(parsed['tenet'])} 条来自 wiki，其中 {n} 条数值有变化")
+        if n:
+            since = _since_for("tenet")
+            changes.append(f"  · Tenet 数值最早出现时刻 → {since}")
+            if not dry:
+                tenet["valence_values_since"] = since
+        if not dry:
+            tenet["valence_snapshot"] = now
+
+    return changes
+
+
+def detect_indent(text: str, default: int = 1) -> int:
+    """探测原文件的缩进宽度，写回时沿用 —— 否则整文件行都会变，diff 没法看。"""
+    m = re.search(r"\n( +)\"", text)
+    return len(m.group(1)) if m else default
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--flare", default=DEFAULT_FLARE)
+    ap.add_argument("--url", default=WIKI_URL)
+    ap.add_argument(
+        "--reset",
+        action="store_true",
+        help="旧路径：抓渲染后的 Reset 页（受解析缓存影响，可能落后一批）",
+    )
+    ap.add_argument("--html", help="离线：从已保存的 FlareSolverr 渲染页响应 JSON 解析")
+    ap.add_argument(
+        "--wikitext",
+        nargs=2,
+        metavar=("CODA_RAW", "TENET_RAW"),
+        help="离线：从已保存的源页 wikitext 解析（Coda Weapons / Tenet Weapons）",
+    )
+    ap.add_argument("--dry-run", action="store_true", help="仅预览（默认行为）")
+    ap.add_argument("--output", type=Path, help="显式写入运行期 rotations.json（禁止包内种子）")
+    ap.add_argument(
+        "--since",
+        nargs=2,
+        metavar=("TENET_ISO", "CODA_ISO"),
+        help="手动指定两张源页那次改数值的修订时刻（不填则从 wiki api.php 现取；填 - 表示该段不改）",
+    )
+    args = ap.parse_args()
+
+    if args.output:
+        target = args.output.resolve()
+        same_seed = target == ROTATION_FILE.resolve() or (
+            target.exists() and ROTATION_FILE.exists() and target.samefile(ROTATION_FILE)
+        )
+        if same_seed or target.parts[-3:] == ("core", "data", "rotations.json"):
+            ap.error("禁止写入包内 core/data/rotations.json；请指定运行期缓存路径")
+    else:
+        target = ROTATION_FILE
+
+    if args.wikitext:
+        p_coda = parse_wikitext(Path(args.wikitext[0]).read_text(encoding="utf-8"))
+        p_tenet = parse_wikitext(Path(args.wikitext[1]).read_text(encoding="utf-8"))
+        parsed = {"coda": dict(p_coda["coda"]), "tenet": p_tenet["tenet"]}
+        if not parsed["tenet"]:  # 兜底：源文件顺序与参数相反也能解析
+            parsed["tenet"] = p_coda["tenet"]
+        if not parsed["coda"]:
+            parsed["coda"] = dict(p_tenet["coda"])
+    elif args.html:
+        raw = json.loads(Path(args.html).read_text(encoding="utf-8"))
+        src = raw.get("solution", {}).get("response") or raw.get("html") or ""
+        parsed = parse(src)
+    elif args.reset:  # 旧路径（保留兼容；见文件头 ★ 2026-10-03）
+        print(f"→ FlareSolverr 抓取（渲染页）{args.url}")
+        parsed = parse(fetch_html(args.flare, args.url))
+    else:  # ★ 默认：源页 wikitext（真源、两批全量）
+        print(f"→ FlareSolverr 抓取源页 wikitext：\n   {WIKI_RAW_CODA}\n   {WIKI_RAW_TENET}")
+        p_coda = parse_wikitext(fetch_html(args.flare, WIKI_RAW_CODA, min_len=2_000))
+        p_tenet = parse_wikitext(fetch_html(args.flare, WIKI_RAW_TENET, min_len=2_000))
+        parsed = {"coda": dict(p_coda["coda"]), "tenet": p_tenet["tenet"]}
+        if not parsed["coda"]:
+            parsed["coda"] = dict(p_tenet["coda"])
+        if not parsed["tenet"]:
+            parsed["tenet"] = p_coda["tenet"]
+
+    print(
+        f"解析到：Coda 批次 {sorted(parsed['coda'])}（各自 "
+        f"{ {k: len(v) for k, v in parsed['coda'].items()} } 把）、"
+        f"Tenet {len(parsed['tenet'])} 把"
+    )
+    if not parsed["coda"] and not parsed["tenet"]:
+        raise SystemExit("没解析到任何效价表 —— 页面结构可能变了，请人工核对")
+
+    original = (target if target.exists() else ROTATION_FILE).read_text(encoding="utf-8")
+    data = json.loads(original)
+    if args.since:
+        revs = {k: v for k, v in zip(("tenet", "coda"), args.since) if v and v != "-"}
+    else:
+        revs = fetch_revisions()
+    preview = args.dry_run or args.output is None
+    changes = apply(data, parsed, dry=preview, revs=revs)
+    print("\n".join(changes))
+
+    if preview:
+        print("\n[dry-run] 未写入文件")
+        return
+    indent = detect_indent(original)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(data, ensure_ascii=False, indent=indent) + "\n", encoding="utf-8")
+    print(f"\n已写入 {target}（缩进 {indent} 空格，与原文件一致）")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,348 @@
+{
+  "corpus": {
+    "url": "https://wiki.warframe.com/images/IconCorpusOn%28xWhite%29.png?9a680",
+    "descriptionurl": "https://wiki.warframe.com/w/File:IconCorpusOn(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=400082"
+  },
+  "grineer": {
+    "url": "https://wiki.warframe.com/images/IconGrineerOn%28xWhite%29.png?28616",
+    "descriptionurl": "https://wiki.warframe.com/w/File:IconGrineerOn(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=400083"
+  },
+  "infested": {
+    "url": "https://wiki.warframe.com/images/IconInfestedOn%28xWhite%29.png?012d9",
+    "descriptionurl": "https://wiki.warframe.com/w/File:IconInfestedOn(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=400084"
+  },
+  "meso": {
+    "url": "https://wiki.warframe.com/images/VoidRelicBronzeIcon64.png?327b2",
+    "descriptionurl": "https://wiki.warframe.com/w/File:VoidRelicBronzeIcon64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1544809"
+  },
+  "axi": {
+    "url": "https://wiki.warframe.com/images/VoidRelicGoldIcon64.png?db75c",
+    "descriptionurl": "https://wiki.warframe.com/w/File:VoidRelicGoldIcon64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1544810"
+  },
+  "lith": {
+    "url": "https://wiki.warframe.com/images/VoidRelicIronIcon64.png?ace4f",
+    "descriptionurl": "https://wiki.warframe.com/w/File:VoidRelicIronIcon64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1544811"
+  },
+  "neo": {
+    "url": "https://wiki.warframe.com/images/VoidRelicSilverIcon64.png?f6b31",
+    "descriptionurl": "https://wiki.warframe.com/w/File:VoidRelicSilverIcon64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1544812"
+  },
+  "sentient": {
+    "url": "https://wiki.warframe.com/images/SentientFactionIcon%28xWhite%29.png",
+    "descriptionurl": "https://wiki.warframe.com/w/File:SentientFactionIcon%28xWhite%29.png"
+  },
+  "orokin": {
+    "url": "https://wiki.warframe.com/images/IconOrokinOn%28xWhite%29.png",
+    "descriptionurl": "https://wiki.warframe.com/w/File:IconOrokinOn%28xWhite%29.png"
+  },
+  "requiem": {
+    "url": "https://wiki.warframe.com/images/RequiemRelicIntact.png",
+    "descriptionurl": "https://wiki.warframe.com/w/File:RequiemRelicIntact.png"
+  },
+  "platinum": {
+    "url": "https://wiki.warframe.com/images/Platinum64.png?6022f",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Platinum64.png"
+  },
+  "heat": {
+    "url": "https://wiki.warframe.com/images/Heat%28xWhite%29.png?1bed4",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Heat%28xWhite%29.png"
+  },
+  "cold": {
+    "url": "https://wiki.warframe.com/images/Cold%28xWhite%29.png?b6156",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Cold%28xWhite%29.png"
+  },
+  "electricity": {
+    "url": "https://wiki.warframe.com/images/Electricity%28xWhite%29.png?1a5c4",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Electricity%28xWhite%29.png"
+  },
+  "toxin": {
+    "url": "https://wiki.warframe.com/images/Toxin%28xWhite%29.png?f0c48",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Toxin%28xWhite%29.png"
+  },
+  "blast": {
+    "url": "https://wiki.warframe.com/images/Blast%28xWhite%29.png?f50f9",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Blast%28xWhite%29.png"
+  },
+  "corrosive": {
+    "url": "https://wiki.warframe.com/images/Corrosive%28xWhite%29.png?e3959",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Corrosive%28xWhite%29.png"
+  },
+  "gas": {
+    "url": "https://wiki.warframe.com/images/Gas%28xWhite%29.png?1a5c4",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Gas%28xWhite%29.png"
+  },
+  "magnetic": {
+    "url": "https://wiki.warframe.com/images/Magnetic%28xWhite%29.png?a3b9d",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Magnetic%28xWhite%29.png"
+  },
+  "radiation": {
+    "url": "https://wiki.warframe.com/images/Radiation%28xWhite%29.png?cbdcc",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Radiation%28xWhite%29.png"
+  },
+  "viral": {
+    "url": "https://wiki.warframe.com/images/Viral%28xWhite%29.png?f0c48",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Viral%28xWhite%29.png"
+  },
+  "impact": {
+    "url": "https://wiki.warframe.com/images/Impact%28xWhite%29.png?916ff",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Impact%28xWhite%29.png"
+  },
+  "puncture": {
+    "url": "https://wiki.warframe.com/images/Puncture%28xWhite%29.png?291b4",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Puncture%28xWhite%29.png"
+  },
+  "slash": {
+    "url": "https://wiki.warframe.com/images/Slash%28xWhite%29.png?41955",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Slash%28xWhite%29.png"
+  },
+  "murmur": {
+    "url": "https://wiki.warframe.com/images/MurmurIcon%28xWhite%29.png?e4daf",
+    "descriptionurl": "https://wiki.warframe.com/w/File:MurmurIcon(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1581918"
+  },
+  "techrot": {
+    "url": "https://wiki.warframe.com/images/TechrotIcon%28xWhite%29.png?5b58e",
+    "descriptionurl": "https://wiki.warframe.com/w/File:TechrotIcon(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1589528"
+  },
+  "scaldra": {
+    "url": "https://wiki.warframe.com/images/ScaldraIcon%28xWhite%29.png?55f29",
+    "descriptionurl": "https://wiki.warframe.com/w/File:ScaldraIcon(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1589527"
+  },
+  "credits": {
+    "url": "https://wiki.warframe.com/images/Credits64.png?6022f",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Credits64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=468528"
+  },
+  "endo": {
+    "url": "https://wiki.warframe.com/images/Endo64.png?3d550",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Endo64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1056882"
+  },
+  "kuva": {
+    "url": "https://wiki.warframe.com/images/Kuva.png?0db18",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Kuva.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1074551"
+  },
+  "narmer": {
+    "url": "https://wiki.warframe.com/images/IconNarmer%28xWhite%29.png?1337d",
+    "descriptionurl": "https://wiki.warframe.com/w/File:IconNarmer(xWhite).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1565713"
+  },
+  "duviri": {
+    "url": "https://wiki.warframe.com/images/DuviriIcon.png?f714f",
+    "descriptionurl": "https://wiki.warframe.com/w/File:DuviriIcon.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1583358"
+  },
+  "ducats": {
+    "url": "https://wiki.warframe.com/images/Ducats_vector%28xBlack%29.png?ab52a",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Ducats_vector(xBlack).png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=644518"
+  },
+  "void": {
+    "url": "https://wiki.warframe.com/images/DmgVoidSmall64.png?e62bb",
+    "descriptionurl": "https://wiki.warframe.com/w/File:DmgVoidSmall64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1545224"
+  },
+  "tau": {
+    "url": "https://wiki.warframe.com/images/DmgTauSmall64.png?f7727",
+    "descriptionurl": "https://wiki.warframe.com/w/File:DmgTauSmall64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1545237"
+  },
+  "true": {
+    "url": "https://wiki.warframe.com/images/DmgTrueSmall64.png?e6aca",
+    "descriptionurl": "https://wiki.warframe.com/w/File:DmgTrueSmall64.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1545234"
+  },
+  "forma": {
+    "url": "https://raw.githubusercontent.com/WFCD/warframe-items/23804b64bc248069ce39adb9f52e9f546d8f343e/data/img/GenericComponent.png",
+    "description": "WFCD warframe-items, DE game artwork; pinned source revision 23804b64bc248069ce39adb9f52e9f546d8f343e"
+  },
+  "moonflesh": {
+    "url": "https://raw.githubusercontent.com/WFCD/warframe-items/23804b64bc248069ce39adb9f52e9f546d8f343e/data/img/Moonflesh.png",
+    "description": "WFCD warframe-items, DE game artwork; pinned source revision 23804b64bc248069ce39adb9f52e9f546d8f343e"
+  },
+  "cycle_cetus": {
+    "url": "https://wiki.warframe.com/images/Cetus.png?a140d",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Cetus.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1593078"
+  },
+  "cycle_vallis": {
+    "url": "https://wiki.warframe.com/images/OrbVallisScene.png?ee274",
+    "descriptionurl": "https://wiki.warframe.com/w/File:OrbVallisScene.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1486925"
+  },
+  "cycle_cambion": {
+    "url": "https://wiki.warframe.com/images/Cambion_Drift.png?f4d47",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Cambion_Drift.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1530888"
+  },
+  "cycle_earth": {
+    "url": "https://wiki.warframe.com/images/EarthCutout.png?c8ac6",
+    "descriptionurl": "https://wiki.warframe.com/w/File:EarthCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116405"
+  },
+  "cycle_duviri": {
+    "url": "https://wiki.warframe.com/images/DuviriIcon.png?f714f",
+    "descriptionurl": "https://wiki.warframe.com/w/File:DuviriIcon.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1583358"
+  },
+  "cycle_zariman": {
+    "url": "https://wiki.warframe.com/images/ZarimanCutout.png?ed73d",
+    "descriptionurl": "https://wiki.warframe.com/w/File:ZarimanCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1563310"
+  },
+  "reward_anasa": {
+    "url": "https://raw.githubusercontent.com/WFCD/warframe-items/23804b64bc248069ce39adb9f52e9f546d8f343e/data/img/OroFusexF.png",
+    "description": "DE artwork via pinned WFCD warframe-items"
+  },
+  "reward_exilus": {
+    "url": "https://raw.githubusercontent.com/WFCD/warframe-items/23804b64bc248069ce39adb9f52e9f546d8f343e/data/img/UtilityModule.png",
+    "description": "DE artwork via pinned WFCD warframe-items"
+  },
+  "reward_reactor": {
+    "url": "https://raw.githubusercontent.com/WFCD/warframe-items/23804b64bc248069ce39adb9f52e9f546d8f343e/data/img/ComponentReactor.png",
+    "description": "DE artwork via pinned WFCD warframe-items"
+  },
+  "reward_catalyst": {
+    "url": "https://raw.githubusercontent.com/WFCD/warframe-items/23804b64bc248069ce39adb9f52e9f546d8f343e/data/img/ComponentCatalyst.png",
+    "description": "DE artwork via pinned WFCD warframe-items"
+  },
+  "reward_affinity": {
+    "url": "https://wiki.warframe.com/images/AffinityBooster%28xLight%29.png?1e12d",
+    "descriptionurl": "https://wiki.warframe.com/w/File:AffinityBooster(xLight).png"
+  },
+  "reward_resource_chance": {
+    "url": "https://wiki.warframe.com/images/ResourceDropChanceBooster%28xLight%29.png?b05a3",
+    "descriptionurl": "https://wiki.warframe.com/w/File:ResourceDropChanceBooster(xLight).png"
+  },
+  "reward_mod_chance": {
+    "url": "https://wiki.warframe.com/images/ModDropChanceBooster%28xLight%29.png?f32fb",
+    "descriptionurl": "https://wiki.warframe.com/w/File:ModDropChanceBooster(xLight).png"
+  },
+  "reward_riven": {
+    "url": "https://wiki.warframe.com/images/RivenModTemplate.png?1cebd",
+    "descriptionurl": "https://wiki.warframe.com/w/File:RivenModTemplate.png"
+  },
+  "reward_legendary": {
+    "url": "https://wiki.warframe.com/images/LegendaryCore.png?30a55",
+    "descriptionurl": "https://wiki.warframe.com/w/File:LegendaryCore.png"
+  },
+  "regal_aya": {
+    "timestamp": "2021-11-12T23:17:52Z",
+    "url": "https://wiki.warframe.com/images/RegalAya.png?dacfe",
+    "descriptionurl": "https://wiki.warframe.com/w/File:RegalAya.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1554103",
+    "name": "RegalAya.png",
+    "ns": 6,
+    "title": "File:RegalAya.png"
+  },
+  "planet_mercury": {
+    "url": "https://wiki.warframe.com/images/MercuryCutout.png?93718",
+    "descriptionurl": "https://wiki.warframe.com/w/File:MercuryCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116410"
+  },
+  "planet_venus": {
+    "url": "https://wiki.warframe.com/images/VenusCutout.png?bc878",
+    "descriptionurl": "https://wiki.warframe.com/w/File:VenusCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116416"
+  },
+  "planet_earth": {
+    "url": "https://wiki.warframe.com/images/EarthCutout.png?c8ac6",
+    "descriptionurl": "https://wiki.warframe.com/w/File:EarthCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116405"
+  },
+  "planet_mars": {
+    "url": "https://wiki.warframe.com/images/MarsCutout.png?db010",
+    "descriptionurl": "https://wiki.warframe.com/w/File:MarsCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116409"
+  },
+  "planet_phobos": {
+    "url": "https://wiki.warframe.com/images/PhobosCutout.png?e3be5",
+    "descriptionurl": "https://wiki.warframe.com/w/File:PhobosCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=159496"
+  },
+  "planet_deimos": {
+    "url": "https://wiki.warframe.com/images/DeimosCutout.png?cf496",
+    "descriptionurl": "https://wiki.warframe.com/w/File:DeimosCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1525572"
+  },
+  "planet_ceres": {
+    "url": "https://wiki.warframe.com/images/CeresCutout.png?3f1d9",
+    "descriptionurl": "https://wiki.warframe.com/w/File:CeresCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116404"
+  },
+  "planet_jupiter": {
+    "url": "https://wiki.warframe.com/images/JupiterCutout.png?3d5e3",
+    "descriptionurl": "https://wiki.warframe.com/w/File:JupiterCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116408"
+  },
+  "planet_europa": {
+    "url": "https://wiki.warframe.com/images/EuropaCutout.png?cd805",
+    "descriptionurl": "https://wiki.warframe.com/w/File:EuropaCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116407"
+  },
+  "planet_saturn": {
+    "url": "https://wiki.warframe.com/images/SaturnCutout.png?d1347",
+    "descriptionurl": "https://wiki.warframe.com/w/File:SaturnCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116413"
+  },
+  "planet_uranus": {
+    "url": "https://wiki.warframe.com/images/UranusCutout.png?1974a",
+    "descriptionurl": "https://wiki.warframe.com/w/File:UranusCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116415"
+  },
+  "planet_neptune": {
+    "url": "https://wiki.warframe.com/images/NeptuneCutout.png?42de4",
+    "descriptionurl": "https://wiki.warframe.com/w/File:NeptuneCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116411"
+  },
+  "planet_pluto": {
+    "url": "https://wiki.warframe.com/images/PlutoCutout.png?a124c",
+    "descriptionurl": "https://wiki.warframe.com/w/File:PlutoCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116412"
+  },
+  "planet_eris": {
+    "url": "https://wiki.warframe.com/images/ErisCutout.png?b0cea",
+    "descriptionurl": "https://wiki.warframe.com/w/File:ErisCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116406"
+  },
+  "planet_sedna": {
+    "url": "https://wiki.warframe.com/images/SednaCutout.png?277ee",
+    "descriptionurl": "https://wiki.warframe.com/w/File:SednaCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=116414"
+  },
+  "planet_lua": {
+    "url": "https://wiki.warframe.com/images/LuaCutout.png?3912f",
+    "descriptionurl": "https://wiki.warframe.com/w/File:LuaCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1017751"
+  },
+  "planet_void": {
+    "url": "https://wiki.warframe.com/images/VoidCutout.png?01833",
+    "descriptionurl": "https://wiki.warframe.com/w/File:VoidCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1034079"
+  },
+  "planet_zariman": {
+    "url": "https://wiki.warframe.com/images/ZarimanCutout.png?ed73d",
+    "descriptionurl": "https://wiki.warframe.com/w/File:ZarimanCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1563310"
+  },
+  "planet_kuvafortress": {
+    "url": "https://wiki.warframe.com/images/Kuva_FortressCutout.png?93ce0",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Kuva_FortressCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1079533"
+  },
+  "planet_veil": {
+    "url": "https://wiki.warframe.com/images/Veil_ProximaCutout.png?1d5b4",
+    "descriptionurl": "https://wiki.warframe.com/w/File:Veil_ProximaCutout.png",
+    "descriptionshorturl": "https://wiki.warframe.com/index.php?curid=1467631"
+  }
+}

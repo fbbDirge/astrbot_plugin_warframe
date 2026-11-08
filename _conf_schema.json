@@ -1,0 +1,380 @@
+{
+  "default_platform": {
+    "description": "默认平台",
+    "type": "string",
+    "default": "pc",
+    "options": [
+      "pc",
+      "ps4",
+      "xb1",
+      "swi"
+    ]
+  },
+  "bare_commands": {
+    "description": "允许直接发送 裂缝、wm 等指令；关闭后需加 wf 前缀",
+    "type": "bool",
+    "default": true
+  },
+  "timeout": {
+    "description": "接口请求超时（秒）",
+    "type": "int",
+    "default": 20
+  },
+  "cooldown": {
+    "description": "每位用户查询间隔（秒）",
+    "type": "int",
+    "default": 2
+  },
+  "page_size": {
+    "description": "状态查询每页条数（5—20）",
+    "type": "int",
+    "default": 10
+  },
+  "background_image": {
+    "description": "全局背景图片绝对路径（机器人服务器上的 PNG/JPG/WebP；留空用纯色）",
+    "type": "string",
+    "default": ""
+  },
+  "background_color": {
+    "description": "默认背景色 #RRGGBB",
+    "type": "string",
+    "default": "#EAF1F6"
+  },
+  "font_path": {
+    "description": "自定义字体文件绝对路径（留空使用内置思源黑体）",
+    "type": "string",
+    "default": ""
+  },
+  "font_size": {
+    "description": "默认正文字号 18—42",
+    "type": "int",
+    "default": 26
+  },
+  "title_size": {
+    "description": "默认标题字号 24—60",
+    "type": "int",
+    "default": 38
+  },
+  "panel_opacity": {
+    "description": "白色内容面板不透明度 0—255，降低后背景更明显",
+    "type": "int",
+    "default": 235
+  },
+  "title": {
+    "description": "标题字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#163D57"
+  },
+  "text": {
+    "description": "正文字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#334155"
+  },
+  "muted": {
+    "description": "备注字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#64748B"
+  },
+  "wm_user": {
+    "description": "用户名字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#2563EB"
+  },
+  "wm_quantity": {
+    "description": "数量字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#047857"
+  },
+  "wm_price": {
+    "description": "价格字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#BE185D"
+  },
+  "tier_lith": {
+    "description": "古纪字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#A16207"
+  },
+  "tier_meso": {
+    "description": "前纪字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#047857"
+  },
+  "tier_neo": {
+    "description": "中纪字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#2563EB"
+  },
+  "tier_axi": {
+    "description": "后纪字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#7C3AED"
+  },
+  "tier_requiem": {
+    "description": "安魂字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#BE123C"
+  },
+  "tier_omnia": {
+    "description": "全能字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#0E7490"
+  },
+  "fissure_map": {
+    "description": "地图字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#0369A1"
+  },
+  "fissure_type": {
+    "description": "地图类型字体颜色 #RRGGBB",
+    "type": "string",
+    "default": "#C2410C"
+  },
+  "command_prefixes": {
+    "description": "全局允许的指令前缀；空字符串表示无前缀，例如 [\"\", \"/\", \".\"]。个人前缀可覆盖；wf 和 /wf 为固定入口。",
+    "type": "list",
+    "default": [
+      "",
+      "/",
+      "."
+    ]
+  },
+  "riven_vision_provider": {
+    "description": "紫卡截图识别：支持图片的 AstrBot 模型提供商 ID；留空关闭截图识别，文字分析仍可用。",
+    "type": "string",
+    "default": ""
+  },
+  "riven_stat": {
+    "description": "紫卡属性颜色 #RRGGBB",
+    "type": "string",
+    "default": "#7C3AED"
+  },
+  "riven_range": {
+    "description": "紫卡区间颜色 #RRGGBB",
+    "type": "string",
+    "default": "#0369A1"
+  },
+  "riven_negative": {
+    "description": "紫卡负面颜色 #RRGGBB",
+    "type": "string",
+    "default": "#BE185D"
+  },
+  "riven_grade": {
+    "description": "紫卡评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#047857"
+  },
+  "game": {
+    "description": "游戏服务、OCR、订阅与数据源",
+    "type": "object",
+    "items": {
+      "worldsource": {
+        "description": "世界状态数据源：de=DE 官方直连（默认；部分出口也可能被拒绝；不含赤毒/仲裁/钢铁轮换）；warframestat=api.warframestat.us（全端点，但部分网络环境会被 Cloudflare 拦截）",
+        "type": "string",
+        "default": "de",
+        "options": [
+          "de",
+          "warframestat"
+        ]
+      },
+      "de_worldstate_url": {
+        "description": "DE 官方 worldstate 端点（一般无需修改）",
+        "type": "string",
+        "default": "https://api.warframe.com/cdn/worldState.php"
+      },
+      "page_size": {
+        "description": "文本分页每页条数",
+        "type": "int",
+        "default": 12
+      },
+      "push_interval": {
+        "description": "蹲推送轮询间隔（秒，最小 15）",
+        "type": "int",
+        "default": 45
+      },
+      "http_timeout": {
+        "description": "HTTP 请求超时（秒）",
+        "type": "int",
+        "default": 15
+      },
+      "proxy": {
+        "description": "出站 HTTP 代理（如 http://127.0.0.1:7890，留空不启用）",
+        "type": "string",
+        "default": ""
+      },
+      "super_admins": {
+        "description": "超级管理员 sender_id 列表（绕过群管理权限校验）",
+        "type": "list",
+        "default": []
+      },
+      "vision_provider_id": {
+        "description": "兼容截图识别主渠道（迁移前专用渠道留空时沿用），留空自动挑选",
+        "type": "string",
+        "default": "",
+        "_special": "select_provider",
+        "hint": "用于兼容旧配置：紫卡主读或识卡未单独设置渠道时沿用本项。指定后兼容路径只使用该渠道，取不到不回落；留空则自动挑选：先按内置候选（zhipu/glm-4v-flash、siliconflow 的 Qwen3-VL-8B / 30B）取已添加的，再加上渠道 id 含 vl / vision / 4v / 4o 的渠道。需要紫卡与配卡截图分别选模型时，请设置各自的专用渠道。迁移前（兼容模式）留空的专用项仍按本项继承；在后台「识图 → 渠道隔离」预览并主动确认迁移后，紫卡与识卡不再使用本项，旧值保留以便回滚。"
+      },
+      "riven_single_ocr": {
+        "description": "紫卡使用单个 OCR 渠道，按需复读",
+        "type": "bool",
+        "default": false,
+        "hint": "启用后，紫卡首读只向指定的紫卡主读渠道提交原图。业务校验需要时，同渠道再读增强图，仍有疑问时按位置复读。建议选择千问视觉 OCR 等兼容图像对话接口的渠道。本地紫卡 OCR 已启用时优先使用本地。"
+      },
+      "vision_provider_id_riven": {
+        "description": "紫卡主读专用多模态模型 id（留空：迁移前沿用兼容主渠道，迁移确认后停止）",
+        "type": "string",
+        "default": "",
+        "_special": "select_provider",
+        "hint": "建议使用千问（Qwen）小型视觉模型，词条窄读可搭配千问 OCR；模型负责识图，校验与分析由插件完成。只影响紫卡识别，不影响配卡「识卡」。模型需要读清中文小字、卡面首行的官方武器名或模块部件名（含变体前缀；后面的拉丁部分是紫卡词缀，不属于武器名）、词条名称、正负号、小数与百分号，并按现有提示输出可解析的结构；可选通过模型 API 调用的 OCR 类模型或通用多模态模型，按实际输出能力选择，不按参数量设门槛。这里选的是模型渠道，与本地 OCR 引擎无关（本地紫卡 OCR 在后台「识图 → 紫卡识别」单独配置，默认关闭）。主读每次只用一个渠道，不竞速。指定后主读只用该渠道，取不到不回落（主读没有可用渠道；独立配置的窄读仍可执行）；留空：迁移前沿用兼容主渠道；迁移确认后紫卡识别停止，不借用其它渠道。词条窄读可在下一项另选渠道。"
+      },
+      "vision_provider_id_line": {
+        "description": "紫卡词条窄读可选渠道（留空=与紫卡主读相同）",
+        "type": "string",
+        "default": "",
+        "_special": "select_provider",
+        "hint": "按现有提示逐行照抄词条，保留正负号、小数、百分号与词条极性，避免漏行或改字。需能返回可解析的逐行词条文本。留空时沿用紫卡主读渠道（迁移前紫卡主读专用项也为空时再沿用兼容主渠道）。迁移前指定后取不到时回落紫卡主读；迁移确认后指定的窄读取不到不回落。"
+      },
+      "vision_provider_id_line_recheck": {
+        "description": "紫卡分歧复读可选渠道（留空关闭）",
+        "type": "string",
+        "default": "",
+        "_special": "select_provider",
+        "hint": "主读完整但与窄读不一致时，最多增加一次同图同提示词复读。仅完整复读与主读逐项一致且未缩短原观察条数时采用；保留原窄读及冲突证据。不按模型名称自动选择渠道，指定渠道不可用时保留待核对结果。"
+      },
+      "vision_provider_id_scan": {
+        "description": "配卡识别「识卡」专用多模态模型 id（留空：迁移前沿用兼容主渠道，迁移确认后停止）",
+        "type": "string",
+        "default": "",
+        "_special": "select_provider",
+        "hint": "建议使用千问 OCR 读取文字与位置，并搭配千问（Qwen）小型视觉模型读取装备名称。只影响配卡截图的主读、标题与分区补读，不影响紫卡。模型需要读清标题栏武器名（可能是玩家自定义名，按原文读取，不根据 MOD 或紫卡名称推测官方武器）、已装备 MOD 名称和容量数字、面板行名、箭头两边数值及单位，并按现有短字段和分区提示返回可解析内容。配卡识卡不提供本地 OCR。指定后只用该渠道，取不到不回落（本次识卡失败）；留空：迁移前沿用兼容主渠道的结果（兼容主渠道也是自动挑选时，主读最多同时请求前 4 个渠道、先通过校验的为准，标题补读最多依次尝试前 2 个，面板、MOD 与赋能的分区补读只用第 1 个）；迁移确认后留空即停止识卡。 装备名称读取可通过“配卡装备文字渠道”另选模型；本项继续负责主读文字位置、标题及其它补读。"
+      },
+      "vision_provider_id_scan_equipment": {
+        "description": "配卡装备文字可选渠道（留空=沿用配卡主读）",
+        "type": "string",
+        "default": "",
+        "_special": "select_provider",
+        "hint": "建议使用千问（Qwen）小型视觉模型，与配卡主读的 OCR 渠道配合。只负责配卡装备区的名称、容量数字和面板文字，使用统一装备读取提示词；文字定位由配卡主读负责，MOD和赋能等级由代码读取像素并核对容量关系。可将配卡主读选为专用OCR，本项选为小型视觉模型。留空沿用配卡主读的首个渠道；显式渠道不可用或配置格式异常时不回落其它渠道，也不改变紫卡两路。"
+      },
+      "allow_private_urls": {
+        "description": "允许自填地址指向内网 / 本机（默认关）",
+        "type": "bool",
+        "default": false,
+        "hint": "「社区数据地址」与面板「从 URL 导入字体」默认只接受公网地址（会做 DNS 解析检查，字体下载的每一跳重定向都检查；自填社区地址不跟随重定向）。只有在你确实把社区快照 / 字体放在内网镜像上时才开启。"
+      },
+      "scan_debug_save": {
+        "description": "识卡对齐失败时留存截图（排查用，默认关）",
+        "type": "bool",
+        "default": false,
+        "hint": "开启后，识卡遇到「豆子检测到了但对齐无解」时，把这张截图存到插件数据目录的 scan_debug/（只保留最近 3 张），便于开发者排查。截图可能含玩家昵称或聊天背景，不排查时请保持关闭；需要清理时直接删除该目录下的 jpg。"
+      },
+      "community_data_url": {
+        "description": "社区数据地址（留空 = 本项目公开仓 bot-data）",
+        "type": "string",
+        "default": "",
+        "hint": "Wiki 直连或浏览器代理不可用时，从社区快照获取较新的元素加成、言录使货单、仲裁评级和奸商到访历史。默认依次尝试 GitHub raw、GitHub API 与 CDN，过期副本会继续换源。可填写自建地址，目录下放同名 JSON，格式与公开仓 bot-data 分支一致；填写后只使用自建地址，不回落本项目。"
+      },
+      "wfhelper_valence": {
+        "description": "元素加成备用来源：WFHelper（第三方，可选）",
+        "type": "bool",
+        "default": false,
+        "hint": "打开后，信条 / 终幕元素加成在抓不到 wiki 源页时，先试第三方站点 WFHelper 的公开接口，再用社区快照。WFHelper 的数据同样来自 wiki 玩家上报，不会更快；适合没装 FlareSolverr、又想多一条通道的用户。它是第三方站点，可用性由对方负责。保存即生效。"
+      },
+      "wiki_intro": {
+        "description": "wiki 简介卡片（战甲 / 武器 / MOD / 资源 / 同伴）",
+        "type": "bool",
+        "default": true,
+        "hint": "开启后 wiki 查询附一张简短介绍卡（定位 / 段位 / 基础属性 / 获取），链接仍以可点击文本另发。简介数据（core/data/wiki_intro.json）由本机知识库构建产出、不进开源与市场包——文件不在时自动只给链接。"
+      },
+      "scan_detail_mode": {
+        "description": "识卡伤害详情什么时候算",
+        "type": "string",
+        "default": "auto",
+        "options": [
+          "auto",
+          "lazy",
+          "eager"
+        ],
+        "hint": "auto＝当前平台能使用按钮时先出识别结果，再按需查看详情；无按钮时照旧两页。lazy＝总是按需查看，无按钮时提供手动指令。eager＝总是直接出两页。延迟省的是详情页再次计算、第二张图渲染和上传，第一页参考伤害及视觉识别照常计算。"
+      },
+      "scan_cooldown": {
+        "description": "识图冷却秒数（同一人两次识图的最小间隔，配卡「识卡」与紫卡截图共用此设置；迁移确认后两类分别计时，0=不限制）",
+        "type": "int",
+        "default": 15,
+        "hint": "识卡每次都会调用你配置的多模态模型（通常按量计费）。冷却用于防止被群友连点刷爆额度与 CPU；设 0 关闭限制。"
+      },
+      "scan_max_concurrent": {
+        "description": "识图全局并发上限（配卡「识卡」与紫卡截图合计同时最多识别几张，0=不限）",
+        "type": "int",
+        "default": 3,
+        "hint": "识卡是「多次视觉调用 + 图片渲染」的重活，多群同时开会把 CPU 打满（实测 2 核上并发几路时单张渲染从 0.7s 涨到 39s）。小机器建议 2~3。"
+      },
+      "panel_platforms": {
+        "description": "控制台：显示哪些聊天平台的设置",
+        "type": "list",
+        "default": [],
+        "hint": "留空 = 按 AstrBot 里已启用的聊天平台自动判断；只影响本插件控制台设置页显示哪些平台相关的设置，不影响机器人本身。可在控制台设置页顶部切换自动 / 手动。"
+      },
+      "vision_routes_isolated": {
+        "description": "截图任务使用指定的独立视觉渠道（移植版默认开启）",
+        "type": "bool",
+        "default": true,
+        "hint": "默认启用独立视觉路由；仅使用明确配置的识卡/紫卡提供商。"
+      }
+    }
+  },
+  "item_name": {
+    "description": "物品名称颜色",
+    "type": "string",
+    "default": "#0369A1"
+  },
+  "rarity": {
+    "description": "稀有度颜色",
+    "type": "string",
+    "default": "#A16207"
+  },
+  "drop_chance": {
+    "description": "掉落概率颜色",
+    "type": "string",
+    "default": "#047857"
+  },
+  "damage": {
+    "description": "伤害数值颜色",
+    "type": "string",
+    "default": "#C2410C"
+  },
+  "faction": {
+    "description": "敌人派系颜色",
+    "type": "string",
+    "default": "#64748B"
+  },
+  "arb_s": {
+    "description": "仲裁 S 评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#B45309"
+  },
+  "arb_a_plus": {
+    "description": "仲裁 A+ 评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#7C3AED"
+  },
+  "arb_a": {
+    "description": "仲裁 A 评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#047857"
+  },
+  "arb_a_minus": {
+    "description": "仲裁 A- 评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#2563EB"
+  },
+  "arb_f": {
+    "description": "仲裁 F 评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#BE123C"
+  },
+  "arb_unrated": {
+    "description": "仲裁 未评级 评级颜色 #RRGGBB",
+    "type": "string",
+    "default": "#64748B"
+  }
+}

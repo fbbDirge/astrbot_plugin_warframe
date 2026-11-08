@@ -1,0 +1,1 @@
+"""AstrBot Warframe plugin."""

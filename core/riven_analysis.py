@@ -1,0 +1,1513 @@
+# -*- coding: utf-8 -*-
+"""紫卡属性数值分析（「紫卡分析」指令的计算层）。
+
+DE 的紫卡属性数值不是随机的随便一个数，而是有确定区间（wiki「Riven Mods」页
+Attribute Value Formula / Base Values 两节）：
+
+    数值 = 属性基值 × 武器倾向 D × 词条数系数 × 随机系数 U
+
+    （2026-10 起 DE 取消倾向，D 对所有武器统一为 UNIFIED_DISPOSITION = 1.2。）
+
+    * U ∈ [0.9, 1.1] —— 同一把武器同词条的 rolled 区间就是基值×D×系数 的 ±10%；
+    * 词条数系数（正词条 / 负词条 magnitude）：
+        2正0负  +0.99
+        3正0负  +0.75
+        2正1负  +1.2375 / 负 0.495
+        3正1负  +0.9375 / 负 0.75
+
+基值表按武器类别（Rifle/Shotgun/Pistol/Archgun/Melee）各一列。数据为静态
+游戏机制（DE 上次改动这些基值是很久以前），不存在过期问题。
+"""
+
+from __future__ import annotations
+
+import math
+from decimal import Decimal
+import re
+from typing import Optional
+
+from .logging_compat import logger
+
+# ★ 2026-10 DE 取消紫卡倾向（Dev Workshop「Ammo Efficiency Changes & Riven Disposition
+#   Retirement」，forums topic 1529475）：所有紫卡共用同一组数值区间，等同倾向 1.2（4 点），
+#   已有紫卡词条不变、数值按 1.2/原倾向缩放。插件里所有「按武器取倾向」的地方统一取这个值；
+#   变体反推、wiki 倾向表定时重抓随之退役。
+UNIFIED_DISPOSITION = 1.2
+
+# 武器类别（WM riven weapons 的 group/rivenType 归一化）→ 基值表列名
+_CLASS_KEYS = {
+    "rifle": "rifle",
+    "shotgun": "shotgun",
+    "pistol": "pistol",
+    "archgun": "archgun",
+    "melee": "melee",
+    "zaw": "melee",
+    "kitgun": "pistol",
+    # ★ 2026-10-19：WM 的 group 对**副手**写 `secondary`（不是 `pistol`）。缺这一项时
+    #   「先看 group」那层对副手**静默失效**，会落到 rivenType —— 而 WM 把那些
+    #   「霰弹式副手」（食人鱼 Pyrana / 德特昂 / 野马 / 布拉克 / 科马克…，共 15 把）
+    #   的 rivenType 标成 `shotgun`，于是整类被按**霰弹枪基值列**算。
+    #   实卡反证：食人鱼 3+1（暴击 +124.4 / 多重 +103.9 / 射速 +71.7 / 装填 −32.1，
+    #   倾向 0.95）四条**只有按手枪列才全部落带**，按霰弹列暴击与射速出界 ⇒ 误判
+    #   「疑似变体卡」。口径与 wfsim 一致：它按武器能吃哪些 MOD 定类（这些武器
+    #   `mod_pools: [pistol]`；`class: shotgun_sidearm` 只是**伤害模拟**用的武器类，
+    #   与紫卡基值列是两回事）。
+    "secondary": "pistol",
+}
+
+# 词条数系数表：{(正词条数, 负词条数): (正系数, 负系数 magnitude)}
+FACTOR = {
+    (2, 0): (0.99, None),
+    (3, 0): (0.75, None),
+    (2, 1): (1.2375, 0.495),
+    (3, 1): (0.9375, 0.75),
+}
+
+# 属性基值表（wiki Base Values 表的静态转录）。
+# 键 = 插件标准词条 id（与 parser.RIVEN_STAT_ZH 同一套）；
+# 值 = (rifle, shotgun, pistol, archgun, melee)，None = 该类别无此词条。
+# 单位：除 punch_through/range（米）、combo_duration（秒）、initial_combo（整数）外
+# 都是百分比，但数值本身用 wiki 表的原值（如 90 表示 +90%）。
+_BASE: dict[str, tuple] = {
+    "melee_damage": (165, 164.7, 219.6, 99.9, 164.7),
+    "crit_chance": (149.99, 90, 149.99, 99.9, 180),
+    "crit_damage": (120, 90, 90, 80.1, 90),
+    "multishot": (90, 119.7, 119.7, 60.3, None),
+    "fire_rate": (60.03, 90, 74.7, 60.03, 54.9),  # 近战即攻速
+    "attack_speed": (60.03, 90, 74.7, 60.03, 54.9),
+    "status_chance": (90, 90, 90, 60.3, 90),
+    "status_duration": (99.99, 99.99, 99.99, 99.99, 99.99),
+    "range": (None, None, None, None, 1.94),
+    "initial_combo": (None, None, None, None, 24.5),
+    "combo_duration": (None, None, None, None, 8.1),
+    "heavy_attack_efficiency": (None, None, None, None, 73.44),
+    # ★ 2026-10-02 补录（用户提供官方 wiki「Riven Mods」基值表整页存档核对）：
+    #   同一 combo 家族的两侧 —— 表后 Legend 注明「¹ 仅正向（永不作为负面）」
+    #   「³ 仅负向（永不作为正面）」，两行近战基值即下列两项：
+    #     Additional Combo Count Chance¹ | Laci/Nus | 近战 58.77%
+    #     Chance to Gain Combo Count³   | –/–     | 近战 104.85%
+    #   反算自洽（报障卡 海波单剑 3+1：近战伤害 231.2/暴伤 128.8/滑暴 130.2
+    #   反推 D≈1.39~1.43，58.77×1.41×0.9375×0.915=71.1 ✓ 命中卡面 +71.1%）。
+    "extra_combo_count": (None, None, None, None, 58.77),
+    "combo_gain_chance": (None, None, None, None, 104.85),
+    "finisher_damage": (None, None, None, None, 119.7),
+    "slide_crit": (None, None, None, None, 120),
+    "slash_damage": (119.97, 119.97, 119.97, 90, 119.7),
+    "impact_damage": (119.97, 119.97, 119.97, 90, 119.7),
+    "puncture_damage": (119.97, 119.97, 119.97, 90, 119.7),
+    "heat_damage": (90, 90, 90, 119.7, 90),
+    "cold_damage": (90, 90, 90, 119.7, 90),
+    "toxin_damage": (90, 90, 90, 119.7, 90),
+    "electric_damage": (90, 90, 90, 119.7, 90),
+    # wiki Base Values：对派系伤害 = 45（百分比）。曾误记为 0.45（少 100 倍），
+    # 导致带该词条的卡永远「不吻合」（2026-09-17 用户截图 冰凇 x0.55 案例）
+    "damage_vs_grineer": (45, 45, 45, 45, 45),
+    "damage_vs_corpus": (45, 45, 45, 45, 45),
+    "damage_vs_infested": (45, 45, 45, 45, 45),
+    "magazine_capacity": (50, 50, 50, 60.3, None),
+    "ammo_max": (49.95, 90, 90, 99.9, None),
+    "projectile_speed": (90, 90, 90, None, None),
+    "punch_through": (2.7, 2.7, 2.7, 2.7, None),
+    "reload_speed": (50, 50, 50, 99.9, None),
+    # 后坐力：幅度 90%（官方 EN 表写 90%、中文表带方向写 -90%）—— 效果方向
+    # 由 INVERTED_STATS 表达：卡面「+」= 增加后坐力 = 负面，区间按负档系数算。
+    "recoil": (90, 90, 90, 90, None),
+    # ★ 2026-10-07：霰弹枪格 None → **41.994**。依据：wiki `Riven_Mods` 页基值表原文
+    #   `| [[Zoom]] | Hera || Lis || 59.99% || 41.994% || 80.1% || 59.99% || –`
+    #   （列序 = rifle|shotgun|pistol|archgun|melee）；且 Update 44 Hotfix 44.0.3
+    #   （wiki 归属 **44.0.2**，原注释误记 44.0.3）补丁说明：**「Shotgun Rivens can now roll Zoom stats」**
+    #   （为 Riven Splicer 铺路，见 wiki 同页）⇒ 此前霰弹枪无 Zoom 词条，故为 None。
+    #   ⚠ 同一批证据还显示：上游导出镜像（senpai @ 2026-09-29）的霰弹枪家族
+    #   `LotusShotgunRandomModRare` **尚未**出现 `WeaponZoomFovMod` 条目 ⇒ 镜像落后
+    #   于 44.0.3，等刷新后再复核（含它是否带 NotSentinel 限制）。
+    "zoom": (59.99, 41.994, 80.1, 59.99, None),
+    # ★ 2026-10-07 Riven Splicer 的 18 个新词条基值（官方 Public Export
+    #   `ExportUpgrades_en.json` upgradeValues ×9000；与 wiki「Spliced Values」表 8 处吻合）。
+    #   弹药效率官方存 -0.005 ⇒ 取绝对值 45（方向由卡面极性表达）【待验证：实卡定档】。
+    #   格挡角度：★ 2026-10-25 定案 **81**（原 8.1 跟的是 wfsim 引用的旧版 wiki）。四源一致：
+    #   ① 英文 wiki「Spliced Values」表 Melee 列 81%，并注明「按基础值的百分比加成，
+    #   尽管文字与 Focused Defense 相同」；② 游戏数据包 rawValue 0.009、STACKING_MULTIPLY、
+    #   displayAsPercent=1（riven-roll 与 warframe-weapon-loadout-build 两份独立抽取）；
+    #   ③ Astra 评估取到的 wiki 搜索索引 81%。卡面文字模板是 ParryAngleNoPercentModDesc
+    #   「|val| 招架角度」—— 数值按百分比放大、但**不印 %** ⇒ 显示不带 %（见 _PCT_IDS）。
+    "gas_damage": (90, 90, 90, 90, 90),
+    "corrosive_damage": (90, 90, 90, 90, 90),
+    "viral_damage": (90, 90, 90, 90, 90),
+    "radiation_damage": (90, 90, 90, 90, 90),
+    "blast_damage": (90, 90, 90, 90, 90),
+    "magnetic_damage": (90, 90, 90, 90, 90),
+    "damage_vs_orokin": (45, 45, 45, 45, 45),
+    "damage_vs_scaldra": (45, 45, 45, 45, 45),
+    "damage_vs_techrot": (45, 45, 45, 45, 45),
+    "weakpoint_damage": (225, 225, 225, 225, None),
+    "weakpoint_crit_chance": (247.5, 247.5, 247.5, 247.5, None),
+    "status_damage": (90, 90, 90, 90, 90),
+    "ammo_efficiency": (45, 45, 45, 45, None),
+    "reload_holstered": (90, 90, 90, None, None),
+    "melee_heavy_attack_damage": (None, None, None, None, 119.7),
+    "melee_heavy_attack_charge": (None, None, None, None, 119.7),
+    "melee_parry_angle": (None, None, None, None, 81),
+    "melee_slam_damage": (None, None, None, None, 119.7),
+}
+
+# Riven Splicer 融合配方（2026-10-24 维护者定：提供「紫卡融合 / 紫卡拼接」视图）：
+# (原词条一, 原词条二, 融合词条, 适用武器类)。来源：英文 wiki「Riven Mods」页
+# 「Riven Splicer Splicing Recipes」表（wikitext 原表逐行转录，22 条配方 / 18 个融合词条；
+# 弹效 / 收枪装填 / 弱点暴击 / 弱点伤害 各有两条配方）。「基伤」= 枪械 Damage 与近战 Melee
+# Damage 同一个词条 id（melee_damage），wiki 状态伤害那行写的正是「Damage / Melee Damage」。
+_GUNS = ("rifle", "shotgun", "pistol", "archgun")
+_ALL = _GUNS + ("melee",)
+SPLICE_RECIPES: tuple = (
+    ("toxin_damage", "heat_damage", "gas_damage", _ALL),
+    ("toxin_damage", "electric_damage", "corrosive_damage", _ALL),
+    ("toxin_damage", "cold_damage", "viral_damage", _ALL),
+    ("heat_damage", "electric_damage", "radiation_damage", _ALL),
+    ("heat_damage", "cold_damage", "blast_damage", _ALL),
+    ("electric_damage", "cold_damage", "magnetic_damage", _ALL),
+    ("damage_vs_grineer", "damage_vs_corpus", "damage_vs_orokin", _ALL),
+    ("damage_vs_infested", "damage_vs_grineer", "damage_vs_scaldra", _ALL),
+    ("damage_vs_corpus", "damage_vs_infested", "damage_vs_techrot", _ALL),
+    ("melee_damage", "status_chance", "status_damage", _ALL),
+    ("magazine_capacity", "reload_speed", "ammo_efficiency", _GUNS),
+    ("recoil", "ammo_max", "ammo_efficiency", _GUNS),
+    ("ammo_max", "reload_speed", "reload_holstered", ("rifle", "shotgun", "pistol")),
+    ("ammo_max", "magazine_capacity", "reload_holstered", ("rifle", "shotgun", "pistol")),
+    ("crit_chance", "zoom", "weakpoint_crit_chance", _GUNS),
+    ("crit_chance", "multishot", "weakpoint_crit_chance", _GUNS),
+    ("melee_damage", "zoom", "weakpoint_damage", _GUNS),
+    ("melee_damage", "multishot", "weakpoint_damage", _GUNS),
+    ("heavy_attack_efficiency", "extra_combo_count", "melee_heavy_attack_damage", ("melee",)),
+    ("heavy_attack_efficiency", "combo_duration", "melee_heavy_attack_charge", ("melee",)),
+    ("attack_speed", "range", "melee_parry_angle", ("melee",)),
+    ("melee_damage", "attack_speed", "melee_slam_damage", ("melee",)),
+)
+
+
+def splice_recipes(cls: Optional[str] = None, stat: Optional[str] = None) -> list:
+    """按武器类（rifle/shotgun/pistol/archgun/melee）与词条过滤融合配方；词条匹配原词条或融合词条。"""
+    return [
+        r
+        for r in SPLICE_RECIPES
+        if (cls is None or cls in r[3]) and (stat is None or stat in r[:3])
+    ]
+
+
+# 百分比词条（显示时补 %）；其余按原单位（米/秒/纯值）
+_PCT_IDS = set(_BASE) - {
+    "punch_through",
+    "range",
+    "combo_duration",
+    "initial_combo",
+    "melee_parry_angle",  # 卡面「+91.1 招架角度」不带 %（模板 ParryAngleNoPercentModDesc）
+}
+
+# 不在基值表（wiki 尚未给基值）、但单位同样按百分比显示的词条：
+# 不补进这个集合的话，「无官方基值」那行会漏掉 %，读起来像绝对值。
+# ★ 2026-10-02：原成员 extra_combo_count / combo_gain_chance 已补录基值
+#   （见 _BASE），本集合现为空 —— 机制保留，供将来 wiki 未收录的新词条使用。
+_PCT_UNIT_ONLY: set = set()
+
+
+_CLASS_IDX = {"rifle": 0, "shotgun": 1, "pistol": 2, "archgun": 3, "melee": 4}
+
+
+def weapon_class(riven_type: str = "", group: str = "") -> Optional[str]:
+    """WM 紫卡武器的 rivenType/group → 基值表列名。
+
+    守护(Robotic)武器按 wiki 规则各自沿用关联类别（Sweeper=霰弹枪 等），
+    无法一概而论，这里回落步枪并在卡面注明近似。
+
+    ★ 2026-09-24：**先看 group 再看 rivenType**——WM 的 rivenType 只记
+    「MOD 适用类别」，曲翼枪械（翠雀 Larkspur / 凯旋将军 Imperator 等）
+    在 WM 数据里 rivenType 也是 ``rifle``，先看 rivenType 会拿步枪基值
+    算曲翼枪械（暴伤基值 120 vs 80.1，差 50%）。
+
+    ★ 2026-10-19：同一条思路补上 **``secondary`` → 手枪列**（见 `_CLASS_KEYS` 处
+    的长注释）。副手在 WM 里 group 写 `secondary`，此前没有映射 ⇒ group 这层对
+    副手不生效，落到被标错的 rivenType。**与 `rifle` 回落一样，这条也适用于
+    「group 为空」的条目**——那种情况仍只能靠 rivenType 或回落。
+    """
+    for key in (group, riven_type):
+        k = (key or "").lower()
+        for name, col in _CLASS_KEYS.items():
+            if name in k:
+                return col
+    # ★ 2026-10-22：**不再静默回落**。推不出类别时仍按步枪列算（保持卡面可用），
+    #   但记一条 INFO 日志留痕，并由调用方在卡面注明「按步枪基值估算」
+    #   （判据见 class_estimated()）—— 此前是彻底静默的，13 把变体/形态条目
+    #   就这么被按步枪列算了很久（详见 2026-10-19 的回执）。
+    logger.info(
+        "[sdjk] 紫卡基值列推不出类别（group=%r riven_type=%r）⇒ 按步枪列估算", group, riven_type
+    )
+    return "rifle"
+
+
+def class_estimated(riven_type: str = "", group: str = "") -> bool:
+    """类别是否**推不出来**（`weapon_class` 回落成了步枪列）。
+
+    调用方据此在卡面注明「⚠ 武器类别未知，按步枪基值估算」。**不猜**：只要
+    group / riven_type 里任何一个能命中 `_CLASS_KEYS` 就算推得出。
+
+    ★ 与 `weapon_class` 同源判据（同一张表、同一段匹配），改一处必须改两处 ——
+      故写成独立函数而不是让调用方自己再判一次。
+    """
+    for key in (group, riven_type):
+        k = (key or "").lower()
+        for name in _CLASS_KEYS:
+            if name in k:
+                return False
+    return True
+
+
+# ★ 2026-10-03 晚（用户同卡双态截图实证，推翻本日早间结论）：组合枪紫卡的
+#   基值列**不分模式一律手枪列** —— 墓指（主要）实卡（伤害 194.7/多重 103.5/
+#   弹匣 50.2）按手枪列×倾向 1.0 反推 U=0.95/0.92/1.07 全部落带，按步枪列
+#   反推 U=1.26/1.23 出带（不可能）。kitgun 在 DE 物品系统里 productCategory
+#   就是 Pistols；「主要形态用霰弹枪 MOD」说的是普通 MOD 槽，不约束紫卡基值。
+#   主/次形态只差**倾向值**（omega/primeOmega，按模式拆分行取）。早间按
+#   「霰弹/步枪列」部署的逐腔体映射由此回退（8721dfc 的回归部分）。
+_MODE_SUFFIX_RE = re.compile(r"[（(](主要|次要|大气|primary|secondary|atmosphere)[)）]\s*$", re.I)
+_MODE_ALIASES = {"主要": "primary", "次要": "secondary", "大气": "atmosphere"}
+
+
+def kitgun_mode_class(name: str, base_cls: str, base_riven_type: str) -> str:
+    """kitgun 腔体的紫卡基值列：**不分模式一律手枪列**（见上，实卡实证）。
+
+    函数保留签名是因为调用方（riven.py 家族候选三元组）按候选传参；
+    非 kitgun 原样返回母行类别。
+    """
+    if (base_riven_type or "").lower() != "kitgun":
+        return base_cls
+    return "pistol"
+
+
+def count_candidates(n_pos: int, n_neg: int, hidden: int = 0) -> list:
+    """已知 n_pos 正 / n_neg 负 + ``hidden`` 条未揭示（卡面「？？？」）⇒ 可能的 (正, 负) 词条数组合。
+
+    2026-10-24 维护者定：融合时还没选定的词条卡面只显示「？？？」，正负未知；按总行数
+    判断是 3+1 还是 2+x —— 4 行必是 3+1，3 行且已有负词条必是 2+1，3 行无负词条则
+    3+0 / 2+1 两可（交给调用方用数值可行性挑）。返回顺序：未揭示的先当正词条。
+    """
+    out = []
+    # 问号行多于 1 行时也可能是**一条**长词条的占位折成了两行（同一词条占两行，
+    # 2026-10-24 用户）⇒ 再按少算几条列候选，由调用方用数值可行性挑
+    for h in range(hidden, 0, -1) if hidden else (0,):
+        for h_neg in range(min(h, 1) + 1):
+            c = (n_pos + h - h_neg, n_neg + h_neg)
+            if c in FACTOR and c not in out:
+                out.append(c)
+    return out
+
+
+def factor_for(n_pos: int, n_neg: int) -> tuple[float, Optional[float]]:
+    """词条数系数：(正词条数, 负词条数) → (正系数, 负系数 magnitude)。"""
+    return FACTOR.get((n_pos, n_neg), (0.9375, 0.75))
+
+
+# 武器机制数据；与 OCR 名称修正和提示词无关。仅终幕·噬轮的物理三项 ×6。
+# 来源：社区 Wiki Coda Motovore / Notes；适用范围见下方机制定义。
+# https://wiki.warframe.com/w/Coda_Motovore
+_WEAPON_STAT_MULTIPLIERS = {
+    "codamotovore": {"impact_damage": 6.0, "puncture_damage": 6.0, "slash_damage": 6.0},
+}
+
+
+def weapon_stat_multipliers(weapon) -> dict:
+    """从已解析武器的英文名/slug 查机制；未知武器、母系列及其它变体不继承。"""
+    names = (
+        [weapon.get(k) or "" for k in ("en", "url_name")] if isinstance(weapon, dict) else [weapon]
+    )
+    for name in names:
+        key = re.sub(r"[\s_-]", "", str(name or "")).casefold()
+        if key in _WEAPON_STAT_MULTIPLIERS:
+            return dict(_WEAPON_STAT_MULTIPLIERS[key])
+    return {}
+
+
+def _stat_multiplier(stat_id: str, stat_multipliers=None) -> float:
+    return (stat_multipliers or {}).get(stat_id, 1.0)
+
+
+def stat_range(
+    stat_id: str,
+    cls: str,
+    disposition: float,
+    n_pos: int,
+    n_neg: int,
+    *,
+    negative: bool = False,
+    stat_multipliers=None,
+) -> tuple:
+    """单词条的取值区间 (min, max)。
+
+    Args:
+        stat_id: 插件标准词条 id。
+        cls: 武器基值列名（weapon_class 的产物）。
+        disposition: 武器倾向数值（如 1.25）。
+        n_pos / n_neg: 正/负词条数量（决定系数）。
+        negative: 该词条是否为负词条。
+
+    Returns:
+        (min, max)；负词条返回的是 magnitude 的区间（显示时再补负号）。
+        基值缺失返回 (None, None)。
+    """
+    base = _BASE.get(stat_id)
+    if not base:
+        return (None, None)
+    idx = {"rifle": 0, "shotgun": 1, "pistol": 2, "archgun": 3, "melee": 4}[cls]
+    b = base[idx]
+    if b is None:
+        return (None, None)
+    pos_f, neg_f = factor_for(n_pos, n_neg)
+    f = neg_f if negative else pos_f
+    mid = b * disposition * f * _stat_multiplier(stat_id, stat_multipliers)
+    return (round(mid * 0.9, 2), round(mid * 1.1, 2))
+
+
+def deviation_pct(value: float, lo: float, hi: float) -> float:
+    """数值偏离区间中值的百分比（正=高卷，负=低卷）。"""
+    if not lo or not hi:
+        return 0.0
+    mid = (lo + hi) / 2
+    return round((value - mid) / mid * 100, 1)
+
+
+def range_position(value: float, lo: float, hi: float) -> int:
+    """数值在区间里的位置百分位（0=贴下限，100=贴上限）。"""
+    if not lo or not hi or hi <= lo:
+        return 50
+    return max(0, min(100, round((value - lo) / (hi - lo) * 100)))
+
+
+def fmt_value(stat_id: str, v: float) -> str:
+    """按词条单位显示数值（符号由调用方处理）。"""
+    if stat_id in ("punch_through", "range"):
+        return f"{v:g}m"
+    if stat_id == "combo_duration":
+        return f"{v:g}s"
+    if stat_id in _PCT_IDS or stat_id in _PCT_UNIT_ONLY:
+        return f"{v:g}%"
+    return f"{v:g}"
+
+
+# ---------------------------------------------------------------------------
+# 数值反推倾向（变体自动判定）
+#
+# 公式可以反着用：v = 基值 × D × 词条系数 × U（U ∈ [0.9, 1.1]）
+#   =>  D ∈ [v/(基值·系数·1.1), v/(基值·系数·0.9)]
+# 每个词条都给出一个 D 区间，取交集即这张卡唯一可能吃的倾向。游戏内紫卡
+# 卡面**只写母武器名**（变体信息根本不在截图里），但数值一定落在某个倾向
+# 的 ±10% 区间内 —— 于是「是不是变体」可以从数值判定出来，无需手输。
+# ---------------------------------------------------------------------------
+
+# 卡面显示精度：词条普遍 1 位小数（±0.05 的不确定度），
+# initial_combo 显示整数（±0.5）。反解时把这点舍入余量算进去，
+# 否则「+1.6m」这种本身就有约 3% 不确定度的数值会把结论卡死。
+_DISPLAY_TOL = 0.05
+
+
+def _base_value(stat_id: str, cls: str) -> Optional[float]:
+    """属性基值（按类别列）；该类别无此词条时返回 None。"""
+    base = _BASE.get(stat_id)
+    idx = _CLASS_IDX.get(cls)
+    if not base or idx is None:
+        return None
+    return base[idx]
+
+
+def display_tol(stat_id: str, value: float) -> float:
+    """卡面显示舍入带来的取值不确定度（± 半个末位）。
+
+    Args:
+        stat_id: 插件标准词条 id。
+        value: 卡面显示值（magnitude）。
+
+    Returns:
+        该数值的不确定度绝对值（1 位小数 → 0.05；initial_combo、派系乘数 → 0.5）。
+    """
+    if stat_id == "initial_combo":
+        return 0.5
+    # ★ 2026-10-25（对照游戏数据包 RoundTo：派系词条显示为乘数、精确到 0.01）：卡面 x1.56 换算成
+    #   百分数 56 时，真实值可在 55.5~56.5 之间 ⇒ 不确定度 0.5（原按 0.05 算，区间边缘的派系卡
+    #   会被误判「不吻合」：3正1负 上限 55.69% 显示 x1.56）。
+    if stat_id.startswith("damage_vs_"):
+        return 0.5
+    return _DISPLAY_TOL
+
+
+def splice_preview(
+    stats_pos,
+    stats_neg,
+    cls,
+    disposition=UNIFIED_DISPOSITION,
+    *,
+    counts=None,
+    hidden=0,
+    incomplete=False,
+    pool=None,
+    allowed_missing=None,
+    blocked_reason="",
+    stat_multipliers=None,
+) -> dict:
+    """预览融合；数值均为内部 magnitude，不把派系百分数转成乘数。
+
+    社区 Wiki Riven Splicer 算法：仅对被消耗的两条按实际正负槽反推 U，
+    取较高 U 生成正面结果。DE 44.1 只证实布局保持，并非此算法的精度背书。
+    卡面舍入使 U 只能估计；区间传播保留 display_tol 的不确定性。
+    ``pool`` 接受 class_pool 的快照；缺少快照时拒绝预测，避免维护第二套许可表。
+    ``allowed_missing`` 为 {stat_id: iterable["positive" | "negative"]}，
+    与 pool 许可及原卡可替换槽取交集。函数不读取文件、不改写输入。
+    """
+    result = {
+        "schema_version": 1,
+        "status": "invalid",
+        "reasons": [],
+        "cls": cls if isinstance(cls, str) else None,
+        "disposition": None,
+        "counts": [],
+        "existing_spliced": [],
+        "direct": [],
+        "missing_one": [],
+        "assumptions": [
+            "preserve_polarity_layout",
+            "retain_existing_inputs",
+            "community_wiki_formula",
+            "display_rounding_uncertainty",
+        ],
+    }
+
+    def stop(status, *reasons):
+        result["status"] = status
+        result["reasons"] = list(reasons)
+        result["direct"] = []
+        result["missing_one"] = []
+        return result
+
+    def normalize(sid):
+        return "attack_speed" if cls == "melee" and sid == "fire_rate" else sid
+
+    try:
+        entries = [
+            (normalize(sid), value, negative)
+            for rows, negative in ((stats_pos or [], False), (stats_neg or [], True))
+            for sid, value in rows
+        ]
+    except (TypeError, ValueError):
+        return stop("invalid", "invalid_stats")
+    actual_counts = (sum(not neg for _, _, neg in entries), sum(neg for _, _, neg in entries))
+    try:
+        metadata_counts = tuple(actual_counts if counts is None else counts)
+        if len(metadata_counts) == 2 and all(type(n) is int for n in metadata_counts):
+            result["counts"] = list(metadata_counts)
+    except TypeError:
+        pass
+    try:
+        metadata_disp = float(disposition)
+        if math.isfinite(metadata_disp):
+            result["disposition"] = metadata_disp
+    except (TypeError, ValueError, OverflowError):
+        pass
+    outputs = {recipe[2] for recipe in SPLICE_RECIPES}
+    result["existing_spliced"] = list(
+        dict.fromkeys(sid for sid, _, _ in entries if isinstance(sid, str) and sid in outputs)
+    )
+    if result["existing_spliced"]:
+        return stop("already_spliced", "existing_spliced")
+    if hidden or incomplete or blocked_reason:
+        reasons = []
+        if hidden:
+            reasons.append("hidden_stats")
+        if incomplete:
+            reasons.append("incomplete_stats")
+        if blocked_reason:
+            reasons.append(str(blocked_reason))
+        return stop("incomplete", *reasons)
+    if not isinstance(cls, str) or cls not in _CLASS_IDX:
+        return stop("unsupported", "unsupported_class")
+    if pool is None:
+        return stop("unsupported", "pool_unavailable")
+    try:
+        layout = tuple(actual_counts if counts is None else counts)
+        if len(layout) != 2 or any(type(n) is not int for n in layout) or layout not in FACTOR:
+            return stop("invalid", "invalid_counts")
+    except TypeError:
+        return stop("invalid", "invalid_counts")
+    result["counts"] = list(layout)
+    if layout != actual_counts:
+        return stop("invalid", "counts_mismatch")
+    try:
+        disp = float(disposition)
+    except (TypeError, ValueError, OverflowError):
+        return stop("invalid", "invalid_disposition")
+    if not math.isfinite(disp) or disp <= 0:
+        return stop("invalid", "invalid_disposition")
+    result["disposition"] = disp
+    pos_factor, neg_factor = FACTOR[layout]
+
+    def permitted(sid, negative):
+        if _base_value(sid, cls) is None:
+            return False
+        limit = pool.get(sid)
+        return bool(limit and limit.get("malus" if negative else "bonus") is True)
+
+    present = {}
+    for sid, raw_value, negative in entries:
+        if not isinstance(sid, str) or sid not in _BASE:
+            return stop("invalid", "unknown_stat")
+        if sid in present:
+            return stop("invalid", "duplicate_stat")
+        if _base_value(sid, cls) is None:
+            return stop("unsupported", "missing_base")
+        if not permitted(sid, negative):
+            return stop("invalid", "stat_not_allowed")
+        if isinstance(raw_value, bool):
+            return stop("invalid", "invalid_value")
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError, OverflowError):
+            return stop("invalid", "invalid_value")
+        if not math.isfinite(value) or value <= 0:
+            return stop("invalid", "invalid_value")
+        center = (
+            _base_value(sid, cls)
+            * disp
+            * (neg_factor if negative else pos_factor)
+            * _stat_multiplier(sid, stat_multipliers)
+        )
+        if not math.isfinite(center) or center <= 0:
+            return stop("invalid", "invalid_disposition")
+        tol = display_tol(sid, value)
+        lower = max(0.9, (value - tol) / center)
+        upper = min(1.1, (value + tol) / center)
+        if lower > upper + 1e-12:
+            return stop("invalid", "out_of_range")
+        # 浮点边界容差只消除算术尾差，不扩大卡面舍入带。
+        lower = max(0.9, min(1.1, min(lower, upper)))
+        upper = max(0.9, upper)
+        present[sid] = {
+            "stat_id": sid,
+            "negative": negative,
+            "value": value,
+            "roll": max(0.9, min(1.1, value / center)),
+            "roll_min": lower,
+            "roll_max": upper,
+        }
+
+    def position(roll):
+        return max(0.0, min(100.0, (roll - 0.9) * 500))
+
+    def prediction(output, known, conditional):
+        center = (
+            _base_value(output, cls)
+            * disp
+            * pos_factor
+            * _stat_multiplier(output, stat_multipliers)
+        )
+        roll_min = max(item["roll_min"] for item in known)
+        roll_max = 1.1 if conditional else max(item["roll_max"] for item in known)
+        roll = None if conditional else max(item["roll"] for item in known)
+        return {
+            "value": None if roll is None else center * roll,
+            "value_min": center * roll_min,
+            "value_max": center * roll_max,
+            "range_min": center * 0.9,
+            "range_max": center * 1.1,
+            "deviation_pct": None if roll is None else (roll - 1.0) * 100,
+            "deviation_min_pct": (roll_min - 1.0) * 100,
+            "deviation_max_pct": (roll_max - 1.0) * 100,
+            "position_pct": None if roll is None else position(roll),
+            "position_min_pct": position(roll_min),
+            "position_max_pct": position(roll_max),
+            "approximate": True,
+        }
+
+    for first, second, output, _classes in splice_recipes(cls):
+        if not permitted(output, False):
+            continue
+        if not math.isfinite(_base_value(output, cls) * disp * pos_factor * 1.1):
+            return stop("invalid", "invalid_disposition")
+        inputs = [first, second]
+        known = [present[sid] for sid in inputs if sid in present]
+        missing = [sid for sid in inputs if sid not in present]
+        if not known:
+            continue
+        polarities = []
+        if missing:
+            sid = missing[0]
+            retained = known[0]
+            for polarity, negative in (("positive", False), ("negative", True)):
+                # 重洗可替换无关负面；保留的输入已占负槽时不能再添负面。
+                slots = layout[1 if negative else 0] - int(retained["negative"] == negative)
+                if slots <= 0 or not permitted(sid, negative):
+                    continue
+                if allowed_missing is not None and polarity not in allowed_missing.get(sid, ()):
+                    continue
+                polarities.append(polarity)
+            if not polarities:
+                continue
+        recipe = {
+            "inputs": inputs,
+            "output": output,
+            "present": known,
+            "missing": missing,
+            "missing_polarities": polarities,
+            "prediction": prediction(output, known, bool(missing)),
+        }
+        result["missing_one" if missing else "direct"].append(recipe)
+    if not result["direct"] and not result["missing_one"]:
+        return stop("no_match", "no_matching_recipe")
+    result["status"] = "ready"
+    return result
+
+
+def _stat_entries(stats_pos, stats_neg) -> list:
+    """词条扁平化 → [(stat_id, value, is_negative)]（值一律为 magnitude）。"""
+    return [(sid, float(v), False) for sid, v in (stats_pos or [])] + [
+        (sid, float(v), True) for sid, v in (stats_neg or [])
+    ]
+
+
+def _fit_dev(
+    entries,
+    cls: str,
+    pos_f: float,
+    neg_f: Optional[float],
+    disp: float,
+    tol_fn,
+    stat_multipliers=None,
+) -> Optional[float]:
+    """候选倾向能否解释全部词条：能则返回最大 |U-1|（越小越居中），否则 None。
+
+    Args:
+        entries: _stat_entries 的产物。
+        cls: 基值列名。
+        pos_f / neg_f: 正/负词条系数。
+        disp: 候选倾向。
+        tol_fn: (stat_id, value) → 显示不确定度。
+
+    Returns:
+        可行时返回各词条 U 偏离 1.0 的最大值；有词条超出区间返回 None。
+    """
+    worst, used = 0.0, 0
+    for sid, v, neg in entries:
+        b = _base_value(sid, cls)
+        f = neg_f if neg else pos_f
+        if not b or not f or v <= 0 or disp <= 0:
+            continue
+        t = tol_fn(sid, v)
+        denom = b * f * disp * _stat_multiplier(sid, stat_multipliers)
+        # 该词条反推的 U 区间必须与 [0.9, 1.1] 有交集
+        if (v + t) / denom < 0.9 or (v - t) / denom > 1.1:
+            return None
+        worst = max(worst, abs(v / denom - 1.0))
+        used += 1
+    return worst if used else None
+
+
+def disposition_interval(
+    stats_pos, stats_neg, cls, *, tol_fn=None, counts=None, stat_multipliers=None
+) -> tuple:
+    """由卡面数值反解倾向的可行区间。
+
+    Args:
+        stats_pos / stats_neg: [(stat_id, value)]，负词条存 magnitude。
+        cls: 武器基值列名（weapon_class 的产物）。
+        tol_fn: 可选的显示不确定度函数（测试用）。
+        counts: (正, 负) 词条数；None = 按 stats 条数（卡面有未揭示词条时由调用方给）。
+
+    Returns:
+        (lo, hi) 可行区间；词条全都无可用基值、或各词条互相矛盾
+        （交集为空）时返回 (None, None)。
+    """
+    tol_fn = tol_fn or display_tol
+    pos_f, neg_f = factor_for(*(counts or (len(stats_pos or []), len(stats_neg or []))))
+    lo, hi, used = 0.0, 1e9, 0
+    for sid, v, neg in _stat_entries(stats_pos, stats_neg):
+        b = _base_value(sid, cls)
+        if b is not None:
+            b *= _stat_multiplier(sid, stat_multipliers)
+        f = neg_f if neg else pos_f
+        if not b or not f or v <= 0:
+            continue
+        t = tol_fn(sid, v)
+        lo = max(lo, (v - t) / (b * f * 1.1))
+        hi = min(hi, (v + t) / (b * f * 0.9))
+        used += 1
+    if not used or hi < lo:
+        return (None, None)
+    return (round(lo, 4), round(hi, 4))
+
+
+def disp_feasible(
+    stats_pos, stats_neg, cls, disp: float, *, tol_fn=None, counts=None, stat_multipliers=None
+) -> bool:
+    """给定倾向 disp，判断卡面数值是否落在其 ±10% 区间内（全词条都要过）。
+
+    ``counts`` 同 `disposition_interval`：(正, 负) 词条数，None = 按 stats 条数。
+    """
+    tol_fn = tol_fn or display_tol
+    pos_f, neg_f = factor_for(*(counts or (len(stats_pos or []), len(stats_neg or []))))
+    return (
+        _fit_dev(
+            _stat_entries(stats_pos, stats_neg),
+            cls,
+            pos_f,
+            neg_f,
+            float(disp),
+            tol_fn,
+            stat_multipliers,
+        )
+        is not None
+    )
+
+
+# ---------------------------------------------------------------------------
+# 卡面原文行解析（2026-09-27）
+# ---------------------------------------------------------------------------
+# 教训（玩家报障 → 服务器日志实证）：让 vision 模型**直接给出语义词条表**
+# 不可靠 —— 4 行卡面 `+120.5% 毒素伤害 / +299.9% 伤害 / +148% 多重射击 /
+# -97.2% 触发时间` 被吐成 7 条（负词条那行拆成「触发」「持续」「触发时间」
+# 三份，还凭空多一条「滑暴」），词条数校验报「4 正 2 负」把整张卡挡掉。
+# 现行分工：模型只负责**逐字照抄卡面文字行**（vision JSON 的 "lines"），
+# 归条 / 极性 / 计数由下面两条纯函数确定性决定 —— 只认行首带极性符号的行，
+# 卡面上的锁图标、行颜色（白色行）、右下角内融值、武器名与自命名一律不是词条。
+_POLARITY = {
+    "+": False,
+    "＋": False,
+    "负": True,
+    "-": True,
+    "−": True,
+    "–": True,
+    "—": True,
+    "－": True,
+}
+# ★ 极性**反转**词条（2026-10-02 玩家报障「盗贼 Visi-fevacan」四行全 `+`，其中
+#   「+95.4% 武器后坐力」实为负面）：卡面符号与收益方向**相反** —— `+` 是负面、
+#   `-` 是正面。依据（双重证据）：
+#     ① WM 拍卖 1500 条 / 32 个词条字段实测（读 `item.attributes[].positive`）：
+#        **只有 recoil 反转** —— positive=true 的值为负（-9.0/-10.5/-16.1），
+#        positive=false 的值为正（+6.6/+5.9/+81.8）；其余 31 个词条（含 zoom）
+#        正号占比 1.00、负号占比 1.00 ⇒ 符号即极性。
+#     ② 区间反推（不依赖 WM）：盗贼 = Furis（手枪 倾向 1.35）× 3+1 系数下，
+#        95.4 按负词条 ∈ [82.01, 100.24] ✅、按正词条 [102.52, 125.3] ❌。
+#   ⚠️ 新增条目必须先有实测证据 + 配套断言，禁止凭「词条名像负面」推断。
+INVERTED_STATS = {"recoil"}
+
+
+def is_inverted(sid: str) -> bool:
+    """该词条的卡面符号是否与极性相反（`+` 实为负面、`-` 实为正面）。"""
+    return sid in INVERTED_STATS
+
+
+# ★ 「仅负向」词条（2026-10-02，官方 wiki「Riven Mods」基值表 Legend：³ 仅负向、
+#   永不作为正面）：「几率来获得连击数」（chance_to_gain_combo_count）——
+#   卡面只会出现「-X% 的几率来获得连击数」。
+#   锁定的理由：模型/OCR 丢符号是实测过的故障模式（曾把 ±43 后坐力都塞进正面槽），
+#   若把该词条读成正数放进正面，会给出一个现实中不存在的正向区间。
+#   （对应另一侧「额外连击数几率」= ¹ 仅正向，但正向本就是默认路径、不做强制。）
+NEGATIVE_ONLY = {"combo_gain_chance"}
+
+
+def is_negative_only(sid: str) -> bool:
+    """该词条是否只以负面形式出现（卡面恒为 `-`）。"""
+    return sid in NEGATIVE_ONLY
+
+
+# 词条行 = 极性符号开头（前面只允许装饰性符号：锁图标/圆点/括号/空白）。
+# 非装饰性字符（汉字、字母、数字）开头的行**不是**词条行 —— 武器名、自命名、
+# 内融值、卡面图例都靠这一条排除；而锁图标与行首那点装饰不能反而把真词条挤掉。
+# ★ 2026-10-01：`x` / `×` 也算极性前缀 —— 卡面「对派系伤害」是**乘数写法**
+#   （`x1.51 对 Infested 的伤害`），旧版整行被当「无极性符号」丢掉，3+1 的卡
+#   被读成 2+1（玩家报障：+91.1%暴伤 / x1.51对Infested / +29.6初始连击 /
+#   -115.7%处决 只认了三行，区间系数从 0.9375 错成 1.2375，整卡数值全不吻合）。
+_POL_RE = re.compile(r"^[^\w]*([+＋\-−–—－]|负|[x×])\s*(.*)$", re.I)
+_NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
+RIVEN_CATEGORY_LABELS = frozenset(
+    {"步枪", "霰弹枪", "手枪", "近战", "空战枪械", "空战近战", "组合枪", "自制近战"}
+)
+_RIVEN_TITLE_RE = re.compile(r"[\u4e00-\u9fff][\u4e00-\u9fff\s·]*\s*[A-Za-z]+(?:[\s-]+[A-Za-z]+)*")
+# 全角 % 用 \uff05 转义写：它只在**输入匹配**里用到（永远不渲染到卡面），
+# 写成字面量会让「仓库语料」多出一个子集字体没有的字形（test_render_overflow
+# 的字库覆盖用例），逼着去重建字体子集。
+_BARE_NUM_RE = re.compile(r"^[\d.,]+\s*[%\uff05]?\s*[\w米秒]*$")
+# 乘数写法（卡面「x0.55 对 Corpus 的伤害」/「x1.51 对 Infested 的伤害」）
+_MULT_RE = re.compile(r"[x×]\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*[x×]", re.I)
+# ★ 括号后缀（「暴击几率（重击时 x2）」「射速（弓类武器效果加倍）」）是**卡面说明文案**，
+#   不是词条数值。搜乘数前必须先剥掉：2026-10-05 P0 —— 近战紫卡常见的
+#   「+211.4% 暴击几率（重击时 x2）」里那个 x2 命中 _MULT_RE，k=2.0 落在
+#   is_faction_mult 域内 ⇒ 被当派系乘数换算成 100.0，**211.4 静默丢失**
+#   （条数判据仍合法，整卡区间/评级全错）。同类：`+150.0% 连击持续时间 x2`。
+_STAT_CATEGORY_ANNOTATIONS = {
+    "重击时x2": "crit_chance",
+    "弓类武器效果加倍": "fire_rate",
+}
+# 乘数写法还原成 magnitude 的下限：对派系伤害基值 45 × 最小倾向 0.5 ×
+# 2正1负的 0.495 ≈ 11 ⇒ 小于 10 的数字一定不是 magnitude，而是「乘数漏写了
+# x / 只写了 1.51 或 0.55」，按乘数还原。
+_FACTION_MIN_MAG = 10.0
+# ★ 派系乘数（净伤害倍率）的合理取值域：卡面这行是 1 ± 基值45%×倾向×系数
+#   ×(0.9~1.1) ⇒ 理论 ≈0.42~1.95，实测样本 0.55/0.63/0.79/0.8/0.83/1.25/1.51。
+#   2026-10-02 线上实证：窄读会把词条图标抄成 `×`（「×59% 多重射击」），旧实现
+#   一律按乘数换算 ⇒ |1−59|×100 = **5800%**。出界（<0.35 或 >2.05）的 x/×
+#   不是乘数 —— 按普通数值读，不做乘法换算。
+_FACTION_MULT_LO = 0.35
+_FACTION_MULT_HI = 2.05
+
+
+def is_faction_mult(k: float) -> bool:
+    """该数值是否是卡面的派系乘数（净伤害倍率）写法。"""
+    return _FACTION_MULT_LO <= k <= _FACTION_MULT_HI
+
+
+def faction_mult_to_mag(k: float) -> tuple:
+    """卡面乘数 k → (magnitude, 是否负词条)。
+
+    卡面「对 X 的伤害」显示的是**净伤害倍率**：x1.51 = +51%（正词条）、
+    x0.55 = −45%（负词条）⇒ 极性由乘数本身决定（k>1 加伤、k<1 减伤），
+    不能一律按负词条收。
+    """
+    return (round(abs(1.0 - k) * 100, 2), k < 1.0)
+
+
+# ★ 2026-10-21 用户实卡（食人女魔 Parci-argiada）：长词条卡面把数值写在**名字后面**并折行 ——
+#   「🔒 收起武器时弹匣每秒自」/「动装填 +112.9 %」。旧实现只认行首极性 ⇒ 整条静默丢掉，
+#   剩 2 正 1 负照样判合法，词条系数按 2+1 算（实为 3+1）⇒ 整卡区间全错。
+_TRAIL_RE = re.compile(
+    r"^[^\w]*(?P<name>[^\d+＋\-−–—－]*?[^\W\d_])\s*(?P<sign>[+＋\-−–—－])\s*"
+    r"(?P<num>\d+(?:[.,]\d+)?)\s*(?P<unit>[%\uff05米秒m]?)\s*$",
+    re.I,
+)
+# 折行的半截词条名：去掉行首图标后**纯中文、无数字**（武器名行带拉丁自命名，天然排除）
+_FRAG_RE = re.compile(r"^[^\w]*[\u4e00-\u9fff]+$")
+
+
+def _trailing_to_leading(t: str):
+    """「词条名 +数值」→「+数值 词条名」；不是这种写法返回 None。"""
+    m = _TRAIL_RE.match(t)
+    if not m:
+        return None
+    return f"{m.group('sign')}{m.group('num')}{m.group('unit')} {m.group('name').strip()}"
+
+
+def merge_polarity_lines(lines) -> list:
+    """把被拆行的词条行拼回一行（极性符号与数值不在同一行时）。
+
+    两种情形合并（2026-09-27 用户口径）：
+      · 纯极性符号行（``+`` / ``-`` / ``负``）→ 与下一行拼成一条；
+      · 带极性但没数值的行（``+毒素伤害``）→ 与下一行**纯数值行**拼成一条。
+    最多缓存一条待合并片段：宁可让残缺行单独被丢弃，也不把两条词条的名称/
+    数值串到一起（串行会让名称与数值交叉配错，比漏读更难发现）。
+    """
+    out: list = []
+    buf = ""
+    frag = ""  # 折行的半截词条名（等下一行「…+数值」来拼）
+    for raw in lines or []:
+        t = str(raw or "").strip()
+        if not t:
+            continue
+        if not _POL_RE.match(t):
+            joined = _trailing_to_leading(frag + t) if frag else None
+            if frag and not joined:
+                out.append(frag)
+            frag = ""
+            lead = joined or _trailing_to_leading(t)
+            if lead:
+                t = lead
+            elif _FRAG_RE.match(t):
+                frag = t
+                continue
+        elif frag:
+            out.append(frag)
+            frag = ""
+        m = _POL_RE.match(t)
+        if m:
+            body = m.group(2).strip()
+            if not body or not _NUM_RE.search(body):
+                if buf:
+                    out.append(buf)
+                buf = t
+                continue
+            out.append(f"{buf} {t}".strip() if buf else t)
+            buf = ""
+            continue
+        if buf and _BARE_NUM_RE.match(t):
+            out.append(f"{buf} {t}")
+            buf = ""
+            continue
+        if buf:
+            out.append(buf)
+            buf = ""
+        out.append(t)
+    if buf:
+        out.append(buf)
+    if frag:
+        out.append(frag)
+    return out
+
+
+# 融合未选定的词条：卡面整行只有「？？？」（可带 ◆ 等图标、空格）
+_HIDDEN_RE = re.compile(r"^[^\w?？]*[?？](?:[\s\u3000]*[?？])+[^\w?？]*$")
+
+
+def hidden_line_count(lines) -> int:
+    """卡面原文行里「？？？」未揭示词条的行数（2026-10-24，融合时还没选定的词条）。
+
+    只认**整行**都是问号的行；「视使之触？？？」这种名字行（自命名未揭示）不算。
+    """
+    return sum(1 for t in (lines or []) if _HIDDEN_RE.match(str(t or "").strip()))
+
+
+def split_stat_annotation(text: str) -> tuple[str, Optional[str], bool]:
+    """只拆完整、单层、同型的已知领域尾注，返回主体、限定 SID 与合法性。
+
+    已知尾注允许一个汉字 OCR 替换，数字、倍率、括号结构必须完整一致。
+    其它未知或损坏的括号保留原文并拒绝；主体整名仍须 exact 校验限定 SID。
+    """
+    # 全/半角括号属于同一个排版字符；仍只允许完整的已知类别尾注。
+    text = text.translate(str.maketrans({"（": "(", "）": ")"}))
+    if not any(char in text for char in "()"):
+        return text, None, True
+    match = re.fullmatch(
+        r"(?P<base>[^()（）]+?)(?:\((?P<ascii>[^()（）]*)\)|（(?P<cjk>[^()（）]*)）)\s*", text
+    )
+    if not match:
+        return text, None, False
+    annotation = re.sub(r"\s+", "", match["ascii"] or match["cjk"] or "").casefold()
+    annotation = annotation.replace("×", "x")
+    sid = _STAT_CATEGORY_ANNOTATIONS.get(annotation)
+    if sid is None:
+        candidates = set()
+        for known, target in _STAT_CATEGORY_ANNOTATIONS.items():
+            if len(annotation) != len(known):
+                continue
+            differences = [(a, b) for a, b in zip(annotation, known) if a != b]
+            if len(differences) == 1 and all(
+                "\u4e00" <= char <= "\u9fff" for char in differences[0]
+            ):
+                candidates.add(target)
+        if len(candidates) == 1:
+            sid = candidates.pop()
+    base = match["base"].rstrip()
+    return (base, sid, True) if sid and base else (text, None, False)
+
+
+def _strip_name(body: str) -> str:
+    """去掉主体数值/单位；完整已知尾注保留给 SID 绑定，未知括号不裁。"""
+    base, annotation_sid, valid = split_stat_annotation(body)
+    annotation = body[len(base) :] if valid and annotation_sid else ""
+    name = _MULT_RE.sub(" ", base if annotation else body)
+    name = _NUM_RE.sub(" ", name)
+    name = re.sub(r"[%\uff05x×\s　·、:：]", "", name, flags=re.I)
+    # 单位只剥两端；词条「收起武器时弹匣每秒自动装填」的「秒」属于名称。
+    name = re.sub(r"^[米秒]+|[米秒]+$", "", name)
+    return name + annotation
+
+
+def _strip_parens(text: str) -> str:
+    """仅从数值扫描排除完整已知领域尾注；名称匹配另须绑定正确 SID。"""
+    base, required_sid, valid = split_stat_annotation(text or "")
+    return base if valid and required_sid else text or ""
+
+
+def _dedup_pairs(pairs: list) -> list:
+    seen: set = set()
+    out: list = []
+    for p in pairs:
+        if p in seen:
+            continue
+        seen.add(p)
+        out.append(p)
+    return out
+
+
+def _is_riven_title(text: str, resolve=None) -> bool:
+    if not _RIVEN_TITLE_RE.fullmatch(text):
+        return False
+    first_latin = re.search(r"[A-Za-z]", text).start()
+    name, suffix = text[:first_latin].strip(), text[first_latin:].casefold()
+    # 协议空值/未知状态不是拉丁自命名；类别字段和损坏词条也不能获得标题角色。
+    if suffix in {"null", "none", "unknown", "unreadable", "unclear", "nan"}:
+        return False
+    if re.search(r"未知|未确认|未读清|看不清", name):
+        return False
+    return name in RIVEN_CATEGORY_LABELS or not (resolve and resolve(name))
+
+
+def _riven_row_roles(rows: list, resolve=None) -> dict:
+    """用单卡字段框架解释结构行；不读取答案，不把未知词条当成UI。"""
+    active = [r for r in rows if not r.get("structural")]
+    titles = [i for i, r in enumerate(active) if _is_riven_title(r["text"], resolve)]
+    data = [
+        i
+        for i, r in enumerate(active)
+        if _POL_RE.match(r["text"]) or _MULT_RE.search(_strip_parens(r["text"]))
+    ]
+    footers = [
+        i
+        for i, r in enumerate(active)
+        if re.fullmatch(r"(?:段位|精通段位|等级需求)\s*[:：]?\s*\d+(?:\s+\d+)*", r["text"])
+    ]
+    context = {"title_count": len(titles), "title_lines": [], "data_lines": [], "footer_lines": []}
+    if len(titles) != 1 or len(data) < 2 or not footers:
+        return context
+    title, first, last = titles[0], min(data), max(data)
+    footer = next((i for i in footers if i > last), None)
+    if not title < first or footer is None:
+        return context
+    context.update(
+        title_lines=active[title]["source_lines"],
+        data_lines=[n for i in data for n in active[i]["source_lines"]],
+        footer_lines=active[footer]["source_lines"],
+    )
+    if title == 1 and first == title + 1 and re.fullmatch(r"\d+\s*[一－—-]?", active[0]["text"]):
+        # 数值只获得“单卡标题前元数据”角色，具体是容量还是其它字段仍不推断。
+        active[0].update(
+            structural="card_header_integer",
+            role="untyped_header_metadata",
+            role_evidence=context.copy(),
+            semantic_field=None,
+        )
+    anchors = [active[title], *[active[i] for i in data]]
+    if not all(r.get("position") for r in anchors):
+        return context
+    left = min(r["position"][0] - r["position"][3] / 2 for r in anchors)
+    right = max(r["position"][0] + r["position"][3] / 2 for r in anchors)
+    bottom = max(active[i]["position"][1] + active[i]["position"][2] / 2 for i in data)
+    for row in active:
+        position = row.get("position")
+        if row["text"] not in {"所有", "等级", "确认", "取消"} or not position:
+            continue
+        x, y, h, w, _angle = position
+        if y - h / 2 > bottom and (x + w / 2 < left or x - w / 2 > right):
+            row.update(
+                structural="outside_card_ui",
+                role="ui_label",
+                role_evidence={**context, "content_column": [left, right], "data_bottom": bottom},
+            )
+    return context
+
+
+def _mark_spatial_riven_region(rows: list, resolve=None) -> None:
+    """只在唯一标题—词条—段位坐标框成立时，标记框外观察；不删原文。"""
+    frames = []
+    for title in rows:
+        if not title.get("position") or not _is_riven_title(title["text"], resolve):
+            continue
+        tx, ty, th, tw, _ = title["position"]
+        for footer in rows:
+            if not footer.get("position") or not re.fullmatch(
+                r"(?:段位|精通段位|等级需求)\s*[:：]?\s*\d+(?:\s+\d+)*", footer["text"]
+            ):
+                continue
+            fx, fy, fh, fw, _ = footer["position"]
+            if fy <= ty or abs(fx - tx) > max(tw, 150):
+                continue
+            stats = [
+                row
+                for row in rows
+                if row.get("position")
+                and ty < row["position"][1] < fy
+                and abs(row["position"][0] - tx) <= max(tw / 2, th * 2)
+                and (_POL_RE.match(row["text"]) or _MULT_RE.search(_strip_parens(row["text"])))
+            ]
+            if not 2 <= len(stats) <= 4:
+                continue
+            first_y = min(row["position"][1] for row in stats)
+            center_x = sum(row["position"][0] for row in stats) / len(stats)
+            # 同一词条列上方的远处标题/配置栏不能跨过更近的卡名抢占这组词条。
+            # 两张各有词条的完整卡仍会得到两个框，保持多区域待确认。
+            if any(
+                other is not title
+                and other.get("position")
+                and ty < other["position"][1] < first_y
+                and _is_riven_title(other["text"], resolve)
+                and abs(other["position"][0] - center_x)
+                <= max(other["position"][3] / 2, other["position"][2] * 2)
+                for other in rows
+            ):
+                continue
+            anchors = [title, footer, *stats]
+            # 折行标题合并后的总高度不是单字高度；不能据此把左右界
+            # 扩大到卡外图标。边距使用标题与段位单行高度的较小者。
+            side_padding = min(th, fh)
+            left = min(r["position"][0] - r["position"][3] / 2 for r in anchors) - side_padding
+            right = max(r["position"][0] + r["position"][3] / 2 for r in anchors) + side_padding
+            frames.append(
+                {
+                    "left": left,
+                    "right": right,
+                    "top": ty - th,
+                    "bottom": fy + fh * 2,
+                    "title_lines": title["source_lines"],
+                    "footer_lines": footer["source_lines"],
+                }
+            )
+    if len(frames) != 1:
+        return
+    frame = frames[0]
+    footer = next(r for r in rows if r["source_lines"] == frame["footer_lines"])
+    fx, fy, fh, _fw, _ = footer["position"]
+    for row in rows:
+        position = row.get("position")
+        if not position or row.get("structural"):
+            continue
+        x, y, h, _w, _angle = position
+        if (
+            re.fullmatch(r"\d+", row["text"])
+            and fx < x <= frame["right"]
+            and abs(y - fy) <= max(h, fh) / 2
+        ):
+            # OCR的输出顺序不一定按阅读顺序。段位右侧同基线纯整数是
+            # 已观测底栏元数据，不把它猜成词条值，也不猜它具体是什么字段。
+            row.update(
+                structural="card_footer_integer",
+                role="untyped_footer_metadata",
+                role_evidence=dict(frame),
+                semantic_field=None,
+            )
+            continue
+        # 明确段位框之外的下方工具栏也不属于卡面正文。带符号/倍率/问号
+        # 或已知属性名的行仍保留，防止漏读的词条被错误底栏吞掉。
+        below_footer = y - h / 2 > frame["bottom"] and not (
+            _POL_RE.match(row["text"])
+            or _MULT_RE.search(_strip_parens(row["text"]))
+            or _HIDDEN_RE.match(row["text"])
+            or (resolve and resolve(row["text"]))
+        )
+        if not frame["left"] <= x <= frame["right"] or y < frame["top"] or below_footer:
+            row.update(
+                structural="outside_card_region",
+                role="outside_observed_card",
+                role_evidence=dict(frame),
+            )
+
+
+def decode_riven_lines(lines, exact=None, *, resolve=None) -> dict:
+    """机械解包坐标、列表及明确折行；保留原行、位置与操作，不接收答案。"""
+    if isinstance(lines, str):
+        lines = lines.splitlines()
+    rows = []
+    for index, raw in enumerate(lines or [], 1):
+        text = str(raw or "").strip()
+        if not text:
+            continue
+        row = {"source_lines": [index], "raw_lines": [str(raw)], "text": text, "operations": []}
+        parts = text.split(",", 5)
+        if len(parts) == 6:
+            from .loadout_ocr import coordinate_aabb
+
+            position = coordinate_aabb(parts[:5])
+            if position:
+                row["position"] = position
+                row["observed_rotated_box"] = list(map(float, parts[:5]))
+                text = parts[5].strip()
+                row["operations"].append("unwrap_coordinate_payload")
+        cleaned = re.sub(
+            r"^(?:[*•]\s+|\d{1,2}[.)、]\s+|第[一二三四五六七八九十\d]+行[：:]\s*)", "", text
+        )
+        if cleaned != text:
+            row["operations"].append("unwrap_explicit_list_prefix")
+        row["text"] = cleaned
+        if re.fullmatch(r"```(?:text|json)?", cleaned, re.I):
+            row["structural"] = "markdown_fence"
+        rows.append(row)
+    _mark_spatial_riven_region(rows, resolve)
+    # 只连接已有字符。括号闭合且完整名称精确命中才允许尾注跨行。
+    joined = []
+    i = 0
+    data_seen = False
+    while i < len(rows):
+        row = rows[i]
+        text, end, operation = row["text"], i, None
+        if (
+            not data_seen
+            and text.endswith("-")
+            and _is_riven_title(text[:-1], resolve)
+            and i + 1 < len(rows)
+            and re.fullmatch(r"[A-Za-z]+(?:-[A-Za-z]+)*", rows[i + 1]["text"])
+            and _is_riven_title(text + rows[i + 1]["text"], resolve)
+        ):
+            # 标题后缀在已有连字符处断行：只接回已有字符，不补任何名称。
+            text += rows[i + 1]["text"]
+            end, operation = i + 1, "join_existing_hyphenated_title"
+        if (
+            operation is None
+            and not data_seen
+            and i + 1 < len(rows)
+            and re.fullmatch(r"[\u4e00-\u9fff][\u4e00-\u9fff\s·]*", text)
+            and not ((resolve or exact) and (resolve or exact)(text.replace(" ", "")))
+            and re.fullmatch(r"[A-Za-z]+(?:-[A-Za-z]+)*", rows[i + 1]["text"])
+            and _is_riven_title(text + " " + rows[i + 1]["text"], resolve)
+            and any(
+                re.fullmatch(r"(?:段位|精通段位|等级需求)\s*[:：]?\s*\d+(?:\s+\d+)*", r["text"])
+                for r in rows
+            )
+            and any(_POL_RE.match(r["text"]) for r in rows[i + 2 :])
+        ):
+            # 中/拉丁两部分属于标题的语法候选；只加分隔空白，不补字母/词条。
+            text += " " + rows[i + 1]["text"]
+            end, operation = i + 1, "join_title_script_boundary"
+        if (
+            operation is None
+            and not data_seen
+            and not row.get("structural")
+            and _is_riven_title(text, resolve)
+            and i + 1 < len(rows)
+            and re.fullmatch(r"[A-Za-z]+(?:-[A-Za-z]+)*", rows[i + 1]["text"])
+            and row.get("position")
+            and rows[i + 1].get("position")
+            and abs(row["position"][0] - rows[i + 1]["position"][0]) <= row["position"][3] / 2
+            and 0
+            < rows[i + 1]["position"][1] - row["position"][1]
+            < max(row["position"][2], rows[i + 1]["position"][2]) * 2
+        ):
+            text += " " + rows[i + 1]["text"]
+            end, operation = i + 1, "join_spatial_title_continuation"
+        if exact and not row.get("structural") and operation is None:
+            pure_value = re.fullmatch(r"[+＋\-−\ufe63×xX]\s*\d+(?:[.,]\d+)?\s*[%％米秒ms]?", text)
+            opened = text.count("(") + text.count("（") - text.count(")") - text.count("）")
+            if (
+                pure_value
+                and i + 1 < len(rows)
+                and not _NUM_RE.search(rows[i + 1]["text"])
+                and exact(_strip_name(rows[i + 1]["text"]))
+            ):
+                text += " " + rows[i + 1]["text"]
+                end, operation = i + 1, "join_signed_value_and_exact_name"
+            elif opened == 1 and _POL_RE.match(text):
+                candidate = text
+                for stop in range(i + 1, min(i + 4, len(rows))):
+                    nxt = rows[stop]["text"]
+                    if rows[stop].get("structural") or re.match(r"^[+＋\-−\ufe63]\s*\d", nxt):
+                        break
+                    candidate += nxt
+                    base, annotation, valid = split_stat_annotation(candidate)
+                    if (
+                        valid
+                        and annotation
+                        and exact(_strip_name(_POL_RE.sub(r"\2", base))) == annotation
+                    ):
+                        text, end, operation = candidate, stop, "join_existing_known_annotation"
+                        break
+                    if any(c in nxt for c in ")）"):
+                        break
+        merged = {**row, "text": text}
+        if operation:
+            merged["source_lines"] = [n for part in rows[i : end + 1] for n in part["source_lines"]]
+            merged["raw_lines"] = [n for part in rows[i : end + 1] for n in part["raw_lines"]]
+            merged["operations"] = [
+                op for part in rows[i : end + 1] for op in part["operations"]
+            ] + [operation]
+            positions = [part.get("position") for part in rows[i : end + 1]]
+            if all(positions):
+                left = min(v[0] - v[3] / 2 for v in positions)
+                right = max(v[0] + v[3] / 2 for v in positions)
+                top = min(v[1] - v[2] / 2 for v in positions)
+                bottom = max(v[1] + v[2] / 2 for v in positions)
+                merged["position"] = [
+                    (left + right) / 2,
+                    (top + bottom) / 2,
+                    bottom - top,
+                    right - left,
+                    0,
+                ]
+        joined.append(merged)
+        data_seen |= bool(not row.get("structural") and _POL_RE.match(text))
+        i = end + 1
+    # 先沿原文合并折行，再排序，避免跨列文字夹进同一卡的标题续行。
+    positioned = [r for r in joined if not r.get("structural")]
+    if positioned and all(r.get("position") for r in positioned):
+        joined.sort(key=lambda r: (r.get("position", [0, -1])[1], r.get("position", [0])[0]))
+    # 标题的拉丁后缀常会折行；拼接后才能建立标题—词条—段位区域。
+    _mark_spatial_riven_region(joined, resolve)
+    context = _riven_row_roles(joined, resolve)
+    return {
+        "rows": joined,
+        "lines": [r["text"] for r in joined if not r.get("structural")],
+        "frame": context,
+    }
+
+
+def parse_riven_lines(lines, resolve, exact=None, *, role_resolve=None) -> tuple:
+    """卡面原文行 → (正词条, 负词条, 备注)。
+
+    Args:
+        lines: 卡面词条行的原文（vision 模型逐字照抄的结果）。
+        resolve: 词条名 → 标准词条 id 的回调（认不出返回 None）。
+        exact: 可选，词条名**整名精确命中**才返回 id 的回调；给了才拼接「数值在前、名字折行」
+            的下一行（子串匹配太宽：「触发时间」+ 图例「点击查看详情」会被认成触发几率）。
+
+    Returns:
+        (pos, neg, notes)；pos/neg 是 [(stat_id, float), ...]，语义与
+        ``main._normalize_llm_stats`` 一致；notes 供日志（哪一行因何被跳过）。
+
+    只认**行首带极性符号**的行：锁图标、行颜色（白色行）、右下角内融值、
+    武器名与自命名因为没有极性符号，天然被排除。名称与数值取**同一行**——
+    不做跨行配对，跨行配对正是模型把两条词条的名称/数值交叉配错的来源。
+    ★ 2026-10-02 两处兼容：① 行首无极性符号时**先试整行乘数**（窄读会把
+    「x1.51 对 Infested 的伤害」抄成「对 X 的伤害 x1.51」，x 挪到行尾）；
+    ② 反转词条（recoil）按 `INVERTED_STATS` 翻转极性。
+    """
+    pos: list = []
+    neg: list = []
+    notes: list = []
+    decoded = decode_riven_lines(lines, exact, resolve=role_resolve or resolve)
+    if decoded.get("frame", {}).get("title_count", 0) > 1:
+        notes.append("多区域标题：无法确认词条属于同一张卡")
+    merged = merge_polarity_lines(decoded["lines"])
+    skip_next = False
+    seen_footer = False
+    for i, raw in enumerate(merged):
+        if skip_next:
+            skip_next = False
+            continue
+        if any(
+            Decimal(m.group().replace(",", ".")) != Decimal(str(float(m.group().replace(",", "."))))
+            for m in _NUM_RE.finditer(raw)
+        ):
+            notes.append(f"数值精度无法保留：{raw}")
+            continue
+        m = _POL_RE.match(raw)
+        if not m or not m.group(2).strip():
+            # ★ 2026-10-02 派系行兼容：行首无极性符号时先试整行乘数 ——
+            #   兼容 `x1.51 对 X 的伤害` 与 `对 X 的伤害 x1.51` 两种抄写
+            #   顺序（线上 16:18 实证：三条派系行因 x 在行尾被整条丢弃）。
+            # ★ 2026-10-05 P0：先剥括号后缀再搜乘数，且只认 damage_vs_* 词条 ——
+            #   否则「（重击时 x2）」的 x2 会把非派系词条的数值换成 100.0。
+            mm2 = _MULT_RE.search(_strip_parens(raw))
+            if mm2:
+                try:
+                    k2 = float((mm2.group(1) or mm2.group(2)).replace(",", "."))
+                except ValueError:
+                    notes.append(f"乘数读不出：{raw}")
+                    continue
+                name2 = _strip_name(raw)
+                sid2 = resolve(name2) if name2 else None
+                if sid2 and sid2.startswith("damage_vs_") and is_faction_mult(k2):
+                    value2, neg2 = faction_mult_to_mag(k2)
+                    if is_inverted(sid2):
+                        neg2 = not neg2
+                    (neg if neg2 else pos).append((sid2, value2))
+                    seen_footer = False
+                    continue
+                # 出界的 x/×（如「多重射击 ×59」）：不猜数值，保留「无极性符号」
+                # 跳过（与旧行为一致）；上面主路径的同类出界按普通数值读。
+            # 无符号也可能是整行损坏的数据。仅明确的结构格式可作杂行；
+            # 不能由“未知名称且没有数字”反推出这行无需核对。
+            metadata = bool(
+                re.fullmatch(
+                    r"(?:段位|精通段位|等级需求|内融值|循环次数)\s*[:：]?\s*"
+                    r"\d+(?:,\d{3})*(?:\s+\d+)*",
+                    raw,
+                )
+            )
+            heading = bool(
+                re.fullmatch(r"(?:以下是)?(?:卡面)?(?:正面|负面)?(?:词条|属性)(?:行)?[:：]?", raw)
+            )
+            legend = bool(re.fullmatch(r"(?:点击|按下)\s*[ⓘℹiI]\s*查看详情", raw))
+            # 卡名 + 拉丁自命名仅在首条数据前视为标题；无具体武器/词条白名单。
+            title = bool(
+                not (pos or neg or seen_footer) and _is_riven_title(raw, role_resolve or resolve)
+            )
+            # 页脚数值只借已经出现的明确元数据锚点，不能借位置猜容量/词条值。
+            footer_integer = (
+                seen_footer
+                and bool(pos or neg)
+                and bool(re.fullmatch(r"\d+", raw))
+                and not any(
+                    _POL_RE.match(line)
+                    or _HIDDEN_RE.match(line)
+                    or _MULT_RE.search(_strip_parens(line))
+                    for line in merged[i + 1 :]
+                )
+            )
+            if metadata:
+                seen_footer = True
+            if _HIDDEN_RE.match(raw):
+                continue
+            # 明确段位底栏之后的循环按钮、费用和余额属于界面，不是词条。
+            footer_ui = bool(
+                seen_footer
+                and (pos or neg)
+                and re.fullmatch(
+                    r"(?:确认|取消|用\s*\d+(?:,\d{3})*\s*来循环|"
+                    r"剩余赤毒\s*[:：]\s*\d+(?:,\d{3})*)",
+                    raw,
+                )
+            )
+            structural = metadata or footer_integer or heading or legend or title or footer_ui
+            notes.append(f"{'无极性符号' if structural else '疑似词条未解析'}：{raw}")
+            continue
+        # 页脚后又出现数据，后续无标签数字重新保持未知。
+        seen_footer = False
+        neg_flag = _POLARITY.get(m.group(1), False)
+        body = m.group(2).strip()
+        name = _strip_name(body)
+        sid = resolve(name) if name else None
+        # ★ 2026-10-24（维护者定：有些词条占两行）：数值在前、名字折到下一行
+        #   （「+112.9% 收起武器时弹匣每秒」/「自动装填」）—— 下一行是不带极性、不带数字、
+        #   不是问号的纯名字尾巴，且拼上后**整名精确命中**词条 ⇒ 按拼好的名字算（否则半截名
+        #   会被子串「弹匣」认成弹匣容量）。
+        nxt = merged[i + 1] if i + 1 < len(merged) else ""
+        if (
+            exact
+            and name
+            and nxt
+            and not _POL_RE.match(nxt)
+            and not _NUM_RE.search(nxt)
+            and not _HIDDEN_RE.match(nxt)
+        ):
+            sid2 = exact(_strip_name(body + nxt))
+            if sid2:
+                sid, skip_next = sid2, True
+        if not sid:
+            notes.append(f"词条名认不出：{raw}")
+            continue
+        mm = _MULT_RE.search(_strip_parens(raw))
+        k = None
+        if mm:
+            # 乘数在一整行里找（`x` 可能已被上面的极性正则吃掉），极性由
+            # 乘数本身决定：x1.51 是正词条、x0.55 是负词条。
+            # ★ 2026-10-05 P0：搜的是剥掉括号后缀的文案 —— 括号里的
+            #   「重击时 x2」不是乘数，参与匹配会把 211.4 换成 100.0。
+            try:
+                k = float((mm.group(1) or mm.group(2)).replace(",", "."))
+            except ValueError:
+                notes.append(f"乘数读不出：{raw}")
+                continue
+        if k is not None and sid.startswith("damage_vs_") and is_faction_mult(k):
+            # ★ 2026-10-05 P0：乘数分支**仅**对 damage_vs_* 启用（与下面
+            #   `value < _FACTION_MIN_MAG and sid.startswith("damage_vs_")`
+            #   的兜底同口径）；其余词条一律走普通数值分支，禁止拿乘数换算。
+            value, neg_flag = faction_mult_to_mag(k)
+        else:
+            # 普通数值分支。也覆盖「x/× 出界」：窄读把词条图标抄成 × 的行
+            # （线上实证「×59% 多重射击」）——出界的 x 不是派系乘数，数字按
+            # 普通数值读（旧实现按乘数换算成 |1−59|×100 = 5800%）。
+            mn = _NUM_RE.search(_strip_parens(body))
+            if not mn:
+                notes.append(f"无数值：{raw}")
+                continue
+            try:
+                value = float(mn.group(0).replace(",", "."))
+            except ValueError:
+                notes.append(f"数值读不出：{raw}")
+                continue
+            if value < _FACTION_MIN_MAG and sid.startswith("damage_vs_"):
+                # 乘数漏写 x（或只写了 1.51 / 0.55）：对派系真 magnitude ≥ 11，
+                # 按乘数还原并据乘数定极性（旧版一律当负词条 ⇒ 正词条会算错）。
+                value, neg_flag = faction_mult_to_mag(value)
+        # ★ 2026-10-02：反转词条翻转极性 —— 「+95.4% 武器后坐力」是负面、
+        #   「-20% 武器后坐力」是正面（证据见 INVERTED_STATS 注释）；
+        #   「仅负向」词条（连击获取）无论读到什么符号都归负面。
+        if is_negative_only(sid):
+            neg_flag = True
+        elif is_inverted(sid):
+            neg_flag = not neg_flag
+        (neg if neg_flag else pos).append((sid, value))
+    ids = [sid for sid, _ in pos + neg]
+    if len(ids) != len(set(ids)):
+        notes.append("重复或冲突词条：原文中同一词条出现多次")
+    # 保留既有返回形状；重复/冲突备注使业务侧拒绝自动采信。
+    neg_ids = {sid for sid, _ in neg}
+    return (_dedup_pairs([p for p in pos if p[0] not in neg_ids]), _dedup_pairs(neg), notes)

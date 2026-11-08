@@ -1,0 +1,5 @@
+Warframe artwork © Digital Extremes. Via WFCD/warframe-items.
+Source revision: 23804b64bc248069ce39adb9f52e9f546d8f343e
+Source URLs recorded per item in manifest.json. Transparent images resized to fit 256 × 256.
+Blueprints/components may share official generic icons. Modular combinations use their individual parts, not invented assembled images.
+Supplement: Mote Amp artwork via WARFRAME Wiki; description URL recorded in manifest.json.

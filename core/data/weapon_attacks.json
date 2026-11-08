@@ -1,0 +1,7542 @@
+{
+ "_meta": {
+  "source": "英文 wiki Module:Weapons/data（各攻击 Attacks）+ Condition Overload (Mechanic) Attack Catalog（范围段吃 CO / 不吃多重的出处），CC BY-NC-SA 3.0；默认主段按 weapons_stats（DE 导出）认",
+  "wiki_snapshot": "wiki-modules-20261026",
+  "generator": "scripts/build_weapon_attacks.py",
+  "scope": "顶层 segments / main / charge_seconds 只描述默认主段（main_attack = 与 weapons_stats 主段一致的 wiki 攻击）；非默认形态收在 forms（键 <种类>:<wiki 攻击名>），只在用户显式选了该形态时整套替换主段与额外段；灵化形态只收带额外段的（主段面板在 incarnon_forms.json）；archgun 取大气条目；近战不收",
+  "note": "段是独立命中实例，各吃同样的 MOD 乘区；段的暴击/触发取 wiki 该子攻击的值；takes_multishot 只写有出处的 false（缺省 = 吃多重）；cluster 段带 count；lingering 段 merge_only"
+ },
+ "/lotus/types/friendly/pets/moapets/moapetcomponents/cryoxionweapon": {
+  "forced_procs": [
+   "cold"
+  ],
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Cold Field",
+    "damage": {
+     "cold": 20.0,
+     "total": 20.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 1.75,
+    "procChance": 0.3,
+    "radius_m": 1.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7,
+    "merge_only": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 10.0,
+    "total": 10.0
+   }
+  },
+  "name": "Cryotra",
+  "wiki": "Cryotra",
+  "main_attack": "Direct Hit"
+ },
+ "/lotus/types/friendly/pets/moapets/moapetcomponents/hextraweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "blast": 100.0,
+     "total": 100.0
+    },
+    "criticalChance": 0.15,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.22,
+    "radius_m": 3.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "puncture": 10.0,
+    "total": 10.0
+   }
+  },
+  "name": "Multron",
+  "wiki": "Multron",
+  "main_attack": "Projectile Impact"
+ },
+ "/lotus/types/friendly/pets/moapets/moapetcomponents/swarmerweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "impact": 6.0,
+     "heat": 24.0,
+     "total": 30.0
+    },
+    "criticalChance": 0.05,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.3,
+    "radius_m": 3.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 4.95,
+    "puncture": 4.05,
+    "total": 9.0
+   }
+  },
+  "name": "Helstrum",
+  "wiki": "Helstrum",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/types/friendly/pets/moapets/moapetcomponents/thermocormoaweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "blast": 100.0,
+     "total": 100.0
+    },
+    "criticalChance": 0.2,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.2,
+    "radius_m": 5.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "heat": 500.0,
+    "total": 500.0
+   }
+  },
+  "name": "Vulcax",
+  "wiki": "Vulcax",
+  "main_attack": "Impact"
+ },
+ "/lotus/types/sentinels/sentinelweapons/sentbioweapon": {
+  "forced_procs": [
+   "toxin"
+  ],
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Toxin Embed",
+    "damage": {
+     "toxin": 15.0,
+     "total": 15.0
+    },
+    "criticalChance": 0.025,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.2,
+    "merge_only": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "toxin": 15.0,
+    "total": 15.0
+   }
+  },
+  "name": "Stinger",
+  "wiki": "Stinger",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/cephalon/primary/cephprimary/cephprimary": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Orb Explosion",
+    "damage": {
+     "magnetic": 200.0,
+     "total": 200.0
+    },
+    "criticalChance": 0.12,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.3,
+    "radius_m": 5.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.6
+   }
+  ],
+  "main": {
+   "damage": {}
+  },
+  "name": "Simulor",
+  "wiki": "Simulor",
+  "main_attack": "Orb Launch"
+ },
+ "/lotus/weapons/clantech/bio/bioweapon": {
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Poison Cloud",
+    "damage": {
+     "toxin": 40.0,
+     "total": 40.0
+    },
+    "criticalChance": 0.15,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.25,
+    "radius_m": 3.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 1.0,
+    "merge_only": true,
+    "takes_condition_overload": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "toxin": 100.0,
+    "total": 100.0
+   }
+  },
+  "name": "Torid",
+  "wiki": "Torid",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/clantech/chemical/rocketlauncher": {
+  "charge_seconds": 0.3,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Explosion",
+    "damage": {
+     "blast": 600.0,
+     "total": 600.0
+    },
+    "criticalChance": 0.05,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.35,
+    "radius_m": 7.1,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.8
+   }
+  ],
+  "main": {
+   "damage": {
+    "blast": 100.0,
+    "total": 100.0
+   }
+  },
+  "name": "Ogris",
+  "wiki": "Ogris",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/clantech/energy/railgun": {
+  "charge_seconds": 1.0,
+  "name": "Lanka",
+  "wiki": "Lanka",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:partially_charged_shot": {
+    "main": {
+     "damage": {
+      "electricity": 200.0,
+      "total": 200.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.25,
+     "fireRate": Infinity,
+     "multishot": 1.0
+    },
+    "name": "Lanka",
+    "attack": "Partially Charged Shot",
+    "charge_seconds": 0.33
+   }
+  }
+ },
+ "/lotus/weapons/corpus/boardexec/primary/crpbeferrox/crpbeferrox": {
+  "charge_seconds": 0.4,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "impact": 6.0,
+     "puncture": 42.0,
+     "slash": 12.0,
+     "total": 60.0
+    },
+    "criticalChance": 0.34,
+    "criticalMultiplier": 3.0,
+    "procChance": 0.26,
+    "radius_m": 4.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 20.0,
+    "puncture": 140.0,
+    "slash": 40.0,
+    "total": 200.0
+   }
+  },
+  "name": "Tenet Ferrox",
+  "wiki": "Tenet Ferrox",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "alt_fire:spear_throw": {
+    "main": {
+     "damage": {
+      "impact": 35.0,
+      "puncture": 5.0,
+      "slash": 10.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.04,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.4,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Tenet Ferrox",
+    "attack": "Spear Throw",
+    "segments": [
+     {
+      "id": "lingering",
+      "name": "残留云团",
+      "attack": "Attraction Field",
+      "damage": {
+       "electricity": 150.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.04,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.5,
+      "radius_m": 10.0,
+      "merge_only": true
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/corpus/boardexec/primary/crpbequanta/crpbequanta": {
+  "name": "Tenet Quanta",
+  "wiki": "Tenet Quanta",
+  "main_attack": "Beam",
+  "forms": {
+   "alt_fire:cube_direct_hit": {
+    "main": {
+     "damage": {
+      "electricity": 180.0,
+      "total": 180.0
+     },
+     "criticalChance": 0.05,
+     "criticalMultiplier": 1.5,
+     "procChance": 1.0,
+     "fireRate": 4.0,
+     "multishot": 1.0
+    },
+    "name": "Tenet Quanta",
+    "attack": "Cube (direct hit)",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Cube Explosion",
+      "damage": {
+       "blast": 150.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.05,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.26,
+      "radius_m": 0.5,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     }
+    ],
+    "ammo_cost": 10.0
+   }
+  }
+ },
+ "/lotus/weapons/corpus/boardexec/primary/crpbetetra/crpbetetra": {
+  "name": "Tenet Tetra",
+  "wiki": "Tenet Tetra",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:grenade_impact": {
+    "main": {
+     "damage": {
+      "impact": 200.0,
+      "total": 200.0
+     },
+     "criticalChance": 0.28,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.3,
+     "fireRate": 1.33,
+     "multishot": 1.0
+    },
+    "name": "Tenet Tetra",
+    "attack": "Grenade Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Grenade AoE",
+      "damage": {
+       "blast": 1000.0,
+       "total": 1000.0
+      },
+      "criticalChance": 0.28,
+      "criticalMultiplier": 2.2,
+      "procChance": 0.3,
+      "radius_m": 8.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "ammo_cost": 80.0
+   }
+  }
+ },
+ "/lotus/weapons/corpus/boardexec/secondary/crpbedetron/crpbedetron": {
+  "name": "Tenet Detron",
+  "wiki": "Tenet Detron",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:burst_shot": {
+    "main": {
+     "damage": {
+      "radiation": 26.0,
+      "total": 26.0
+     },
+     "criticalChance": 0.18,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.1,
+     "fireRate": 2.0,
+     "multishot": 10.0
+    },
+    "name": "Tenet Detron",
+    "attack": "Burst Shot",
+    "burst": {
+     "count": 6,
+     "delay_seconds": 0.12
+    }
+   }
+  }
+ },
+ "/lotus/weapons/corpus/boardexec/secondary/crpbeplinx/crpbeplinxweapon": {
+  "name": "Tenet Plinx",
+  "wiki": "Tenet Plinx",
+  "main_attack": "Semi-Auto",
+  "main_form": "semi_auto",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 1000.0,
+      "total": 1000.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.2,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Tenet Plinx",
+    "attack": "Alt-Fire",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Alt-Fire AoE",
+      "damage": {
+       "radiation": 1000.0,
+       "total": 1000.0
+      },
+      "criticalChance": 0.4,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.5,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.4
+     }
+    ],
+    "charge_seconds": 0.8,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 10.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/corpus/bow/longbow/crpbow": {
+  "charge_seconds": 1.2,
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Bubble Collapse",
+    "damage": {
+     "blast": 660.0,
+     "total": 660.0
+    },
+    "criticalChance": 0.5,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.05,
+    "radius_m": 7.2,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   },
+   {
+    "id": "radial_2",
+    "name": "范围伤害（第二阶段）",
+    "attack": "Initial Blast",
+    "damage": {
+     "cold": 10.0,
+     "total": 10.0
+    },
+    "criticalChance": 0.5,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.05,
+    "radius_m": 7.2,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7,
+    "count": 1.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 50.0,
+    "total": 50.0
+   }
+  },
+  "name": "Lenz",
+  "wiki": "Lenz",
+  "main_attack": "Charged Shot"
+ },
+ "/lotus/weapons/corpus/bow/longbow/prismalenz/prismalenzweapon": {
+  "charge_seconds": 1.2,
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Bubble Collapse",
+    "damage": {
+     "blast": 740.0,
+     "total": 740.0
+    },
+    "criticalChance": 0.5,
+    "criticalMultiplier": 2.8,
+    "procChance": 0.16,
+    "radius_m": 7.2,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   },
+   {
+    "id": "radial_2",
+    "name": "范围伤害（第二阶段）",
+    "attack": "Initial Blast",
+    "damage": {
+     "cold": 10.0,
+     "total": 10.0
+    },
+    "criticalChance": 0.5,
+    "criticalMultiplier": 2.8,
+    "procChance": 0.16,
+    "radius_m": 7.2,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7,
+    "count": 1.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 56.0,
+    "total": 56.0
+   }
+  },
+  "name": "Prisma Lenz",
+  "wiki": "Prisma Lenz",
+  "main_attack": "Charged Shot"
+ },
+ "/lotus/weapons/corpus/longguns/crparsniper/crparsniperrifle": {
+  "name": "Ambassador",
+  "wiki": "Ambassador",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "charged:charge": {
+    "main": {
+     "damage": {
+      "electricity": 600.0,
+      "total": 600.0
+     },
+     "criticalChance": 0.16,
+     "criticalMultiplier": 2.8,
+     "procChance": 0.32,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Ambassador",
+    "attack": "Charge",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Charged AoE",
+      "damage": {
+       "electricity": 800.0,
+       "total": 800.0
+      },
+      "criticalChance": 0.16,
+      "criticalMultiplier": 2.8,
+      "procChance": 0.32,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ],
+    "charge_seconds": 1.0,
+    "ammo_cost": 16.0
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpbfg/crpbfg": {
+  "charge_seconds": 2.0,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Charged Shot AoE",
+    "damage": {
+     "magnetic": 400.0,
+     "total": 400.0
+    },
+    "criticalChance": 0.2,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.2,
+    "radius_m": 6.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.6,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 100.0,
+    "puncture": 850.0,
+    "slash": 50.0,
+    "total": 1000.0
+   }
+  },
+  "name": "Opticor",
+  "wiki": "Opticor",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:quick_shot": {
+    "main": {
+     "damage": {
+      "impact": 50.0,
+      "puncture": 425.0,
+      "slash": 25.0,
+      "total": 500.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.2,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Opticor",
+    "attack": "Quick Shot",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Quick Shot AoE",
+      "damage": {
+       "magnetic": 200.0,
+       "total": 200.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 2.5,
+      "procChance": 0.2,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpbfg/vandal/vandalcrpbfg": {
+  "charge_seconds": 0.6,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Charged Shot AoE",
+    "damage": {
+     "magnetic": 200.0,
+     "total": 200.0
+    },
+    "criticalChance": 0.24,
+    "criticalMultiplier": 2.6,
+    "procChance": 0.3,
+    "radius_m": 4.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.6,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 40.0,
+    "puncture": 280.0,
+    "slash": 80.0,
+    "total": 400.0
+   }
+  },
+  "name": "Opticor Vandal",
+  "wiki": "Opticor Vandal",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:quick_shot": {
+    "main": {
+     "damage": {
+      "impact": 20.0,
+      "puncture": 140.0,
+      "slash": 40.0,
+      "total": 200.0
+     },
+     "criticalChance": 0.24,
+     "criticalMultiplier": 2.6,
+     "procChance": 0.3,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Opticor Vandal",
+    "attack": "Quick Shot",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Quick Shot AoE",
+      "damage": {
+       "magnetic": 100.0,
+       "total": 100.0
+      },
+      "criticalChance": 0.24,
+      "criticalMultiplier": 2.6,
+      "procChance": 0.3,
+      "radius_m": 4.6,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpbriefcaselauncher/crpbriefcaselauncher": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Explosion",
+    "damage": {
+     "cold": 640.0,
+     "total": 640.0
+    },
+    "criticalChance": 0.28,
+    "criticalMultiplier": 2.6,
+    "procChance": 0.24,
+    "radius_m": 8.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.8
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 100.0,
+    "total": 100.0
+   }
+  },
+  "name": "Tenet Envoy",
+  "wiki": "Tenet Envoy",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/corpus/longguns/crprubanrifle/crprubanrifle": {
+  "name": "Stahlta",
+  "wiki": "Stahlta",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 120.0,
+      "puncture": 180.0,
+      "slash": 300.0,
+      "total": 600.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.32,
+     "fireRate": 0.667,
+     "multishot": 1.0
+    },
+    "name": "Stahlta",
+    "attack": "Alt-Fire",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Alt-Fire AoE",
+      "damage": {
+       "radiation": 1200.0,
+       "total": 1200.0
+      },
+      "criticalChance": 0.4,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.5,
+      "radius_m": 7.2,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.7
+     }
+    ],
+    "charge_seconds": 1.6,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 20.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpsentamlgsniper/crpsentamlgsniper": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "3.5x Zoom Radial Attack",
+    "damage": {
+     "viral": 53.0,
+     "total": 53.0
+    },
+    "criticalChance": 0.16,
+    "criticalMultiplier": 2.1,
+    "procChance": 0.34,
+    "radius_m": 3.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 9.7,
+    "puncture": 40.74,
+    "slash": 46.56,
+    "total": 97.0
+   }
+  },
+  "name": "Komorex",
+  "wiki": "Komorex",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/corpus/longguns/crpsentexperimentrifle/crpsentexperimentrifle": {
+  "name": "Battacor",
+  "wiki": "Battacor",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:secondary_fire": {
+    "main": {
+     "damage": {
+      "radiation": 208.0,
+      "total": 208.0
+     },
+     "criticalChance": 0.34,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.08,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Battacor",
+    "attack": "Secondary Fire",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Secondary Fire AoE",
+      "damage": {
+       "radiation": 208.0,
+       "total": 208.0
+      },
+      "criticalChance": 0.34,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.5,
+      "radius_m": 3.4,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.4
+     }
+    ],
+    "charge_seconds": 0.4
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpshockrifle/crpshockrifle": {
+  "name": "Quanta",
+  "wiki": "Quanta",
+  "main_attack": "Beam",
+  "forms": {
+   "alt_fire:cube_direct_hit": {
+    "main": {
+     "damage": {
+      "electricity": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.05,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.26,
+     "fireRate": 4.0,
+     "multishot": 1.0
+    },
+    "name": "Quanta",
+    "attack": "Cube (direct hit)",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Cube Explosion",
+      "damage": {
+       "blast": 150.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.05,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.26,
+      "radius_m": 0.5,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     }
+    ],
+    "ammo_cost": 10.0
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpshockrifle/quantavandal": {
+  "name": "Quanta Vandal",
+  "wiki": "Quanta Vandal",
+  "main_attack": "Beam",
+  "forms": {
+   "alt_fire:cube_direct_hit": {
+    "main": {
+     "damage": {
+      "electricity": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.05,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.26,
+     "fireRate": 4.0,
+     "multishot": 1.0
+    },
+    "name": "Quanta Vandal",
+    "attack": "Cube (direct hit)",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Cube Explosion",
+      "damage": {
+       "blast": 150.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.05,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.26,
+      "radius_m": 0.5,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     }
+    ],
+    "ammo_cost": 10.0
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/crpsplitlaser/crpsplitlaser": {
+  "name": "Convectrix",
+  "wiki": "Convectrix",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 0.9,
+      "puncture": 0.9,
+      "slash": 7.2,
+      "total": 9.0
+     },
+     "criticalChance": 0.16,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.45,
+     "fireRate": 16.0,
+     "multishot": 2.0
+    },
+    "name": "Convectrix",
+    "attack": "Alt-Fire",
+    "ammo_cost": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/corpus/longguns/grenadelauncher/carminepenta": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Grenade Detonation",
+    "damage": {
+     "blast": 350.0,
+     "total": 350.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.1,
+    "radius_m": 4.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 75.0,
+    "total": 75.0
+   }
+  },
+  "name": "Carmine Penta",
+  "wiki": "Carmine Penta",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/corpus/longguns/grenadelauncher/grenadelauncher": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Grenade Detonation",
+    "damage": {
+     "blast": 350.0,
+     "total": 350.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.1,
+    "radius_m": 4.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 75.0,
+    "total": 75.0
+   }
+  },
+  "name": "Penta",
+  "wiki": "Penta",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/corpus/longguns/spears/railgun/corpusrailgun": {
+  "charge_seconds": 0.5,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "impact": 100.0,
+     "total": 100.0
+    },
+    "criticalChance": 0.32,
+    "criticalMultiplier": 2.8,
+    "procChance": 0.1,
+    "radius_m": 3.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 35.0,
+    "puncture": 245.0,
+    "slash": 70.0,
+    "total": 350.0
+   }
+  },
+  "name": "Ferrox",
+  "wiki": "Ferrox",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "alt_fire:spear_throw": {
+    "main": {
+     "damage": {
+      "impact": 35.0,
+      "puncture": 5.0,
+      "slash": 10.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.04,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.33,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Ferrox",
+    "attack": "Spear Throw",
+    "segments": [
+     {
+      "id": "lingering",
+      "name": "残留云团",
+      "attack": "Attraction Field",
+      "damage": {
+       "electricity": 150.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.04,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.5,
+      "radius_m": 10.0,
+      "merge_only": true
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/corpus/pistols/crpairpistol/crpairpistolarray": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "impact": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.25,
+    "radius_m": 5.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 150.0,
+    "total": 150.0
+   }
+  },
+  "name": "Sonicor",
+  "wiki": "Sonicor",
+  "main_attack": "Projectile Impact"
+ },
+ "/lotus/weapons/corpus/pistols/crpbriefcaseakimbo/crpbriefcaseakimbopistol": {
+  "name": "Tenet Diplos",
+  "wiki": "Tenet Diplos",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:lock_on_mode": {
+    "main": {
+     "damage": {
+      "impact": 11.2,
+      "puncture": 9.0,
+      "slash": 7.8,
+      "total": 28.0
+     },
+     "criticalChance": 0.36,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.14,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Tenet Diplos",
+    "attack": "Lock-on Mode",
+    "burst": {
+     "count": 2,
+     "delay_seconds": 0.06
+    },
+    "ammo_cost": 2.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/corpus/pistols/crpelectromag/crpelectromag": {
+  "charge_seconds": 1.0,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Fully Charged Explosion",
+    "damage": {
+     "radiation": 106.0,
+     "total": 106.0
+    },
+    "criticalChance": 0.14,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.28,
+    "radius_m": 9.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.9
+   }
+  ],
+  "main": {
+   "damage": {
+    "radiation": 44.0,
+    "total": 44.0
+   }
+  },
+  "name": "Staticor",
+  "wiki": "Staticor",
+  "main_attack": "Fully Charged Projectile",
+  "main_form": "charged",
+  "forms": {
+   "base:uncharged_projectile": {
+    "main": {
+     "damage": {
+      "radiation": 44.0,
+      "total": 44.0
+     },
+     "criticalChance": 0.14,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.28,
+     "fireRate": 3.5,
+     "multishot": 1.0
+    },
+    "name": "Staticor",
+    "attack": "Uncharged Projectile",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Uncharged Explosion",
+      "damage": {
+       "radiation": 88.0,
+       "total": 88.0
+      },
+      "criticalChance": 0.0,
+      "criticalMultiplier": 1.0,
+      "procChance": 0.28,
+      "radius_m": 2.4,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.3
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/corpus/pistols/crphandrl/corpushandrocketlauncher": {
+  "charge_seconds": 0.5,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Single Rocket Explosion",
+    "damage": {
+     "blast": 250.0,
+     "total": 250.0
+    },
+    "criticalChance": 0.16,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.22,
+    "radius_m": 3.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4
+   }
+  ],
+  "main": {
+   "damage": {
+    "blast": 200.0,
+    "total": 200.0
+   }
+  },
+  "name": "Angstrum",
+  "wiki": "Angstrum",
+  "main_attack": "Single Rocket Impact"
+ },
+ "/lotus/weapons/corpus/pistols/crphandrl/prismaangstrum": {
+  "charge_seconds": 0.2,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Single Rocket Explosion",
+    "damage": {
+     "blast": 250.0,
+     "total": 250.0
+    },
+    "criticalChance": 0.18,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.26,
+    "radius_m": 3.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4
+   }
+  ],
+  "main": {
+   "damage": {
+    "blast": 200.0,
+    "total": 200.0
+   }
+  },
+  "name": "Prisma Angstrum",
+  "wiki": "Prisma Angstrum",
+  "main_attack": "Single Rocket Impact"
+ },
+ "/lotus/weapons/corpus/pistols/crpigniterpistol/crpigniterpistol": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "heat": 80.0,
+     "total": 80.0
+    },
+    "criticalChance": 0.26,
+    "criticalMultiplier": 2.4,
+    "procChance": 0.4,
+    "radius_m": 2.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 40.0,
+    "puncture": 20.0,
+    "heat": 60.0,
+    "total": 120.0
+   }
+  },
+  "name": "Tenet Spirex",
+  "wiki": "Tenet Spirex",
+  "main_attack": "Slug Impact"
+ },
+ "/lotus/weapons/corpus/pistols/crpsentamalgpistol/crpsentamalgpistol": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Projectile Explosion",
+    "damage": {
+     "gas": 41.0,
+     "total": 41.0
+    },
+    "criticalChance": 0.08,
+    "criticalMultiplier": 1.4,
+    "procChance": 0.32,
+    "radius_m": 0.7,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 50.0,
+    "total": 50.0
+   }
+  },
+  "name": "Cyanex",
+  "wiki": "Cyanex",
+  "main_attack": "Projectile Impact",
+  "forms": {
+   "alt_fire:burst_mode": {
+    "main": {
+     "damage": {
+      "impact": 2.88,
+      "puncture": 30.24,
+      "slash": 38.88,
+      "total": 72.0
+     },
+     "criticalChance": 0.08,
+     "criticalMultiplier": 1.4,
+     "procChance": 0.32,
+     "fireRate": 4.67,
+     "multishot": 1.0
+    },
+    "name": "Cyanex",
+    "attack": "Burst Mode",
+    "burst": {
+     "count": 11,
+     "delay_seconds": 0.08
+    },
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/bows/grnbow/grnbowweapon": {
+  "charge_seconds": 0.4,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "blast": 839.0,
+     "total": 839.0
+    },
+    "criticalChance": 0.35,
+    "criticalMultiplier": 2.1,
+    "procChance": 0.21,
+    "radius_m": 8.3,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.9
+   },
+   {
+    "id": "cluster",
+    "name": "集束子炸弹（接触）",
+    "attack": "Cluster Bomb Contact",
+    "damage": {
+     "impact": 49.0,
+     "total": 49.0
+    },
+    "criticalChance": 0.35,
+    "criticalMultiplier": 2.1,
+    "procChance": 0.21,
+    "count": 3.0
+   },
+   {
+    "id": "cluster_radial",
+    "name": "集束子炸弹（爆炸）",
+    "attack": "Cluster Bomb Explosion",
+    "damage": {
+     "blast": 57.0,
+     "total": 57.0
+    },
+    "criticalChance": 0.35,
+    "criticalMultiplier": 2.1,
+    "procChance": 0.21,
+    "radius_m": 3.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5,
+    "count": 3.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 187.0,
+    "total": 187.0
+   }
+  },
+  "name": "Kuva Bramma",
+  "wiki": "Kuva Bramma",
+  "main_attack": "Charged Shot"
+ },
+ "/lotus/weapons/grineer/heavyweapons/grnheavygrenadelauncher": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "blast": 280.0,
+     "total": 280.0
+    },
+    "criticalChance": 0.35,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.2,
+    "radius_m": 6.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 130.0,
+    "total": 130.0
+   }
+  },
+  "name": "Kuva Ayanga",
+  "wiki": "Kuva Ayanga (Atmosphere)",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/grineer/kuvalich/heavyweapons/grattler/kuvagrattler": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "blast": 235.0,
+     "total": 235.0
+    },
+    "criticalChance": 0.27,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.27,
+    "radius_m": 9.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 14.0,
+    "puncture": 112.0,
+    "slash": 14.0,
+    "total": 140.0
+   }
+  },
+  "name": "Kuva Grattler",
+  "wiki": "Kuva Grattler (Atmosphere)",
+  "main_attack": "Projectile Impact"
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/drakgoon/kuvadrakgoon": {
+  "name": "Kuva Drakgoon",
+  "wiki": "Kuva Drakgoon",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 4.6,
+      "puncture": 4.6,
+      "slash": 36.8,
+      "total": 46.0
+     },
+     "criticalChance": 0.21,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.09,
+     "fireRate": 3.33,
+     "multishot": 10.0
+    },
+    "name": "Kuva Drakgoon",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.3
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/hek/kuvahekweapon": {
+  "name": "Kuva Hek",
+  "wiki": "Kuva Hek",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 13.05,
+      "puncture": 56.55,
+      "slash": 17.4,
+      "total": 87.0
+     },
+     "criticalChance": 0.23,
+     "criticalMultiplier": 2.1,
+     "procChance": 0.0332,
+     "fireRate": 1.17,
+     "multishot": 28.0
+    },
+    "name": "Kuva Hek",
+    "attack": "Alt-Fire",
+    "ammo_cost": 4.0
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/hind/kuvahind": {
+  "name": "Kuva Hind",
+  "wiki": "Kuva Hind",
+  "main_attack": "Burst",
+  "forms": {
+   "auto:auto": {
+    "main": {
+     "damage": {
+      "impact": 6.0,
+      "puncture": 6.0,
+      "slash": 18.0,
+      "total": 30.0
+     },
+     "criticalChance": 0.21,
+     "criticalMultiplier": 1.9,
+     "procChance": 0.33,
+     "fireRate": 10.0,
+     "multishot": 1.0
+    },
+    "name": "Kuva Hind",
+    "attack": "Auto"
+   },
+   "semi_auto:semi_auto": {
+    "main": {
+     "damage": {
+      "impact": 18.0,
+      "puncture": 18.0,
+      "slash": 54.0,
+      "total": 90.0
+     },
+     "criticalChance": 0.37,
+     "criticalMultiplier": 2.9,
+     "procChance": 0.21,
+     "fireRate": 2.5,
+     "multishot": 1.0
+    },
+    "name": "Kuva Hind",
+    "attack": "Semi-Auto",
+    "ammo_cost": 3.0
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/kohm/kuvakohm": {
+  "name": "Kuva Kohm",
+  "wiki": "Kuva Kohm",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "alt_fire:single_pellet": {
+    "main": {
+     "damage": {
+      "impact": 4.0,
+      "puncture": 4.0,
+      "slash": 12.0,
+      "total": 20.0
+     },
+     "criticalChance": 0.19,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.9,
+     "fireRate": 0.8333,
+     "multishot": 1.0
+    },
+    "name": "Kuva Kohm",
+    "attack": "Single Pellet"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/ogris/kuvaogris": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Explosion",
+    "damage": {
+     "puncture": 183.0,
+     "slash": 155.0,
+     "blast": 349.0,
+     "total": 687.0
+    },
+    "criticalChance": 0.09,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.47,
+    "radius_m": 7.9,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.8
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 18.9,
+    "puncture": 8.1,
+    "total": 27.0
+   }
+  },
+  "name": "Kuva Ogris",
+  "wiki": "Kuva Ogris",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/quartakk/kuvaquartakk": {
+  "name": "Kuva Quartakk",
+  "wiki": "Kuva Quartakk",
+  "main_attack": "Full-Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:burst_fire_while_aiming": {
+    "main": {
+     "damage": {
+      "impact": 19.98,
+      "puncture": 15.66,
+      "slash": 18.36,
+      "total": 54.0
+     },
+     "criticalChance": 0.31,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.27,
+     "fireRate": 1.58,
+     "multishot": 1.0
+    },
+    "name": "Kuva Quartakk",
+    "attack": "Burst-Fire While Aiming",
+    "burst": {
+     "count": 4,
+     "delay_seconds": 0.0
+    }
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/tonkor/kuvatonkor": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Grenade Explosion",
+    "damage": {
+     "puncture": 168.0,
+     "slash": 204.0,
+     "blast": 302.0,
+     "total": 674.0
+    },
+    "criticalChance": 0.3,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.17,
+    "radius_m": 7.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "puncture": 59.0,
+    "total": 59.0
+   }
+  },
+  "name": "Kuva Tonkor",
+  "wiki": "Kuva Tonkor",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/grineer/kuvalich/longguns/zarr/kuvazarr": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Cannon Mode Explosion",
+    "damage": {
+     "blast": 673.0,
+     "total": 673.0
+    },
+    "criticalChance": 0.25,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.31,
+    "radius_m": 7.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   },
+   {
+    "id": "cluster",
+    "name": "集束子炸弹（接触）",
+    "attack": "Cannon Mode Cluster Bomb Contact",
+    "damage": {
+     "impact": 15.0,
+     "total": 15.0
+    },
+    "criticalChance": 0.25,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.31,
+    "count": 3.0
+   },
+   {
+    "id": "cluster_radial",
+    "name": "集束子炸弹（爆炸）",
+    "attack": "Cannon Mode Cluster Bomb Explosion",
+    "damage": {
+     "blast": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.25,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.31,
+    "radius_m": 3.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.1,
+    "count": 3.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 50.0,
+    "total": 50.0
+   }
+  },
+  "name": "Kuva Zarr",
+  "wiki": "Kuva Zarr",
+  "main_attack": "Cannon Mode Projectile",
+  "forms": {
+   "alt_fire:barrage_mode": {
+    "main": {
+     "damage": {
+      "impact": 15.0,
+      "puncture": 25.0,
+      "slash": 10.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.37,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.097,
+     "fireRate": 2.17,
+     "multishot": 10.0
+    },
+    "name": "Kuva Zarr",
+    "attack": "Barrage Mode"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/secondaries/kraken/kuvakraken": {
+  "name": "Kuva Kraken",
+  "wiki": "Kuva Kraken",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 32.25,
+      "puncture": 5.375,
+      "slash": 5.375,
+      "total": 43.0
+     },
+     "criticalChance": 0.21,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.29,
+     "fireRate": 4.17,
+     "multishot": 1.0
+    },
+    "name": "Kuva Kraken",
+    "attack": "Alt-Fire",
+    "burst": {
+     "count": 21,
+     "delay_seconds": 0.05
+    }
+   }
+  }
+ },
+ "/lotus/weapons/grineer/kuvalich/secondaries/seer/kuvaseer": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "corrosive": 69.0,
+     "total": 69.0
+    },
+    "criticalChance": 0.21,
+    "criticalMultiplier": 1.9,
+    "procChance": 0.33,
+    "radius_m": 2.3,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 26.2,
+    "puncture": 68.12,
+    "slash": 36.68,
+    "total": 131.0
+   }
+  },
+  "name": "Kuva Seer",
+  "wiki": "Kuva Seer",
+  "main_attack": "Projectile Impact"
+ },
+ "/lotus/weapons/grineer/longguns/burstrifle/grnburstrifle": {
+  "name": "Hind",
+  "wiki": "Hind",
+  "main_attack": "Burst Mode",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 12.0,
+      "puncture": 12.0,
+      "slash": 36.0,
+      "total": 60.0
+     },
+     "criticalChance": 0.15,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.1,
+     "fireRate": 2.5,
+     "multishot": 1.0
+    },
+    "name": "Hind",
+    "attack": "Semi-Auto Mode"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grineerflakcannon/flakcannon": {
+  "name": "Drakgoon",
+  "wiki": "Drakgoon",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 7.0,
+      "puncture": 7.0,
+      "slash": 56.0,
+      "total": 70.0
+     },
+     "criticalChance": 0.075,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.069,
+     "fireRate": 3.33,
+     "multishot": 10.0
+    },
+    "name": "Drakgoon",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grineersawbladegun/sawbladegun": {
+  "name": "Miter",
+  "wiki": "Miter",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 25.0,
+      "puncture": 25.0,
+      "slash": 450.0,
+      "total": 500.0
+     },
+     "criticalChance": 0.1,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.5,
+     "fireRate": 2.5,
+     "multishot": 1.0
+    },
+    "name": "Miter",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.75
+   },
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 12.0,
+      "puncture": 6.0,
+      "slash": 42.0,
+      "total": 60.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 3.3,
+     "procChance": 0.56,
+     "fireRate": 3.33,
+     "multishot": 1.0
+    },
+    "name": "Miter",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "heat": 80.0,
+       "total": 80.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 3.3,
+      "procChance": 0.56,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grncannon/grncannonweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Cannon Mode Explosion",
+    "damage": {
+     "blast": 175.0,
+     "total": 175.0
+    },
+    "criticalChance": 0.17,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.29,
+    "radius_m": 4.9,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   },
+   {
+    "id": "cluster",
+    "name": "集束子炸弹（接触）",
+    "attack": "Cannon Mode Cluster Bomb Contact",
+    "damage": {
+     "impact": 15.0,
+     "total": 15.0
+    },
+    "criticalChance": 0.15,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.2,
+    "count": 6.0
+   },
+   {
+    "id": "cluster_radial",
+    "name": "集束子炸弹（爆炸）",
+    "attack": "Cannon Mode Cluster Bomb Explosion",
+    "damage": {
+     "blast": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.15,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.1,
+    "radius_m": 3.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.9,
+    "count": 6.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 25.0,
+    "total": 25.0
+   }
+  },
+  "name": "Zarr",
+  "wiki": "Zarr",
+  "main_attack": "Cannon Mode Projectile",
+  "forms": {
+   "alt_fire:barrage_mode": {
+    "main": {
+     "damage": {
+      "impact": 24.0,
+      "puncture": 40.0,
+      "slash": 16.0,
+      "total": 80.0
+     },
+     "criticalChance": 0.17,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.087,
+     "fireRate": 3.0,
+     "multishot": 10.0
+    },
+    "name": "Zarr",
+    "attack": "Barrage Mode"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grnflamespear/grnflamespear": {
+  "charge_seconds": 0.3,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Projectile Explosion",
+    "damage": {
+     "heat": 120.0,
+     "total": 120.0
+    },
+    "criticalChance": 0.2,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.25,
+    "radius_m": 2.4,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "heat": 160.0,
+    "total": 160.0
+   }
+  },
+  "name": "Javlok",
+  "wiki": "Javlok",
+  "main_attack": "Projectile Impact",
+  "forms": {
+   "alt_fire:spear_throw_impact": {
+    "main": {
+     "damage": {
+      "impact": 45.0,
+      "puncture": 75.0,
+      "slash": 30.0,
+      "total": 150.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.25,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Javlok",
+    "attack": "Spear Throw Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Spear Throw Explosion",
+      "damage": {
+       "heat": 300.0,
+       "total": 300.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.25,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grngorgsniperrifle/grngorgsniperrifle": {
+  "name": "Buzlok",
+  "wiki": "Buzlok",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:beacon": {
+    "main": {
+     "damage": {
+      "puncture": 3.0,
+      "total": 3.0
+     },
+     "criticalChance": 0.0,
+     "criticalMultiplier": 1.0,
+     "procChance": 0.0,
+     "fireRate": 1.67,
+     "multishot": 1.0
+    },
+    "name": "Buzlok",
+    "attack": "Beacon",
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grngrenadelauncher/grngrenadelauncher": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Grenade Explosion",
+    "damage": {
+     "blast": 650.0,
+     "total": 650.0
+    },
+    "criticalChance": 0.25,
+    "criticalMultiplier": 2.5,
+    "procChance": 0.1,
+    "radius_m": 7.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "puncture": 75.0,
+    "total": 75.0
+   }
+  },
+  "name": "Tonkor",
+  "wiki": "Tonkor",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/grineer/longguns/grnharpoongun/grnharpoongun": {
+  "name": "Harpak",
+  "wiki": "Harpak",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:harpoon": {
+    "main": {
+     "damage": {
+      "impact": 40.0,
+      "puncture": 50.0,
+      "slash": 10.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.25,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.13,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Harpak",
+    "attack": "Harpoon",
+    "forced_procs": [
+     "puncture"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/grnkuvalichrifle/grnkuvalichrifleweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "puncture": 52.0,
+     "slash": 29.0,
+     "blast": 25.0,
+     "total": 106.0
+    },
+    "criticalChance": 0.5,
+    "criticalMultiplier": 2.3,
+    "procChance": 0.27,
+    "radius_m": 2.9,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 260.0,
+    "total": 260.0
+   }
+  },
+  "name": "Kuva Chakkhurr",
+  "wiki": "Kuva Chakkhurr",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/grineer/longguns/grnspark/grnsparkrifle": {
+  "name": "Kohm",
+  "wiki": "Kohm",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "alt_fire:single_pellet": {
+    "main": {
+     "damage": {
+      "impact": 6.0,
+      "puncture": 6.0,
+      "slash": 18.0,
+      "total": 30.0
+     },
+     "criticalChance": 0.11,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.75,
+     "fireRate": 0.7333,
+     "multishot": 1.0
+    },
+    "name": "Kohm",
+    "attack": "Single Pellet"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/laseraimrifle/laseraimrifle": {
+  "name": "Argonak",
+  "wiki": "Argonak",
+  "main_attack": "Semi-Auto Mode",
+  "main_form": "semi_auto",
+  "forms": {
+   "auto:full_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 24.51,
+      "puncture": 6.27,
+      "slash": 26.22,
+      "total": 57.0
+     },
+     "criticalChance": 0.09,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.27,
+     "fireRate": 6.0,
+     "multishot": 1.0
+    },
+    "name": "Argonak",
+    "attack": "Full Auto Mode"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/voidtradergorgon/vtgorgon": {
+  "name": "Prisma Gorgon",
+  "wiki": "Prisma Gorgon",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 15.0,
+      "puncture": 45.0,
+      "slash": 15.0,
+      "total": 75.0
+     },
+     "criticalChance": 0.27,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.21,
+     "fireRate": 1.167,
+     "multishot": 1.0
+    },
+    "name": "Prisma Gorgon",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 700.0,
+       "total": 700.0
+      },
+      "criticalChance": 0.27,
+      "criticalMultiplier": 2.3,
+      "procChance": 0.21,
+      "radius_m": 5.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/grineer/longguns/wraithgorgon/wraithgorgon": {
+  "name": "Gorgon Wraith",
+  "wiki": "Gorgon Wraith",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 25.0,
+      "puncture": 75.0,
+      "slash": 25.0,
+      "total": 125.0
+     },
+     "criticalChance": 0.19,
+     "criticalMultiplier": 2.1,
+     "procChance": 0.27,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Gorgon Wraith",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 750.0,
+       "total": 750.0
+      },
+      "criticalChance": 0.19,
+      "criticalMultiplier": 2.1,
+      "procChance": 0.27,
+      "radius_m": 5.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/grineer/pistols/grineercrossbow/grineergoogun": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Blob Explosion",
+    "damage": {
+     "corrosive": 75.0,
+     "total": 75.0
+    },
+    "criticalChance": 0.05,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.1,
+    "radius_m": 0.3,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "corrosive": 4.0,
+    "total": 4.0
+   }
+  },
+  "name": "Stug",
+  "wiki": "Stug",
+  "main_attack": "Blob Embed",
+  "forms": {
+   "incarnon:incarnon_form_blob_embed": {
+    "main": {
+     "damage": {
+      "corrosive": 50.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.15,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.2,
+     "fireRate": 4.0,
+     "multishot": 1.0
+    },
+    "name": "Stug",
+    "attack": "Incarnon Form Blob Embed",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Blob Explosion",
+      "damage": {
+       "corrosive": 200.0,
+       "total": 200.0
+      },
+      "criticalChance": 0.15,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.2,
+      "radius_m": 0.3,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.3
+     }
+    ],
+    "co_behavior": "inert"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/pistols/grnamphispistol/grnamphispistol": {
+  "name": "Quatz",
+  "wiki": "Quatz",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:burst": {
+    "main": {
+     "damage": {
+      "impact": 9.0,
+      "puncture": 2.0,
+      "slash": 7.0,
+      "electricity": 11.0,
+      "total": 29.0
+     },
+     "criticalChance": 0.27,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.19,
+     "fireRate": 2.5,
+     "multishot": 1.0
+    },
+    "name": "Quatz",
+    "attack": "Burst",
+    "burst": {
+     "count": 4,
+     "delay_seconds": 0.0
+    }
+   }
+  }
+ },
+ "/lotus/weapons/grineer/pistols/grndwuniques/grntwinkohmaks": {
+  "name": "Twin Kohmak",
+  "wiki": "Twin Kohmak",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "alt_fire:single_pellet": {
+    "main": {
+     "damage": {
+      "impact": 6.0,
+      "puncture": 6.0,
+      "slash": 18.0,
+      "total": 30.0
+     },
+     "criticalChance": 0.11,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.69,
+     "fireRate": 1.334,
+     "multishot": 1.0
+    },
+    "name": "Twin Kohmak",
+    "attack": "Single Pellet"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/pistols/grnkohmpistol/grnkohmpistol": {
+  "name": "Kohmak",
+  "wiki": "Kohmak",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "alt_fire:single_pellet": {
+    "main": {
+     "damage": {
+      "impact": 6.0,
+      "puncture": 6.0,
+      "slash": 18.0,
+      "total": 30.0
+     },
+     "criticalChance": 0.11,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.69,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Kohmak",
+    "attack": "Single Pellet"
+   }
+  }
+ },
+ "/lotus/weapons/grineer/pistols/grntorpedopistol/grntorpedopistol": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Explosion",
+    "damage": {
+     "blast": 300.0,
+     "total": 300.0
+    },
+    "criticalChance": 0.17,
+    "criticalMultiplier": 2.3,
+    "procChance": 0.19,
+    "radius_m": 3.9,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4
+   },
+   {
+    "id": "cluster",
+    "name": "集束子炸弹（接触）",
+    "attack": "Cluster Bombs",
+    "damage": {
+     "impact": 75.0,
+     "total": 75.0
+    },
+    "criticalChance": 0.17,
+    "criticalMultiplier": 2.3,
+    "procChance": 0.19,
+    "count": 3.0
+   },
+   {
+    "id": "cluster_radial",
+    "name": "集束子炸弹（爆炸）",
+    "attack": "Cluster Bomb Explosion",
+    "damage": {
+     "blast": 90.0,
+     "total": 90.0
+    },
+    "criticalChance": 0.17,
+    "criticalMultiplier": 2.3,
+    "procChance": 0.19,
+    "radius_m": 3.9,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4,
+    "count": 3.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 200.0,
+    "total": 200.0
+   }
+  },
+  "name": "Kulstar",
+  "wiki": "Kulstar",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/grineer/pistols/heatgun/grnheatgun": {
+  "name": "Atomos",
+  "wiki": "Atomos",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.18,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.41,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Atomos",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "blast": 450.0,
+       "total": 450.0
+      },
+      "criticalChance": 0.18,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.41,
+      "radius_m": 7.9,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.8
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/grineer/throwingweapons/grnvorstickybomb/grnvorstickybomb": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Detonation",
+    "damage": {
+     "blast": 797.0,
+     "total": 797.0
+    },
+    "criticalChance": 0.37,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.19,
+    "radius_m": 9.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 4.5,
+    "puncture": 1.8,
+    "slash": 2.7,
+    "total": 9.0
+   }
+  },
+  "name": "Aegrit",
+  "wiki": "Aegrit",
+  "main_attack": "Direct Hit"
+ },
+ "/lotus/weapons/infested/bow/infcernosbow/infcernos": {
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Toxin Cloud",
+    "damage": {
+     "toxin": 5.0,
+     "total": 5.0
+    },
+    "criticalChance": 0.15,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.49,
+    "radius_m": 2.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0,
+    "merge_only": true,
+    "takes_condition_overload": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 184.5,
+    "puncture": 10.25,
+    "slash": 10.25,
+    "total": 205.0
+   }
+  },
+  "name": "Mutalist Cernos",
+  "wiki": "Mutalist Cernos",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 369.0,
+      "puncture": 20.5,
+      "slash": 20.5,
+      "total": 410.0
+     },
+     "criticalChance": 0.15,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.49,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Mutalist Cernos",
+    "attack": "Charged Shot",
+    "segments": [
+     {
+      "id": "lingering",
+      "name": "残留云团",
+      "attack": "Toxin Cloud",
+      "damage": {
+       "toxin": 5.0,
+       "total": 5.0
+      },
+      "criticalChance": 0.15,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.49,
+      "radius_m": 2.5,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0,
+      "merge_only": true,
+      "takes_condition_overload": true
+     }
+    ],
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/infested/infestedlich/longguns/1999infshotgun/1999infshotgunweapon": {
+  "name": "Coda Bassocyst",
+  "wiki": "Coda Bassocyst",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "blast": 303.0,
+      "total": 303.0
+     },
+     "criticalChance": 0.18,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.4,
+     "fireRate": 1.67,
+     "multishot": 6.0
+    },
+    "name": "Coda Bassocyst",
+    "attack": "Alt-Fire",
+    "forced_procs": [
+     "impact",
+     "magnetic"
+    ],
+    "ammo_cost": 4.0,
+    "co_behavior": "inert"
+   }
+  }
+ },
+ "/lotus/weapons/infested/infestedlich/longguns/codabubonico/codabubonicocannon": {
+  "name": "Coda Bubonico",
+  "wiki": "Coda Bubonico",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:burst": {
+    "main": {
+     "damage": {
+      "impact": 9.0,
+      "total": 9.0
+     },
+     "criticalChance": 0.05,
+     "criticalMultiplier": 3.5,
+     "procChance": 0.61,
+     "fireRate": 7.0,
+     "multishot": 1.0
+    },
+    "name": "Coda Bubonico",
+    "attack": "Burst",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Radial Attack",
+      "damage": {
+       "viral": 143.0,
+       "total": 143.0
+      },
+      "criticalChance": 0.05,
+      "criticalMultiplier": 3.5,
+      "procChance": 0.57,
+      "radius_m": 7.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     }
+    ],
+    "burst": {
+     "count": 3,
+     "delay_seconds": 0.23
+    },
+    "ammo_cost": 3.0
+   }
+  }
+ },
+ "/lotus/weapons/infested/infestedlich/longguns/codasporothrix": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "AoE",
+    "damage": {
+     "slash": 25.0,
+     "viral": 23.0,
+     "total": 48.0
+    },
+    "criticalChance": 0.05,
+    "criticalMultiplier": 3.0,
+    "procChance": 0.55,
+    "radius_m": 2.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.1
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 101.52,
+    "puncture": 116.56,
+    "slash": 157.92,
+    "total": 376.0
+   }
+  },
+  "name": "Coda Sporothrix",
+  "wiki": "Coda Sporothrix",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/infested/infestedlich/pistols/codacatabolyst": {
+  "name": "Coda Catabolyst",
+  "wiki": "Coda Catabolyst",
+  "main_attack": "Primary",
+  "forms": {
+   "alt_fire:partial_reload_impact": {
+    "main": {
+     "damage": {
+      "impact": 11.0,
+      "total": 11.0
+     },
+     "criticalChance": 0.11,
+     "criticalMultiplier": 2.9,
+     "procChance": 0.43,
+     "fireRate": 12.0,
+     "multishot": 3.0
+    },
+    "name": "Coda Catabolyst",
+    "attack": "Partial Reload Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Partial Reload Explosion",
+      "damage": {
+       "corrosive": 74.0,
+       "total": 74.0
+      },
+      "criticalChance": 0.11,
+      "criticalMultiplier": 2.9,
+      "procChance": 0.43,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/infested/infestedlich/pistols/codapox": {
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Poison Cloud",
+    "damage": {
+     "toxin": 35.0,
+     "total": 35.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.45,
+    "radius_m": 2.8,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0,
+    "merge_only": true,
+    "takes_condition_overload": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "toxin": 55.0,
+    "total": 55.0
+   }
+  },
+  "name": "Coda Pox",
+  "wiki": "Coda Pox",
+  "main_attack": "Spore Impact"
+ },
+ "/lotus/weapons/infested/infestedlich/pistols/codatysis": {
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Corrosive DoT",
+    "damage": {
+     "corrosive": 59.0,
+     "total": 59.0
+    },
+    "criticalChance": 0.13,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.5,
+    "merge_only": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 18.0,
+    "puncture": 32.0,
+    "slash": 26.0,
+    "total": 76.0
+   }
+  },
+  "name": "Coda Tysis",
+  "wiki": "Coda Tysis",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/infested/longguns/infarmcannon/infarmcannon": {
+  "name": "Bubonico",
+  "wiki": "Bubonico",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:burst": {
+    "main": {
+     "damage": {
+      "impact": 9.0,
+      "total": 9.0
+     },
+     "criticalChance": 0.03,
+     "criticalMultiplier": 3.5,
+     "procChance": 0.57,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Bubonico",
+    "attack": "Burst",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Radial Attack",
+      "damage": {
+       "viral": 143.0,
+       "total": 143.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 3.5,
+      "procChance": 0.57,
+      "radius_m": 7.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     }
+    ],
+    "burst": {
+     "count": 3,
+     "delay_seconds": 0.23
+    },
+    "ammo_cost": 3.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/infested/longguns/infcrpshockswarm/infcrpshockswarmrifle": {
+  "name": "Mutalist Quanta",
+  "wiki": "Mutalist Quanta",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:infested_orb": {
+    "main": {
+     "damage": {
+      "radiation": 20.0,
+      "total": 20.0
+     },
+     "criticalChance": 0.0,
+     "criticalMultiplier": 1.0,
+     "procChance": 1.0,
+     "fireRate": 10.0,
+     "multishot": 1.0
+    },
+    "name": "Mutalist Quanta",
+    "attack": "Infested Orb",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Orb Explosion",
+      "damage": {
+       "toxin": 100.0,
+       "total": 100.0
+      },
+      "criticalChance": 0.05,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.39,
+      "radius_m": 4.4,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     }
+    ],
+    "ammo_cost": 5.0
+   }
+  }
+ },
+ "/lotus/weapons/infested/longguns/infsniperrifle/infsniperrifle": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "AoE",
+    "damage": {
+     "slash": 22.0,
+     "viral": 19.0,
+     "total": 41.0
+    },
+    "criticalChance": 0.01,
+    "criticalMultiplier": 3.0,
+    "procChance": 0.53,
+    "radius_m": 1.7,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.1
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 100.17,
+    "puncture": 115.01,
+    "slash": 155.82,
+    "total": 371.0
+   }
+  },
+  "name": "Sporothrix",
+  "wiki": "Sporothrix",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/infested/longguns/quantafullyinfested/infquantarifle": {
+  "name": "Paracyst",
+  "wiki": "Paracyst",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:infested_harpoon": {
+    "main": {
+     "damage": {
+      "toxin": 15.0,
+      "total": 15.0
+     },
+     "criticalChance": 0.0,
+     "criticalMultiplier": 1.0,
+     "procChance": 0.3,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Paracyst",
+    "attack": "Infested Harpoon",
+    "charge_seconds": 0.25,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/infested/pistols/infbeampistol/infbeampistol": {
+  "name": "Catabolyst",
+  "wiki": "Catabolyst",
+  "main_attack": "Primary",
+  "forms": {
+   "alt_fire:partial_reload_impact": {
+    "main": {
+     "damage": {
+      "impact": 11.0,
+      "total": 11.0
+     },
+     "criticalChance": 0.11,
+     "criticalMultiplier": 2.9,
+     "procChance": 0.43,
+     "fireRate": 12.0,
+     "multishot": 1.0
+    },
+    "name": "Catabolyst",
+    "attack": "Partial Reload Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Partial Reload Explosion",
+      "damage": {
+       "corrosive": 203.0,
+       "total": 203.0
+      },
+      "criticalChance": 0.11,
+      "criticalMultiplier": 2.9,
+      "procChance": 0.43,
+      "radius_m": 5.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/infested/pistols/infesteddartpistol/infesteddartpistol": {
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Corrosive DoT",
+    "damage": {
+     "corrosive": 27.0,
+     "total": 27.0
+    },
+    "criticalChance": 0.03,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.5,
+    "merge_only": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 9.0,
+    "puncture": 23.0,
+    "slash": 17.0,
+    "total": 49.0
+   }
+  },
+  "name": "Tysis",
+  "wiki": "Tysis",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/infested/pistols/infproximitystars/infproximitystars": {
+  "segments": [
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Poison Cloud",
+    "damage": {
+     "toxin": 20.0,
+     "total": 20.0
+    },
+    "criticalChance": 0.01,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.35,
+    "radius_m": 2.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0,
+    "merge_only": true,
+    "takes_condition_overload": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "toxin": 50.0,
+    "total": 50.0
+   }
+  },
+  "name": "Pox",
+  "wiki": "Pox",
+  "main_attack": "Spore Impact"
+ },
+ "/lotus/weapons/infested/pistols/infuzi/infuziweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "toxin": 61.0,
+     "total": 61.0
+    },
+    "criticalChance": 0.05,
+    "criticalMultiplier": 2.3,
+    "procChance": 0.3,
+    "radius_m": 3.3,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   },
+   {
+    "id": "headshot_radial",
+    "name": "爆头爆炸",
+    "attack": "Headshot Explosion",
+    "damage": {
+     "toxin": 953.0,
+     "total": 953.0
+    },
+    "criticalChance": 0.05,
+    "criticalMultiplier": 2.3,
+    "procChance": 0.5,
+    "radius_m": 3.3,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3,
+    "headshot_only": true
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 9.2,
+    "puncture": 13.8,
+    "total": 23.0
+   }
+  },
+  "name": "Zymos",
+  "wiki": "Zymos",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/lasria/lasgooak/lasgooakplayerweapon": {
+  "name": "EFV-5 Jupiter",
+  "wiki": "EFV-5 Jupiter",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "charged:buckshot": {
+    "main": {
+     "damage": {
+      "puncture": 57.0,
+      "slash": 35.0,
+      "corrosive": 35.0,
+      "total": 127.0
+     },
+     "criticalChance": 0.21,
+     "criticalMultiplier": 2.1,
+     "procChance": 0.0573,
+     "fireRate": 7.8334,
+     "multishot": 11.0
+    },
+    "name": "EFV-5 Jupiter",
+    "attack": "Buckshot",
+    "charge_seconds": 1.0,
+    "forced_procs": [
+     "corrosive"
+    ],
+    "ammo_cost": 15.0
+   }
+  }
+ },
+ "/lotus/weapons/lasria/lasgoopistol/lasgoopistolplayerweapon": {
+  "name": "EFV-8 Mars",
+  "wiki": "EFV-8 Mars",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "corrosive": 35.0,
+      "total": 35.0
+     },
+     "criticalChance": 0.27,
+     "criticalMultiplier": 2.1,
+     "procChance": 0.33,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "EFV-8 Mars",
+    "attack": "Alt-Fire",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Alt-Fire AoE",
+      "damage": {
+       "corrosive": 313.0,
+       "total": 313.0
+      },
+      "criticalChance": 0.27,
+      "criticalMultiplier": 2.1,
+      "procChance": 0.33,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.8
+     }
+    ],
+    "ammo_cost": 3.0
+   }
+  }
+ },
+ "/lotus/weapons/mk1series/mk1paris": {
+  "name": "Mk1-Paris",
+  "wiki": "Mk1-Paris",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 11.5,
+      "puncture": 184.0,
+      "slash": 34.5,
+      "total": 230.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.15,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Mk1-Paris",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/mk1series/mk1strun": {
+  "name": "Mk1-Strun",
+  "wiki": "Mk1-Strun",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.44,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.4,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Mk1-Strun",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 25.0,
+       "slash": 60.0,
+       "blast": 45.0,
+       "total": 130.0
+      },
+      "criticalChance": 0.44,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.4,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/sentients/sentoctaminigun/sentoctaminigun": {
+  "name": "Haalvu",
+  "wiki": "Haalvu",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "tau": 34.0,
+      "total": 34.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 1.8,
+     "procChance": 0.26,
+     "fireRate": 12.0,
+     "multishot": 1.0
+    },
+    "name": "Haalvu",
+    "attack": "Alt-Fire",
+    "burst": {
+     "count": 2,
+     "delay_seconds": 0.05
+    },
+    "ammo_cost": 1.5
+   }
+  }
+ },
+ "/lotus/weapons/sentients/sentriflenewwar/sentriflenewwargun": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "heat": 19.0,
+     "total": 19.0
+    },
+    "criticalChance": 0.15,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.29,
+    "radius_m": 1.7,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "electricity": 39.0,
+    "total": 39.0
+   }
+  },
+  "name": "Basmu",
+  "wiki": "Basmu",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:held": {
+    "main": {
+     "damage": {
+      "electricity": 12.0,
+      "total": 12.0
+     },
+     "criticalChance": 0.02,
+     "criticalMultiplier": 4.8,
+     "procChance": 0.3,
+     "fireRate": 12.0,
+     "multishot": 2.0
+    },
+    "name": "Basmu",
+    "attack": "Held"
+   }
+  }
+ },
+ "/lotus/weapons/sentients/shedu/sheduheavyweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "electricity": 87.0,
+     "total": 87.0
+    },
+    "criticalChance": 0.25,
+    "criticalMultiplier": 2.1,
+    "procChance": 0.29,
+    "radius_m": 6.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.6
+   }
+  ],
+  "main": {
+   "damage": {
+    "heat": 71.0,
+    "total": 71.0
+   }
+  },
+  "name": "Shedu",
+  "wiki": "Shedu",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/syndicates/cephalonsuda/longguns/cssimulor": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Orb Explosion",
+    "damage": {
+     "magnetic": 240.0,
+     "total": 240.0
+    },
+    "criticalChance": 0.14,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.35,
+    "radius_m": 5.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 1.0
+   },
+   {
+    "id": "lingering",
+    "name": "残留云团",
+    "attack": "Fully Stacked Orb Singularity",
+    "damage": {
+     "magnetic": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.0,
+    "criticalMultiplier": 1.0,
+    "procChance": 0.0,
+    "radius_m": 5.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0,
+    "merge_only": true
+   }
+  ],
+  "main": {
+   "damage": {}
+  },
+  "name": "Synoid Simulor",
+  "wiki": "Synoid Simulor",
+  "main_attack": "Orb Launch"
+ },
+ "/lotus/weapons/syndicates/cephalonsuda/pistols/csdroidarray": {
+  "name": "Gammacor",
+  "wiki": "Gammacor",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 80.0,
+      "total": 80.0
+     },
+     "criticalChance": 0.14,
+     "criticalMultiplier": 1.8,
+     "procChance": 0.22,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Gammacor",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "cold": 660.0,
+       "total": 660.0
+      },
+      "criticalChance": 0.14,
+      "criticalMultiplier": 1.8,
+      "procChance": 0.22,
+      "radius_m": 5.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.3
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/syndicates/cephalonsuda/pistols/cssynoidgammacor": {
+  "name": "Synoid Gammacor",
+  "wiki": "Synoid Gammacor",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.28,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Synoid Gammacor",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "cold": 800.0,
+       "total": 800.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.28,
+      "radius_m": 5.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.3
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/syndicates/newloka/pistols/nlcastanas": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Embedded Detonation",
+    "damage": {
+     "electricity": 300.0,
+     "total": 300.0
+    },
+    "criticalChance": 0.24,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.1,
+    "radius_m": 3.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4
+   }
+  ],
+  "main": {
+   "damage": {
+    "electricity": 300.0,
+    "total": 300.0
+   }
+  },
+  "name": "Sancti Castanas",
+  "wiki": "Sancti Castanas",
+  "main_attack": "Mid-Flight Detonation"
+ },
+ "/lotus/weapons/syndicates/perrinsequence/longguns/pspenta": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Grenade Detonation",
+    "damage": {
+     "blast": 300.0,
+     "total": 300.0
+    },
+    "criticalChance": 0.26,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.26,
+    "radius_m": 6.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.6
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 75.0,
+    "total": 75.0
+   }
+  },
+  "name": "Secura Penta",
+  "wiki": "Secura Penta",
+  "main_attack": "Grenade Impact"
+ },
+ "/lotus/weapons/syndicates/redveil/bows/rvcernos": {
+  "name": "Rakta Cernos",
+  "wiki": "Rakta Cernos",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 423.0,
+      "puncture": 23.5,
+      "slash": 23.5,
+      "total": 470.0
+     },
+     "criticalChance": 0.35,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.15,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Rakta Cernos",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.25
+   }
+  }
+ },
+ "/lotus/weapons/syndicates/redveil/pistols/rvballistica": {
+  "charge_seconds": 1.0,
+  "name": "Rakta Ballistica",
+  "wiki": "Rakta Ballistica",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:burst_shot": {
+    "main": {
+     "damage": {
+      "impact": 18.75,
+      "puncture": 37.5,
+      "slash": 18.75,
+      "total": 75.0
+     },
+     "criticalChance": 0.05,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.05,
+     "fireRate": 6.67,
+     "multishot": 1.0
+    },
+    "name": "Rakta Ballistica",
+    "attack": "Burst Shot",
+    "burst": {
+     "count": 4,
+     "delay_seconds": 0.05
+    }
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/launchgrenade/archcannon": {
+  "charge_seconds": 0.5,
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Corvas",
+  "wiki": "Corvas (Atmosphere)",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:uncharged_shot": {
+    "main": {
+     "damage": {
+      "impact": 64.0,
+      "puncture": 8.0,
+      "slash": 8.0,
+      "total": 80.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.013,
+     "fireRate": 2.0,
+     "multishot": 11.0
+    },
+    "name": "Corvas",
+    "attack": "Uncharged Shot",
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/nokkoarchgun/nokkoarchgun": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "1st Attack Radial Attack",
+    "damage": {
+     "blast": 228.0,
+     "total": 228.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 2.9,
+    "procChance": 0.349,
+    "radius_m": 4.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "blast": 32.0,
+    "total": 32.0
+   }
+  },
+  "name": "Arbucep",
+  "wiki": "Arbucep (Atmosphere)",
+  "main_attack": "1st Attack"
+ },
+ "/lotus/weapons/tenno/archwing/primary/primecorvas/primecorvasweapon": {
+  "charge_seconds": 0.5,
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Corvas Prime",
+  "wiki": "Corvas Prime (Atmosphere)",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:uncharged_shot": {
+    "main": {
+     "damage": {
+      "impact": 230.0,
+      "heat": 330.0,
+      "total": 560.0
+     },
+     "criticalChance": 0.44,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.2,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Corvas Prime",
+    "attack": "Uncharged Shot",
+    "forced_procs": [
+     "impact"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/primelarkspur/primelarkspurweapon": {
+  "name": "Larkspur Prime",
+  "wiki": "Larkspur Prime (Atmosphere)",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire_projectile_impact": {
+    "main": {
+     "damage": {
+      "impact": 280.0,
+      "blast": 360.0,
+      "radiation": 200.0,
+      "total": 840.0
+     },
+     "criticalChance": 0.28,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.38,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Larkspur Prime",
+    "attack": "Alt-Fire Projectile Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Explosion",
+      "damage": {
+       "blast": 800.0,
+       "radiation": 800.0,
+       "total": 1600.0
+      },
+      "criticalChance": 0.28,
+      "criticalMultiplier": 2.2,
+      "procChance": 0.38,
+      "radius_m": 9.6,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "charge_seconds": 0.5,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 10.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/railgun/archrailgun": {
+  "charge_seconds": 1.0,
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Velocitus",
+  "wiki": "Velocitus (Atmosphere)",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:uncharged_shot": {
+    "main": {
+     "damage": {
+      "impact": 300.0,
+      "puncture": 300.0,
+      "slash": 300.0,
+      "magnetic": 300.0,
+      "total": 1200.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.25,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Velocitus",
+    "attack": "Uncharged Shot",
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/repurposedgrineerantiaircraftgun/archgrnaagun": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "blast": 310.0,
+     "total": 310.0
+    },
+    "criticalChance": 0.25,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.25,
+    "radius_m": 9.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 22.5,
+    "puncture": 180.0,
+    "slash": 22.5,
+    "total": 225.0
+   }
+  },
+  "name": "Grattler",
+  "wiki": "Grattler (Atmosphere)",
+  "main_attack": "Projectile Impact"
+ },
+ "/lotus/weapons/tenno/archwing/primary/thanotecharchgun/thanotecharchgun": {
+  "name": "Cortege",
+  "wiki": "Cortege (Atmosphere)",
+  "main_attack": "Held",
+  "forms": {
+   "alt_fire:grenade_impact": {
+    "main": {
+     "damage": {
+      "impact": 20.0,
+      "total": 20.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.167,
+     "fireRate": 0.25,
+     "multishot": 3.0
+    },
+    "name": "Cortege",
+    "attack": "Grenade Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Radial Attack",
+      "damage": {
+       "blast": 2000.0,
+       "total": 2000.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 2.4,
+      "procChance": 0.167,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.3
+     }
+    ],
+    "ammo_cost": 0.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/thanotecharchlonggun/thanotechlonggun": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Auto Radial Attack",
+    "damage": {
+     "heat": 72.0,
+     "total": 72.0
+    },
+    "criticalChance": 0.3,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.26,
+    "radius_m": 1.8,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 35.0,
+    "puncture": 70.0,
+    "heat": 75.0,
+    "total": 180.0
+   }
+  },
+  "name": "Mausolon",
+  "wiki": "Mausolon (Atmosphere)",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "charged:charged_shot_laser": {
+    "main": {
+     "damage": {
+      "impact": 150.0,
+      "puncture": 600.0,
+      "heat": 750.0,
+      "total": 1500.0
+     },
+     "criticalChance": 0.5,
+     "criticalMultiplier": 3.5,
+     "procChance": 0.5,
+     "fireRate": 0.5,
+     "multishot": 1.0
+    },
+    "name": "Mausolon",
+    "attack": "Charged Shot Laser",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Charged Shot Explosion",
+      "damage": {
+       "heat": 4500.0,
+       "total": 4500.0
+      },
+      "criticalChance": 0.5,
+      "criticalMultiplier": 3.5,
+      "procChance": 0.5,
+      "radius_m": 8.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.4,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ],
+    "charge_seconds": 0.8,
+    "ammo_cost": 0.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/thanotechgrenadelaunch/thanotechgrenadelauncher": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "blast": 328.0,
+     "total": 328.0
+    },
+    "criticalChance": 0.3,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.28,
+    "radius_m": 3.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 64.0,
+    "total": 64.0
+   }
+  },
+  "name": "Morgha",
+  "wiki": "Morgha (Atmosphere)",
+  "main_attack": "Auto-Burst",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 200.0,
+      "total": 200.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.5,
+     "fireRate": 0.833,
+     "multishot": 1.0
+    },
+    "name": "Morgha",
+    "attack": "Charged Shot",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Charged Shot Explosion",
+      "damage": {
+       "impact": 1200.0,
+       "puncture": 1600.0,
+       "slash": 2000.0,
+       "blast": 2400.0,
+       "total": 7200.0
+      },
+      "criticalChance": 0.4,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.5,
+      "radius_m": 12.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "ammo_cost": 0.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/tnconcretearchgun/tnconcretearchgunweapon": {
+  "charge_seconds": 1.5,
+  "name": "Mandonel",
+  "wiki": "Mandonel (Atmosphere)",
+  "main_attack": "Charge",
+  "main_form": "charged",
+  "forms": {
+   "base:horizontal_spread": {
+    "main": {
+     "damage": {
+      "impact": 50.0,
+      "puncture": 30.0,
+      "slash": 20.0,
+      "radiation": 80.0,
+      "total": 180.0
+     },
+     "criticalChance": 0.25,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.15,
+     "fireRate": 3.0,
+     "multishot": 8.0
+    },
+    "name": "Mandonel",
+    "attack": "Horizontal Spread",
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/archwing/primary/tnshieldframearchgun/tnshieldframearchgun": {
+  "name": "Larkspur",
+  "wiki": "Larkspur (Atmosphere)",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire_projectile_impact": {
+    "main": {
+     "damage": {
+      "impact": 280.0,
+      "blast": 360.0,
+      "radiation": 200.0,
+      "total": 840.0
+     },
+     "criticalChance": 0.26,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.34,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Larkspur",
+    "attack": "Alt-Fire Projectile Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Explosion",
+      "damage": {
+       "blast": 800.0,
+       "radiation": 800.0,
+       "total": 1600.0
+      },
+      "criticalChance": 0.26,
+      "criticalMultiplier": 2.2,
+      "procChance": 0.34,
+      "radius_m": 9.6,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "charge_seconds": 0.5,
+    "ammo_cost": 10.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/antlerbow/antlerbow": {
+  "name": "Cernos",
+  "wiki": "Cernos",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 342.0,
+      "puncture": 19.0,
+      "slash": 19.0,
+      "total": 380.0
+     },
+     "criticalChance": 0.36,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.18,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Cernos",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/asymetricalbow/asymetricalbow": {
+  "charge_seconds": 1.0,
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Daikyu",
+  "wiki": "Daikyu",
+  "main_attack": "Charged Shot"
+ },
+ "/lotus/weapons/tenno/bows/daxduviriasymetricalbow/daxduviriasymmetricallongbowplayerweapon": {
+  "name": "Cinta",
+  "wiki": "Cinta",
+  "main_attack": "Quick Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "puncture": 640.0,
+      "slash": 160.0,
+      "total": 800.0
+     },
+     "criticalChance": 0.36,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.32,
+     "fireRate": 0.667,
+     "multishot": 1.0
+    },
+    "name": "Cinta",
+    "attack": "Charged Shot",
+    "charge_seconds": 1.5,
+    "co_behavior": "independent"
+   },
+   "charged:perfect_shot": {
+    "main": {
+     "damage": {
+      "heat": 600.0,
+      "total": 600.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.34,
+     "fireRate": 0.667,
+     "multishot": 1.0
+    },
+    "name": "Cinta",
+    "attack": "Perfect Shot",
+    "charge_seconds": 1.05,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/duelistbow/duelistbow": {
+  "charge_seconds": 1.5,
+  "name": "Nunchasa",
+  "wiki": "Nunchasa",
+  "main_attack": "Alt-Fire",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "puncture": 200.0,
+      "cold": 200.0,
+      "total": 400.0
+     },
+     "criticalChance": 0.32,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.32,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Nunchasa",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.6
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/huntingbow": {
+  "name": "Paris",
+  "wiki": "Paris",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 16.0,
+      "puncture": 256.0,
+      "slash": 48.0,
+      "total": 320.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.1,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Paris",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/omicrus/omicrusplayerwep": {
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Nataruk",
+  "wiki": "Nataruk",
+  "main_attack": "Quick Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "puncture": 648.0,
+      "slash": 252.0,
+      "total": 900.0
+     },
+     "criticalChance": 0.5,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.5,
+     "fireRate": 0.667,
+     "multishot": 1.0
+    },
+    "name": "Nataruk",
+    "attack": "Charged Shot",
+    "charge_seconds": 1.0,
+    "co_behavior": "independent"
+   },
+   "charged:perfect_shot": {
+    "main": {
+     "damage": {
+      "puncture": 648.0,
+      "slash": 252.0,
+      "total": 900.0
+     },
+     "criticalChance": 0.6,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.5,
+     "fireRate": 0.667,
+     "multishot": 1.0
+    },
+    "name": "Nataruk",
+    "attack": "Perfect Shot",
+    "charge_seconds": 0.7,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/primecernos/primecernos": {
+  "name": "Cernos Prime",
+  "wiki": "Cernos Prime",
+  "main_attack": "Uncharged Horizontal/Vertical Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_horizontal_vertical_shot": {
+    "main": {
+     "damage": {
+      "impact": 165.6,
+      "puncture": 9.2,
+      "slash": 9.2,
+      "total": 184.0
+     },
+     "criticalChance": 0.35,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.3,
+     "fireRate": 1.0,
+     "multishot": 3.0
+    },
+    "name": "Cernos Prime",
+    "attack": "Charged Horizontal/Vertical Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/primedaikyu/primedaikyubow": {
+  "charge_seconds": 1.0,
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Daikyu Prime",
+  "wiki": "Daikyu Prime",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:quick_shot": {
+    "main": {
+     "damage": {
+      "impact": 112.5,
+      "puncture": 150.0,
+      "slash": 112.5,
+      "total": 375.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.5,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Daikyu Prime",
+    "attack": "Quick Shot",
+    "charge_seconds": 0.25,
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/primederelictcernos/derelictcernos": {
+  "charge_seconds": 0.7,
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Charged Shot Explosion",
+    "damage": {
+     "viral": 1003.0,
+     "total": 1003.0
+    },
+    "criticalChance": 0.07,
+    "criticalMultiplier": 1.9,
+    "procChance": 0.43,
+    "radius_m": 7.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   },
+   {
+    "id": "radial_2",
+    "name": "范围伤害（第二阶段）",
+    "attack": "Appendages",
+    "damage": {
+     "slash": 49.0,
+     "viral": 41.0,
+     "total": 90.0
+    },
+    "criticalChance": 0.07,
+    "criticalMultiplier": 1.9,
+    "procChance": 0.43,
+    "radius_m": 9.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0,
+    "count": 2.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 103.23,
+    "puncture": 30.69,
+    "slash": 145.08,
+    "total": 279.0
+   }
+  },
+  "name": "Proboscis Cernos",
+  "wiki": "Proboscis Cernos",
+  "main_attack": "Charged Shot"
+ },
+ "/lotus/weapons/tenno/bows/primehuntingbow": {
+  "name": "Paris Prime",
+  "wiki": "Paris Prime",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 9.0,
+      "puncture": 288.0,
+      "slash": 63.0,
+      "total": 360.0
+     },
+     "criticalChance": 0.45,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.2,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Paris Prime",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/stalkerbow": {
+  "name": "Dread",
+  "wiki": "Dread",
+  "main_attack": "Uncharged Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 16.8,
+      "puncture": 16.8,
+      "slash": 302.4,
+      "total": 336.0
+     },
+     "criticalChance": 0.5,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.2,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Dread",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.5
+   }
+  }
+ },
+ "/lotus/weapons/tenno/bows/tnchoirbow/tnchoirbow": {
+  "name": "Evensong",
+  "wiki": "Evensong",
+  "main_attack": "Quick Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "puncture": 150.0,
+      "slash": 350.0,
+      "total": 500.0
+     },
+     "criticalChance": 0.25,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.38,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Evensong",
+    "attack": "Charged Shot",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Charged Radial Attack",
+      "damage": {
+       "puncture": 45.0,
+       "slash": 105.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.25,
+      "criticalMultiplier": 2.2,
+      "procChance": 0.38,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.9,
+      "falloff_reduction": 0.7
+     }
+    ],
+    "charge_seconds": 1.2
+   }
+  }
+ },
+ "/lotus/weapons/tenno/grimoire/tngrimoire": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Normal Radial Attack",
+    "damage": {
+     "electricity": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.2,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.26,
+    "radius_m": 1.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.8
+   }
+  ],
+  "main": {
+   "damage": {
+    "electricity": 100.0,
+    "total": 100.0
+   }
+  },
+  "name": "Grimoire",
+  "wiki": "Grimoire",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:active_attack": {
+    "main": {
+     "damage": {
+      "electricity": 350.0,
+      "total": 350.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.26,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Grimoire",
+    "attack": "Active Attack",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Active Radial Attack",
+      "damage": {
+       "electricity": 250.0,
+       "total": 250.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.26,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.8
+     }
+    ],
+    "forced_procs": [
+     "electricity"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/garudacrossbow/garudacrossbow": {
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Nagantaka",
+  "wiki": "Nagantaka",
+  "main_attack": "Semi-Auto",
+  "main_form": "semi_auto",
+  "forms": {
+   "alt_fire:burst_shot": {
+    "main": {
+     "damage": {
+      "impact": 1.6,
+      "puncture": 14.3,
+      "slash": 143.1,
+      "total": 159.0
+     },
+     "criticalChance": 0.15,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.39,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Nagantaka",
+    "attack": "Burst Shot",
+    "burst": {
+     "count": 9,
+     "delay_seconds": 0.15
+    },
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/gunbrella/shrinemaidengunbrellaweapon": {
+  "name": "Higasa",
+  "wiki": "Higasa",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "blast": 390.0,
+      "total": 390.0
+     },
+     "criticalChance": 0.24,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.18,
+     "fireRate": 1.2,
+     "multishot": 1.0
+    },
+    "name": "Higasa",
+    "attack": "Charged Shot",
+    "charge_seconds": 1.0,
+    "ammo_cost": 0.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/gyrerifle/gyrerifleweapon": {
+  "name": "Alternox",
+  "wiki": "Alternox",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire_contact": {
+    "main": {
+     "damage": {
+      "impact": 5.0,
+      "puncture": 37.5,
+      "slash": 7.5,
+      "total": 50.0
+     },
+     "criticalChance": 0.02,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.44,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Alternox",
+    "attack": "Alt-Fire Contact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Alt-Fire Explosion",
+      "damage": {
+       "electricity": 100.0,
+       "total": 100.0
+      },
+      "criticalChance": 0.02,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.44,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "ammo_cost": 4.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/loginprimary/sundialrifle": {
+  "name": "Zenith",
+  "wiki": "Zenith",
+  "main_attack": "Auto Mode",
+  "main_form": "auto",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 15.0,
+      "puncture": 120.0,
+      "slash": 15.0,
+      "total": 150.0
+     },
+     "criticalChance": 0.35,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.08,
+     "fireRate": 3.0,
+     "multishot": 1.0
+    },
+    "name": "Zenith",
+    "attack": "Semi-Auto Mode",
+    "ammo_cost": 3.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/miter/tnomiter": {
+  "name": "Panthera",
+  "wiki": "Panthera",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 10.0,
+      "puncture": 10.0,
+      "slash": 80.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.25,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.35,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Panthera",
+    "attack": "Alt-Fire"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primeacceltra/primeacceltraweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Explosion",
+    "damage": {
+     "puncture": 42.4,
+     "slash": 10.6,
+     "total": 53.0
+    },
+    "criticalChance": 0.34,
+    "criticalMultiplier": 3.0,
+    "procChance": 0.18,
+    "radius_m": 5.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 44.0,
+    "total": 44.0
+   }
+  },
+  "name": "Acceltra Prime",
+  "wiki": "Acceltra Prime",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/tenno/longguns/primeafentis/primeafentisweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "heat": 250.0,
+     "blast": 800.0,
+     "total": 1050.0
+    },
+    "criticalChance": 0.26,
+    "criticalMultiplier": 2.6,
+    "procChance": 0.1,
+    "radius_m": 5.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 40.0,
+    "puncture": 120.0,
+    "slash": 40.0,
+    "total": 200.0
+   }
+  },
+  "name": "Afentis Prime",
+  "wiki": "Afentis Prime",
+  "main_attack": "Semi",
+  "main_form": "semi_auto",
+  "forms": {
+   "alt_fire:spear_throw": {
+    "main": {
+     "damage": {
+      "impact": 330.0,
+      "puncture": 165.0,
+      "slash": 55.0,
+      "total": 550.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.3,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Afentis Prime",
+    "attack": "Spear Throw"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primealternox/primealternoxweapon": {
+  "name": "Alternox Prime",
+  "wiki": "Alternox Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire_contact": {
+    "main": {
+     "damage": {
+      "impact": 7.0,
+      "puncture": 52.5,
+      "slash": 10.5,
+      "total": 70.0
+     },
+     "criticalChance": 0.02,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.5,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Alternox Prime",
+    "attack": "Alt-Fire Contact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Alt-Fire Explosion",
+      "damage": {
+       "electricity": 140.0,
+       "total": 140.0
+      },
+      "criticalChance": 0.02,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.5,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "ammo_cost": 4.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primeastilla/astillaprimeweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Glass Explosion",
+    "damage": {
+     "puncture": 49.0,
+     "slash": 91.0,
+     "total": 140.0
+    },
+    "criticalChance": 0.21,
+    "criticalMultiplier": 1.9,
+    "procChance": 0.37,
+    "radius_m": 2.4,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 100.0,
+    "total": 100.0
+   }
+  },
+  "name": "Astilla Prime",
+  "wiki": "Astilla Prime",
+  "main_attack": "Slug Impact"
+ },
+ "/lotus/weapons/tenno/longguns/primeburston/primeburston": {
+  "name": "Burston Prime",
+  "wiki": "Burston Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "heat": 13.0,
+      "total": 13.0
+     },
+     "criticalChance": 0.28,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.3,
+     "fireRate": 20.0,
+     "multishot": 1.0
+    },
+    "name": "Burston Prime",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "heat": 13.0,
+       "total": 13.0
+      },
+      "criticalChance": 0.28,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.3,
+      "radius_m": 2.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 1.0,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primecedo/primecedoweapon": {
+  "name": "Cedo Prime",
+  "wiki": "Cedo Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire_glaive": {
+    "main": {
+     "damage": {
+      "slash": 20.0,
+      "total": 20.0
+     },
+     "criticalChance": 0.1,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.5,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Cedo Prime",
+    "attack": "Alt-Fire Glaive",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Glaive Radial Attack",
+      "damage": {
+       "blast": 10.0,
+       "total": 10.0
+      },
+      "criticalChance": 0.1,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.5,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     }
+    ],
+    "ammo_cost": 0.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primecorinth/primecorinth": {
+  "name": "Corinth Prime",
+  "wiki": "Corinth Prime",
+  "main_attack": "Buckshot",
+  "forms": {
+   "alt_fire:air_burst_projectile": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.04,
+     "criticalMultiplier": 1.6,
+     "procChance": 0.5,
+     "fireRate": 0.667,
+     "multishot": 1.0
+    },
+    "name": "Corinth Prime",
+    "attack": "Air Burst Projectile",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Air Burst Explosion",
+      "damage": {
+       "blast": 2200.0,
+       "total": 2200.0
+      },
+      "criticalChance": 0.04,
+      "criticalMultiplier": 1.6,
+      "procChance": 0.5,
+      "radius_m": 9.8,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.9
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 4.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primefulmin/primefulmin": {
+  "name": "Fulmin Prime",
+  "wiki": "Fulmin Prime",
+  "main_attack": "Full Auto Mode",
+  "main_form": "auto",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 110.0,
+      "electricity": 440.0,
+      "total": 550.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.22,
+     "fireRate": 2.17,
+     "multishot": 1.0
+    },
+    "name": "Fulmin Prime",
+    "attack": "Semi-Auto Mode",
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 10.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primelightninggun/primelightninggun": {
+  "charge_seconds": 0.75,
+  "name": "Vadarya Prime",
+  "wiki": "Vadarya Prime",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/tenno/longguns/primenagantaka/primenagantakaweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Nagantaka Prime",
+  "wiki": "Nagantaka Prime",
+  "main_attack": "Semi-Auto",
+  "main_form": "semi_auto",
+  "forms": {
+   "alt_fire:burst_shot": {
+    "main": {
+     "damage": {
+      "impact": 1.7,
+      "puncture": 15.6,
+      "slash": 155.7,
+      "total": 173.0
+     },
+     "criticalChance": 0.25,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.39,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Nagantaka Prime",
+    "attack": "Burst Shot",
+    "burst": {
+     "count": 11,
+     "delay_seconds": 0.11
+    },
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primepanthera/primepanthera": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "slash": 20.0,
+     "total": 20.0
+    },
+    "criticalChance": 0.18,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.3,
+    "radius_m": 1.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 20.0,
+    "puncture": 10.0,
+    "slash": 70.0,
+    "total": 100.0
+   }
+  },
+  "name": "Panthera Prime",
+  "wiki": "Panthera Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "slash": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.26,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.38,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Panthera Prime",
+    "attack": "Alt-Fire"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primephantasma/phantasmaprimeshotgun": {
+  "name": "Phantasma Prime",
+  "wiki": "Phantasma Prime",
+  "main_attack": "Beam",
+  "main_form": "base",
+  "forms": {
+   "charged:plasma_bomb_impact": {
+    "main": {
+     "damage": {
+      "impact": 15.0,
+      "total": 15.0
+     },
+     "criticalChance": 0.03,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.37,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Phantasma Prime",
+    "attack": "Plasma Bomb Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Plasma Bomb Explosion",
+      "damage": {
+       "radiation": 73.0,
+       "total": 73.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.37,
+      "radius_m": 4.8,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     },
+     {
+      "id": "cluster",
+      "name": "集束子炸弹（接触）",
+      "attack": "Cluster Bombs Impact",
+      "damage": {
+       "impact": 3.0,
+       "total": 3.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.37,
+      "count": 5.0
+     },
+     {
+      "id": "cluster_radial",
+      "name": "集束子炸弹（爆炸）",
+      "attack": "Cluster Bombs Explosion",
+      "damage": {
+       "radiation": 18.0,
+       "total": 18.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.37,
+      "radius_m": 2.0,
+      "count": 5.0
+     }
+    ],
+    "charge_seconds": 1.0,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 2.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primescourge/primescourgeweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "corrosive": 60.0,
+     "total": 60.0
+    },
+    "criticalChance": 0.1,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.3,
+    "radius_m": 1.7,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "corrosive": 80.0,
+    "total": 80.0
+   }
+  },
+  "name": "Scourge Prime",
+  "wiki": "Scourge Prime",
+  "main_attack": "Projectile Impact",
+  "forms": {
+   "alt_fire:spear_throw": {
+    "main": {
+     "damage": {
+      "impact": 140.0,
+      "puncture": 30.0,
+      "slash": 30.0,
+      "total": 200.0
+     },
+     "criticalChance": 0.1,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.3,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Scourge Prime",
+    "attack": "Spear Throw",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Spear Explosion",
+      "damage": {
+       "corrosive": 55.0,
+       "total": 55.0
+      },
+      "criticalChance": 0.1,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.3,
+      "radius_m": 7.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primestradavar/primestradavargun": {
+  "name": "Stradavar Prime",
+  "wiki": "Stradavar Prime",
+  "main_attack": "Full Auto Mode",
+  "main_form": "auto",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 8.0,
+      "puncture": 24.0,
+      "slash": 48.0,
+      "total": 80.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.8,
+     "procChance": 0.22,
+     "fireRate": 3.33,
+     "multishot": 1.0
+    },
+    "name": "Stradavar Prime",
+    "attack": "Semi-Auto Mode",
+    "ammo_cost": 2.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primestrun/primestrunweapon": {
+  "name": "Strun Prime",
+  "wiki": "Strun Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.48,
+     "criticalMultiplier": 3.4,
+     "procChance": 0.46,
+     "fireRate": 2.5,
+     "multishot": 1.0
+    },
+    "name": "Strun Prime",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 40.0,
+       "slash": 100.0,
+       "blast": 60.0,
+       "total": 200.0
+      },
+      "criticalChance": 0.48,
+      "criticalMultiplier": 3.4,
+      "procChance": 0.46,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primetenora/tenoraprimeweapon": {
+  "name": "Tenora Prime",
+  "wiki": "Tenora Prime",
+  "main_attack": "Fully Spooled",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_attack": {
+    "main": {
+     "damage": {
+      "impact": 56.0,
+      "puncture": 168.0,
+      "slash": 56.0,
+      "total": 280.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.2,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Tenora Prime",
+    "attack": "Charged Attack",
+    "charge_seconds": 0.8,
+    "ammo_cost": 10.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primetiberon/primetiberonrifle": {
+  "name": "Tiberon Prime",
+  "wiki": "Tiberon Prime",
+  "main_attack": "Burst",
+  "forms": {
+   "auto:auto": {
+    "main": {
+     "damage": {
+      "impact": 14.4,
+      "puncture": 19.2,
+      "slash": 14.4,
+      "total": 48.0
+     },
+     "criticalChance": 0.16,
+     "criticalMultiplier": 2.8,
+     "procChance": 0.32,
+     "fireRate": 8.33,
+     "multishot": 1.0
+    },
+    "name": "Tiberon Prime",
+    "attack": "Auto"
+   },
+   "semi_auto:semi_auto": {
+    "main": {
+     "damage": {
+      "impact": 14.4,
+      "puncture": 19.2,
+      "slash": 14.4,
+      "total": 48.0
+     },
+     "criticalChance": 0.42,
+     "criticalMultiplier": 3.4,
+     "procChance": 0.18,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Tiberon Prime",
+    "attack": "Semi-Auto"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primetrumna/primetrumnaweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Auto AoE",
+    "damage": {
+     "heat": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.24,
+    "criticalMultiplier": 2.4,
+    "procChance": 0.34,
+    "radius_m": 1.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.15,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 32.0,
+    "heat": 53.0,
+    "total": 85.0
+   }
+  },
+  "name": "Trumna Prime",
+  "wiki": "Trumna Prime",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:grenade_impact": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.38,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.5,
+     "fireRate": 1.33,
+     "multishot": 1.0
+    },
+    "name": "Trumna Prime",
+    "attack": "Grenade Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Grenade Bounce AoE",
+      "damage": {
+       "heat": 1150.0,
+       "total": 1150.0
+      },
+      "criticalChance": 0.38,
+      "criticalMultiplier": 2.4,
+      "procChance": 0.5,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.4
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primevectis/primevectisrifle": {
+  "name": "Vectis Prime",
+  "wiki": "Vectis Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "cold": 150.0,
+      "total": 150.0
+     },
+     "criticalChance": 0.35,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.3,
+     "fireRate": 1.333,
+     "multishot": 1.0
+    },
+    "name": "Vectis Prime",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Embed AoE",
+      "damage": {
+       "cold": 25.0,
+       "total": 25.0
+      },
+      "criticalChance": 0.35,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.3,
+      "radius_m": 0.15,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     },
+     {
+      "id": "headshot_radial",
+      "name": "爆头爆炸",
+      "attack": "Incarnon Form Headshot AoE",
+      "damage": {
+       "cold": 150.0,
+       "total": 150.0
+      },
+      "criticalChance": 0.35,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.3,
+      "radius_m": 6.7,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0,
+      "headshot_only": true
+     }
+    ],
+    "forced_procs": [
+     "cold"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/primezhuge/primezhugecrossbow": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Arrow Explosion",
+    "damage": {
+     "impact": 11.2,
+     "puncture": 4.0,
+     "slash": 24.8,
+     "total": 40.0
+    },
+    "criticalChance": 0.26,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.3,
+    "radius_m": 2.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 10.0,
+    "puncture": 22.5,
+    "slash": 17.5,
+    "total": 50.0
+   }
+  },
+  "name": "Zhuge Prime",
+  "wiki": "Zhuge Prime",
+  "main_attack": "Arrow Impact"
+ },
+ "/lotus/weapons/tenno/longguns/revenantshotgun/revenantshotgun": {
+  "name": "Phantasma",
+  "wiki": "Phantasma",
+  "main_attack": "Beam",
+  "main_form": "base",
+  "forms": {
+   "charged:plasma_bomb_impact": {
+    "main": {
+     "damage": {
+      "impact": 15.0,
+      "total": 15.0
+     },
+     "criticalChance": 0.03,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.37,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Phantasma",
+    "attack": "Plasma Bomb Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Plasma Bomb Explosion",
+      "damage": {
+       "radiation": 73.0,
+       "total": 73.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.37,
+      "radius_m": 4.8,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     },
+     {
+      "id": "cluster",
+      "name": "集束子炸弹（接触）",
+      "attack": "Cluster Bombs Impact",
+      "damage": {
+       "impact": 3.0,
+       "total": 3.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.37,
+      "count": 5.0
+     },
+     {
+      "id": "cluster_radial",
+      "name": "集束子炸弹（爆炸）",
+      "attack": "Cluster Bombs Explosion",
+      "damage": {
+       "radiation": 18.0,
+       "total": 18.0
+      },
+      "criticalChance": 0.03,
+      "criticalMultiplier": 1.5,
+      "procChance": 0.37,
+      "radius_m": 2.0,
+      "count": 5.0
+     }
+    ],
+    "charge_seconds": 1.0,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 2.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/sapientprimary/sapientprimaryweapon": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Explosion",
+    "damage": {
+     "puncture": 35.2,
+     "slash": 8.8,
+     "total": 44.0
+    },
+    "criticalChance": 0.32,
+    "criticalMultiplier": 2.8,
+    "procChance": 0.06,
+    "radius_m": 4.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 35.0,
+    "total": 35.0
+   }
+  },
+  "name": "Acceltra",
+  "wiki": "Acceltra",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/tenno/longguns/tennotommygun/tennotommygunrifle": {
+  "name": "Stradavar",
+  "wiki": "Stradavar",
+  "main_attack": "Full Auto Mode",
+  "main_form": "auto",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 7.5,
+      "puncture": 30.0,
+      "slash": 12.5,
+      "total": 50.0
+     },
+     "criticalChance": 0.28,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.16,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Stradavar",
+    "attack": "Semi-Auto Mode"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnalchemistshotgun/tnalchemistshotgun": {
+  "name": "Cedo",
+  "wiki": "Cedo",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire_glaive": {
+    "main": {
+     "damage": {
+      "slash": 20.0,
+      "total": 20.0
+     },
+     "criticalChance": 0.02,
+     "criticalMultiplier": 1.4,
+     "procChance": 0.5,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Cedo",
+    "attack": "Alt-Fire Glaive",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Glaive Radial Attack",
+      "damage": {
+       "blast": 10.0,
+       "total": 10.0
+      },
+      "criticalChance": 0.02,
+      "criticalMultiplier": 1.4,
+      "procChance": 0.5,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     }
+    ],
+    "ammo_cost": 0.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnbardrifle/tnbardrifle": {
+  "name": "Tenora",
+  "wiki": "Tenora",
+  "main_attack": "Fully Spooled",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_attack": {
+    "main": {
+     "damage": {
+      "impact": 48.0,
+      "puncture": 144.0,
+      "slash": 48.0,
+      "total": 240.0
+     },
+     "criticalChance": 0.34,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.11,
+     "fireRate": 10.0,
+     "multishot": 1.0
+    },
+    "name": "Tenora",
+    "attack": "Charged Attack",
+    "charge_seconds": 0.8,
+    "ammo_cost": 10.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnglassshotgun/tnglassshotgungun": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Glass Explosion",
+    "damage": {
+     "puncture": 42.0,
+     "slash": 78.0,
+     "total": 120.0
+    },
+    "criticalChance": 0.17,
+    "criticalMultiplier": 1.9,
+    "procChance": 0.33,
+    "radius_m": 2.4,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 70.0,
+    "total": 70.0
+   }
+  },
+  "name": "Astilla",
+  "wiki": "Astilla",
+  "main_attack": "Slug Impact"
+ },
+ "/lotus/weapons/tenno/longguns/tnheavyshotgun/tnheavyshotgungun": {
+  "name": "Corinth",
+  "wiki": "Corinth",
+  "main_attack": "Buckshot",
+  "forms": {
+   "alt_fire:air_burst_projectile": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.04,
+     "criticalMultiplier": 1.6,
+     "procChance": 0.28,
+     "fireRate": 1.17,
+     "multishot": 1.0
+    },
+    "name": "Corinth",
+    "attack": "Air Burst Projectile",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Air Burst Explosion",
+      "damage": {
+       "blast": 404.0,
+       "total": 404.0
+      },
+      "criticalChance": 0.04,
+      "criticalMultiplier": 1.6,
+      "procChance": 0.28,
+      "radius_m": 9.4,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.9
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnhoplitespear/tnhoplitespeargunweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "blast": 800.0,
+     "total": 800.0
+    },
+    "criticalChance": 0.26,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.1,
+    "radius_m": 3.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 20.0,
+    "puncture": 60.0,
+    "slash": 20.0,
+    "total": 100.0
+   }
+  },
+  "name": "Afentis",
+  "wiki": "Afentis",
+  "main_attack": "Semi",
+  "main_form": "semi_auto",
+  "forms": {
+   "alt_fire:spear_throw": {
+    "main": {
+     "damage": {
+      "impact": 240.0,
+      "puncture": 120.0,
+      "slash": 40.0,
+      "total": 400.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.2,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Afentis",
+    "attack": "Spear Throw"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnpriestspear/tnpriestspeargun": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "corrosive": 55.0,
+     "total": 55.0
+    },
+    "criticalChance": 0.02,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.3,
+    "radius_m": 1.7,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.3
+   }
+  ],
+  "main": {
+   "damage": {
+    "corrosive": 70.0,
+    "total": 70.0
+   }
+  },
+  "name": "Scourge",
+  "wiki": "Scourge",
+  "main_attack": "Projectile Impact",
+  "forms": {
+   "alt_fire:spear_throw_impact": {
+    "main": {
+     "damage": {
+      "impact": 105.0,
+      "puncture": 22.5,
+      "slash": 22.5,
+      "total": 150.0
+     },
+     "criticalChance": 0.04,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.3,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Scourge",
+    "attack": "Spear Throw Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Spear Throw Explosion",
+      "damage": {
+       "corrosive": 55.0,
+       "total": 55.0
+      },
+      "criticalChance": 0.04,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.3,
+      "radius_m": 7.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnrailjackrifle/railjackriflegun": {
+  "name": "Quellor",
+  "wiki": "Quellor",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 600.0,
+      "cold": 800.0,
+      "total": 1400.0
+     },
+     "criticalChance": 0.4,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.1,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Quellor",
+    "attack": "Alt-Fire",
+    "charge_seconds": 1.2,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 50.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnrifleersatz/tnrifleersatzweapon": {
+  "name": "Aeolak",
+  "wiki": "Aeolak",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 58.2,
+      "puncture": 9.7,
+      "slash": 29.1,
+      "total": 97.0
+     },
+     "criticalChance": 0.21,
+     "criticalMultiplier": 2.3,
+     "procChance": 0.33,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Aeolak",
+    "attack": "Alt-Fire",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Alt-Fire Explosion",
+      "damage": {
+       "blast": 789.0,
+       "total": 789.0
+      },
+      "criticalChance": 0.21,
+      "criticalMultiplier": 2.3,
+      "procChance": 0.33,
+      "radius_m": 7.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.5
+     }
+    ],
+    "charge_seconds": 0.3,
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 10.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/tnwisprifle/tnwisprifle": {
+  "name": "Fulmin",
+  "wiki": "Fulmin",
+  "main_attack": "Full Auto Mode",
+  "main_form": "auto",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "electricity": 400.0,
+      "total": 500.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.16,
+     "fireRate": 2.17,
+     "multishot": 1.0
+    },
+    "name": "Fulmin",
+    "attack": "Semi-Auto Mode",
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 10.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/longguns/wraithlatron/wraithlatron": {
+  "name": "Latron Wraith",
+  "wiki": "Latron Wraith",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 50.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.48,
+     "criticalMultiplier": 3.4,
+     "procChance": 0.28,
+     "fireRate": 3.67,
+     "multishot": 1.0
+    },
+    "name": "Latron Wraith",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 50.0,
+       "heat": 50.0,
+       "total": 100.0
+      },
+      "criticalChance": 0.48,
+      "criticalMultiplier": 3.4,
+      "procChance": 0.28,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/1999enthybridpistolweapon/1999enthybridpistolweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "blast": 48.0,
+     "total": 48.0
+    },
+    "criticalChance": 0.26,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.26,
+    "radius_m": 1.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "puncture": 12.0,
+    "total": 12.0
+   }
+  },
+  "name": "Riot-848",
+  "wiki": "Riot-848",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/tenno/pistols/allnew1hsg/allnew1hsg": {
+  "name": "Euphona Prime",
+  "wiki": "Euphona Prime",
+  "main_attack": "Slug",
+  "forms": {
+   "alt_fire:buckshot": {
+    "main": {
+     "damage": {
+      "impact": 4.4,
+      "puncture": 17.6,
+      "slash": 66.0,
+      "total": 88.0
+     },
+     "criticalChance": 0.02,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.09,
+     "fireRate": 1.5,
+     "multishot": 10.0
+    },
+    "name": "Euphona Prime",
+    "attack": "Buckshot"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/automatichandcrossbow/autocrossbow": {
+  "charge_seconds": 1.0,
+  "name": "Ballistica",
+  "wiki": "Ballistica",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:burst_shot": {
+    "main": {
+     "damage": {
+      "impact": 6.25,
+      "puncture": 12.5,
+      "slash": 6.25,
+      "total": 25.0
+     },
+     "criticalChance": 0.025,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.025,
+     "fireRate": 6.67,
+     "multishot": 1.0
+    },
+    "name": "Ballistica",
+    "attack": "Burst Shot",
+    "burst": {
+     "count": 4,
+     "delay_seconds": 0.05
+    }
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/conclaveleverpistol/conclaveleverpistol": {
+  "name": "Zylok",
+  "wiki": "Zylok",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 160.0,
+      "puncture": 240.0,
+      "total": 400.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.4,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Zylok",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "heat": 600.0,
+       "total": 600.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 2.0,
+      "procChance": 0.4,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ],
+    "charge_seconds": 0.6
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/primeakarius/primeakariusweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Detonation",
+    "damage": {
+     "blast": 509.0,
+     "total": 509.0
+    },
+    "criticalChance": 0.18,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.34,
+    "radius_m": 7.8,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 68.0,
+    "total": 68.0
+   }
+  },
+  "name": "Akarius Prime",
+  "wiki": "Akarius Prime",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/tenno/pistols/primeathodai/primeathodaipistolweapon": {
+  "name": "Athodai Prime",
+  "wiki": "Athodai Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "heat": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.35,
+     "fireRate": 12.0,
+     "multishot": 1.0
+    },
+    "name": "Athodai Prime",
+    "attack": "Alt-Fire",
+    "burst": {
+     "count": 24,
+     "delay_seconds": 0.0833
+    }
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/primeballistica/primeballistica": {
+  "name": "Ballistica Prime",
+  "wiki": "Ballistica Prime",
+  "main_attack": "Normal Shot",
+  "main_form": "base",
+  "forms": {
+   "charged:charged_shot": {
+    "main": {
+     "damage": {
+      "impact": 3.8,
+      "puncture": 41.8,
+      "slash": 30.4,
+      "total": 76.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.15,
+     "fireRate": 3.33,
+     "multishot": 4.0
+    },
+    "name": "Ballistica Prime",
+    "attack": "Charged Shot",
+    "charge_seconds": 0.8,
+    "ammo_cost": 4.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/primeepitaph/primeepitaphsidearmweapon": {
+  "charge_seconds": 0.36,
+  "forced_procs": [
+   "impact",
+   "cold"
+  ],
+  "name": "Epitaph Prime",
+  "wiki": "Epitaph Prime",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:uncharged_direct_hit": {
+    "main": {
+     "damage": {
+      "impact": 40.0,
+      "puncture": 30.0,
+      "slash": 30.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.04,
+     "criticalMultiplier": 1.8,
+     "procChance": 0.5,
+     "fireRate": 1.75,
+     "multishot": 1.0
+    },
+    "name": "Epitaph Prime",
+    "attack": "Uncharged Direct Hit",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Uncharged AoE",
+      "damage": {
+       "blast": 30.0,
+       "total": 30.0
+      },
+      "criticalChance": 0.04,
+      "criticalMultiplier": 1.8,
+      "procChance": 0.5,
+      "radius_m": 10.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.8
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/primehystrix/primehystrixweapon": {
+  "forced_procs": [
+   "toxin"
+  ],
+  "name": "Hystrix Prime",
+  "wiki": "Hystrix Prime",
+  "main_attack": "Poison Quill",
+  "forms": {
+   "alt_fire:fire_quill": {
+    "main": {
+     "damage": {
+      "impact": 2.76,
+      "puncture": 39.56,
+      "slash": 3.68,
+      "total": 46.0
+     },
+     "criticalChance": 0.28,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.2,
+     "fireRate": 7.0,
+     "multishot": 1.0
+    },
+    "name": "Hystrix Prime",
+    "attack": "Fire Quill",
+    "forced_procs": [
+     "heat"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/primekompressa/primekompressa": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "viral": 46.0,
+     "total": 46.0
+    },
+    "criticalChance": 0.16,
+    "criticalMultiplier": 1.8,
+    "procChance": 0.36,
+    "radius_m": 2.8,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "viral": 2.0,
+    "total": 2.0
+   }
+  },
+  "name": "Kompressa Prime",
+  "wiki": "Kompressa Prime",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/tenno/pistols/primepandero/panderoprimeweapon": {
+  "name": "Pandero Prime",
+  "wiki": "Pandero Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 26.0,
+      "puncture": 26.0,
+      "slash": 52.0,
+      "total": 104.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.8,
+     "procChance": 0.24,
+     "fireRate": 4.17,
+     "multishot": 1.0
+    },
+    "name": "Pandero Prime",
+    "attack": "Alt-Fire",
+    "burst": {
+     "count": 8,
+     "delay_seconds": 0.1
+    }
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/primezakti/primezaktipistol": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Gas Cloud",
+    "damage": {
+     "gas": 100.0,
+     "total": 100.0
+    },
+    "criticalChance": 0.08,
+    "criticalMultiplier": 1.8,
+    "procChance": 0.42,
+    "radius_m": 3.8,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 12.0,
+    "puncture": 18.0,
+    "total": 30.0
+   }
+  },
+  "name": "Zakti Prime",
+  "wiki": "Zakti Prime",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/tenno/pistols/primezylok/zylokprimepistol": {
+  "name": "Zylok Prime",
+  "wiki": "Zylok Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 200.0,
+      "puncture": 300.0,
+      "total": 500.0
+     },
+     "criticalChance": 0.26,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.4,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Zylok Prime",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "heat": 700.0,
+       "total": 700.0
+      },
+      "criticalChance": 0.26,
+      "criticalMultiplier": 2.4,
+      "procChance": 0.4,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.6,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ],
+    "charge_seconds": 0.6
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/quilldartgun/quilldartgunweapon": {
+  "forced_procs": [
+   "toxin"
+  ],
+  "name": "Hystrix",
+  "wiki": "Hystrix",
+  "main_attack": "Poison Quill",
+  "forms": {
+   "alt_fire:fire_quill": {
+    "main": {
+     "damage": {
+      "impact": 2.4,
+      "puncture": 34.4,
+      "slash": 3.2,
+      "total": 40.0
+     },
+     "criticalChance": 0.24,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.1,
+     "fireRate": 7.0,
+     "multishot": 1.0
+    },
+    "name": "Hystrix",
+    "attack": "Fire Quill",
+    "forced_procs": [
+     "heat"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/sapientpistol/sapientpistol": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Rocket Detonation",
+    "damage": {
+     "blast": 419.0,
+     "total": 419.0
+    },
+    "criticalChance": 0.06,
+    "criticalMultiplier": 1.8,
+    "procChance": 0.28,
+    "radius_m": 7.2,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.7
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 68.0,
+    "total": 68.0
+   }
+  },
+  "name": "Akarius",
+  "wiki": "Akarius",
+  "main_attack": "Rocket Impact"
+ },
+ "/lotus/weapons/tenno/pistols/tnbardpistol/tnbardpistolgun": {
+  "name": "Pandero",
+  "wiki": "Pandero",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "impact": 18.0,
+      "puncture": 18.0,
+      "slash": 36.0,
+      "total": 72.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.8,
+     "procChance": 0.1,
+     "fireRate": 4.17,
+     "multishot": 1.0
+    },
+    "name": "Pandero",
+    "attack": "Alt-Fire",
+    "burst": {
+     "count": 8,
+     "delay_seconds": 0.1
+    }
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/tnguandopistol/tnguandopistolgun": {
+  "forced_procs": [
+   "impact"
+  ],
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Gas Cloud",
+    "damage": {
+     "gas": 80.0,
+     "total": 80.0
+    },
+    "criticalChance": 0.02,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.2,
+    "radius_m": 3.5,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.0
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 12.0,
+    "puncture": 18.0,
+    "total": 30.0
+   }
+  },
+  "name": "Zakti",
+  "wiki": "Zakti",
+  "main_attack": "Dart Impact"
+ },
+ "/lotus/weapons/tenno/pistols/tnjetturbine/tnjetturbinepistolweapon": {
+  "name": "Athodai",
+  "wiki": "Athodai",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "alt_fire:alt_fire": {
+    "main": {
+     "damage": {
+      "heat": 88.0,
+      "total": 88.0
+     },
+     "criticalChance": 0.18,
+     "criticalMultiplier": 2.0,
+     "procChance": 0.24,
+     "fireRate": 12.0,
+     "multishot": 1.0
+    },
+    "name": "Athodai",
+    "attack": "Alt-Fire",
+    "burst": {
+     "count": 24,
+     "delay_seconds": 0.0833
+    }
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/tnwraithesidearm/tnwraithesidearmweapon": {
+  "charge_seconds": 0.36,
+  "forced_procs": [
+   "impact"
+  ],
+  "name": "Epitaph",
+  "wiki": "Epitaph",
+  "main_attack": "Charged Shot",
+  "main_form": "charged",
+  "forms": {
+   "base:uncharged_direct_hit": {
+    "main": {
+     "damage": {
+      "impact": 40.0,
+      "puncture": 30.0,
+      "slash": 30.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.02,
+     "criticalMultiplier": 1.2,
+     "procChance": 0.5,
+     "fireRate": 1.5,
+     "multishot": 1.0
+    },
+    "name": "Epitaph",
+    "attack": "Uncharged Direct Hit",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Uncharged AoE",
+      "damage": {
+       "blast": 20.0,
+       "total": 20.0
+      },
+      "criticalChance": 0.02,
+      "criticalMultiplier": 1.2,
+      "procChance": 0.5,
+      "radius_m": 8.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.8
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/pistols/tnyarelipistol/tnyarelipistolweapon": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Explosion",
+    "damage": {
+     "viral": 42.0,
+     "total": 42.0
+    },
+    "criticalChance": 0.06,
+    "criticalMultiplier": 1.8,
+    "procChance": 0.3,
+    "radius_m": 2.4,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "viral": 2.0,
+    "total": 2.0
+   }
+  },
+  "name": "Kompressa",
+  "wiki": "Kompressa",
+  "main_attack": "Normal Attack"
+ },
+ "/lotus/weapons/tenno/rifle/bratonprime": {
+  "name": "Braton Prime",
+  "wiki": "Braton Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 28.0,
+      "puncture": 2.8,
+      "slash": 39.2,
+      "total": 70.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.3,
+     "fireRate": 5.67,
+     "multishot": 1.0
+    },
+    "name": "Braton Prime",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 70.0,
+       "total": 70.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.3,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/burstrifle": {
+  "name": "Burston",
+  "wiki": "Burston",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "heat": 3.0,
+      "total": 3.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.3,
+     "fireRate": 20.0,
+     "multishot": 1.0
+    },
+    "name": "Burston",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "heat": 3.0,
+       "total": 3.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.3,
+      "radius_m": 2.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 1.0,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/heavyrifle": {
+  "name": "Gorgon",
+  "wiki": "Gorgon",
+  "main_attack": "Fully Spooled",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 20.0,
+      "puncture": 60.0,
+      "slash": 20.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.21,
+     "criticalMultiplier": 1.9,
+     "procChance": 0.19,
+     "fireRate": 0.833,
+     "multishot": 1.0
+    },
+    "name": "Gorgon",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 750.0,
+       "total": 750.0
+      },
+      "criticalChance": 0.21,
+      "criticalMultiplier": 1.9,
+      "procChance": 0.19,
+      "radius_m": 5.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/latronprime": {
+  "name": "Latron Prime",
+  "wiki": "Latron Prime",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 50.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.44,
+     "criticalMultiplier": 3.4,
+     "procChance": 0.3,
+     "fireRate": 3.33,
+     "multishot": 1.0
+    },
+    "name": "Latron Prime",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 70.0,
+       "heat": 70.0,
+       "total": 140.0
+      },
+      "criticalChance": 0.44,
+      "criticalMultiplier": 3.4,
+      "procChance": 0.3,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/rifle": {
+  "name": "Braton",
+  "wiki": "Braton",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 20.0,
+      "puncture": 2.0,
+      "slash": 28.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.12,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Braton",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 50.0,
+       "total": 50.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.12,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/semiautorifle": {
+  "name": "Latron",
+  "wiki": "Latron",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 50.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.32,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.24,
+     "fireRate": 3.33,
+     "multishot": 1.0
+    },
+    "name": "Latron",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 40.0,
+       "heat": 40.0,
+       "total": 80.0
+      },
+      "criticalChance": 0.32,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.24,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/startingrifle": {
+  "name": "Mk1-Braton",
+  "wiki": "Mk1-Braton",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 20.0,
+      "puncture": 2.0,
+      "slash": 28.0,
+      "total": 50.0
+     },
+     "criticalChance": 0.2,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.1,
+     "fireRate": 5.0,
+     "multishot": 1.0
+    },
+    "name": "Mk1-Braton",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 50.0,
+       "total": 50.0
+      },
+      "criticalChance": 0.2,
+      "criticalMultiplier": 2.4,
+      "procChance": 0.1,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/tennosniperrifle": {
+  "name": "Vectis",
+  "wiki": "Vectis",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "cold": 5.0,
+      "total": 5.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 2.5,
+     "procChance": 0.3,
+     "fireRate": 1.333,
+     "multishot": 1.0
+    },
+    "name": "Vectis",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Embed AoE",
+      "damage": {
+       "cold": 5.0,
+       "total": 5.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 2.5,
+      "procChance": 0.3,
+      "radius_m": 0.15,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0
+     },
+     {
+      "id": "headshot_radial",
+      "name": "爆头爆炸",
+      "attack": "Incarnon Form Headshot AoE",
+      "damage": {
+       "cold": 5.0,
+       "total": 5.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 2.5,
+      "procChance": 0.3,
+      "radius_m": 6.7,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.0,
+      "headshot_only": true
+     }
+    ],
+    "forced_procs": [
+     "cold"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/rifle/viprifle": {
+  "name": "Braton Vandal",
+  "wiki": "Braton Vandal",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 26.0,
+      "puncture": 2.6,
+      "slash": 36.4,
+      "total": 65.0
+     },
+     "criticalChance": 0.38,
+     "criticalMultiplier": 3.2,
+     "procChance": 0.22,
+     "fireRate": 4.67,
+     "multishot": 1.0
+    },
+    "name": "Braton Vandal",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "heat": 65.0,
+       "total": 65.0
+      },
+      "criticalChance": 0.38,
+      "criticalMultiplier": 3.2,
+      "procChance": 0.22,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.1,
+      "takes_condition_overload": true,
+      "takes_multishot": false
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/shotgun/shotgun": {
+  "name": "Strun",
+  "wiki": "Strun",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.44,
+     "criticalMultiplier": 2.8,
+     "procChance": 0.4,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Strun",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 30.0,
+       "slash": 80.0,
+       "blast": 60.0,
+       "total": 170.0
+      },
+      "criticalChance": 0.44,
+      "criticalMultiplier": 2.8,
+      "procChance": 0.4,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/shotgun/shotgunvandal": {
+  "name": "Strun Wraith",
+  "wiki": "Strun Wraith",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.56,
+     "criticalMultiplier": 3.4,
+     "procChance": 0.44,
+     "fireRate": 2.0,
+     "multishot": 1.0
+    },
+    "name": "Strun Wraith",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form AoE",
+      "damage": {
+       "puncture": 40.0,
+       "slash": 90.0,
+       "blast": 70.0,
+       "total": 200.0
+      },
+      "criticalChance": 0.56,
+      "criticalMultiplier": 3.4,
+      "procChance": 0.44,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/throwingweapons/glasskunai/glasskunaiweapon": {
+  "name": "Fusilai",
+  "wiki": "Fusilai",
+  "main_attack": "Full Auto Mode",
+  "main_form": "auto",
+  "forms": {
+   "semi_auto:semi_auto_mode": {
+    "main": {
+     "damage": {
+      "puncture": 30.8,
+      "slash": 46.2,
+      "total": 77.0
+     },
+     "criticalChance": 0.03,
+     "criticalMultiplier": 1.5,
+     "procChance": 0.123,
+     "fireRate": 1.5,
+     "multishot": 3.0
+    },
+    "name": "Fusilai",
+    "attack": "Semi-Auto Mode",
+    "ammo_cost": 3.0
+   }
+  }
+ },
+ "/lotus/weapons/tenno/throwingweapons/stalkerkunai": {
+  "name": "Despair",
+  "wiki": "Despair",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 3.0,
+      "puncture": 48.0,
+      "slash": 9.0,
+      "total": 60.0
+     },
+     "criticalChance": 0.3,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.2,
+     "fireRate": 3.0,
+     "multishot": 1.0
+    },
+    "name": "Despair",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Incarnon Form Radial Attack",
+      "damage": {
+       "heat": 160.0,
+       "total": 160.0
+      },
+      "criticalChance": 0.3,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.3,
+      "radius_m": 4.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/tenno/throwingweapons/stickybomb/stickybombs": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Embedded Detonation",
+    "damage": {
+     "electricity": 160.0,
+     "total": 160.0
+    },
+    "criticalChance": 0.08,
+    "criticalMultiplier": 1.5,
+    "procChance": 0.22,
+    "radius_m": 3.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.4
+   }
+  ],
+  "main": {
+   "damage": {
+    "electricity": 160.0,
+    "total": 160.0
+   }
+  },
+  "name": "Castanas",
+  "wiki": "Castanas",
+  "main_attack": "Mid-Flight Detonation"
+ },
+ "/lotus/weapons/tenno/throwingweapons/tnoraxiaflechette/tnoraxiaflechette": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Semi",
+    "damage": {
+     "toxin": 40.0,
+     "total": 40.0
+    },
+    "criticalChance": 0.08,
+    "criticalMultiplier": 2.4,
+    "procChance": 0.32
+   }
+  ],
+  "main": {
+   "damage": {
+    "puncture": 8.0,
+    "toxin": 32.0,
+    "total": 40.0
+   }
+  },
+  "name": "Scyotid",
+  "wiki": "Scyotid",
+  "main_attack": "Auto"
+ },
+ "/lotus/weapons/tenno/throwingweapons/u18throwingknives/u18throwingknives": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Embedded Detonation",
+    "damage": {
+     "blast": 250.0,
+     "total": 250.0
+    },
+    "criticalChance": 0.22,
+    "criticalMultiplier": 2.0,
+    "procChance": 0.1,
+    "radius_m": 4.0,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.5
+   }
+  ],
+  "main": {
+   "damage": {
+    "blast": 120.0,
+    "total": 120.0
+   }
+  },
+  "name": "Talons",
+  "wiki": "Talons",
+  "main_attack": "Mid-Flight Detonation"
+ },
+ "/lotus/weapons/tenno/zariman/pistols/heavypistol/zarimanheavypistol": {
+  "name": "Laetum",
+  "wiki": "Laetum",
+  "main_attack": "Normal Attack",
+  "forms": {
+   "incarnon:incarnon_form": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.22,
+     "criticalMultiplier": 2.2,
+     "procChance": 0.22,
+     "fireRate": 6.67,
+     "multishot": 1.0
+    },
+    "name": "Laetum",
+    "attack": "Incarnon Form",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Auto Radial Attack",
+      "damage": {
+       "radiation": 300.0,
+       "total": 300.0
+      },
+      "criticalChance": 0.22,
+      "criticalMultiplier": 2.2,
+      "procChance": 0.22,
+      "radius_m": 2.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ]
+   }
+  }
+ },
+ "/lotus/weapons/thanotech/thanopistol/thanotechpistol": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Radial Attack",
+    "damage": {
+     "heat": 46.0,
+     "total": 46.0
+    },
+    "criticalChance": 0.3,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.14,
+    "radius_m": 1.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.2
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 9.6,
+    "puncture": 26.88,
+    "slash": 11.52,
+    "total": 48.0
+   }
+  },
+  "name": "Sepulcrum",
+  "wiki": "Sepulcrum",
+  "main_attack": "Primary-Fire",
+  "forms": {
+   "alt_fire:lock_on_mode": {
+    "main": {
+     "damage": {
+      "impact": 19.2,
+      "puncture": 53.76,
+      "slash": 23.04,
+      "total": 96.0
+     },
+     "criticalChance": 0.38,
+     "criticalMultiplier": 3.0,
+     "procChance": 0.26,
+     "fireRate": 1.0,
+     "multishot": 1.0
+    },
+    "name": "Sepulcrum",
+    "attack": "Lock-On Mode",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Lock-On Radial Attack",
+      "damage": {
+       "heat": 480.0,
+       "total": 480.0
+      },
+      "criticalChance": 0.38,
+      "criticalMultiplier": 3.0,
+      "procChance": 0.26,
+      "radius_m": 3.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.2
+     }
+    ],
+    "forced_procs": [
+     "impact"
+    ],
+    "ammo_cost": 0.0,
+    "co_behavior": "independent"
+   }
+  }
+ },
+ "/lotus/weapons/thanotech/thanorifle/thanotechrifle": {
+  "segments": [
+   {
+    "id": "radial",
+    "name": "范围伤害",
+    "attack": "Auto AoE",
+    "damage": {
+     "heat": 50.0,
+     "total": 50.0
+    },
+    "criticalChance": 0.24,
+    "criticalMultiplier": 2.2,
+    "procChance": 0.3,
+    "radius_m": 1.6,
+    "falloff_start_m": 0.0,
+    "falloff_reduction": 0.15,
+    "takes_condition_overload": true,
+    "takes_multishot": false
+   }
+  ],
+  "main": {
+   "damage": {
+    "impact": 29.0,
+    "heat": 53.0,
+    "total": 82.0
+   }
+  },
+  "name": "Trumna",
+  "wiki": "Trumna",
+  "main_attack": "Auto",
+  "main_form": "auto",
+  "forms": {
+   "alt_fire:grenade_impact": {
+    "main": {
+     "damage": {
+      "impact": 100.0,
+      "total": 100.0
+     },
+     "criticalChance": 0.38,
+     "criticalMultiplier": 2.4,
+     "procChance": 0.5,
+     "fireRate": 1.33,
+     "multishot": 1.0
+    },
+    "name": "Trumna",
+    "attack": "Grenade Impact",
+    "segments": [
+     {
+      "id": "radial",
+      "name": "范围伤害",
+      "attack": "Grenade Bounce AoE",
+      "damage": {
+       "heat": 1000.0,
+       "total": 1000.0
+      },
+      "criticalChance": 0.38,
+      "criticalMultiplier": 2.4,
+      "procChance": 0.5,
+      "radius_m": 6.0,
+      "falloff_start_m": 0.0,
+      "falloff_reduction": 0.4
+     }
+    ],
+    "co_behavior": "independent"
+   }
+  }
+ }
+}

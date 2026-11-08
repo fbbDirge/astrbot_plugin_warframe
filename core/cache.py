@@ -1,0 +1,112 @@
+# -*- coding: utf-8 -*-
+"""异步安全的 TTL + LRU 内存缓存。
+
+所有频繁请求的第三方接口（世界状态 / WM 市场 / 物品搜索）都经由本缓存，
+以降低对他人服务器的压力，并让重复查询的响应稳定在毫秒级。
+"""
+
+from __future__ import annotations
+
+import asyncio
+import time
+from collections import OrderedDict
+from typing import Any, Callable, Coroutine, Optional
+
+
+class TTLCache:
+    """带过期时间的 LRU 缓存，读多写少场景下用一把 asyncio 锁保证协程安全。"""
+
+    def __init__(self, maxsize: int = 512):
+        self._maxsize = maxsize
+        self._store: "OrderedDict[str, tuple[float, Any]]" = OrderedDict()
+        self._lock = asyncio.Lock()
+        # 同 key 并发回源时做单飞（singleflight），避免缓存击穿
+        self._inflight: dict[str, asyncio.Future[Any]] = {}
+        self._hits = 0
+        self._misses = 0
+
+    async def get(self, key: str) -> Optional[Any]:
+        async with self._lock:
+            item = self._store.get(key)
+            if item is None:
+                self._misses += 1
+                return None
+            exp, value = item
+            if exp <= time.monotonic():
+                self._store.pop(key, None)
+                self._misses += 1
+                return None
+            self._store.move_to_end(key)
+            self._hits += 1
+            return value
+
+    async def set(self, key: str, value: Any, ttl: float) -> None:
+        async with self._lock:
+            self._set_locked(key, value, ttl)
+
+    def _set_locked(self, key: str, value: Any, ttl: float) -> None:
+        self._store[key] = (time.monotonic() + max(0.0, ttl), value)
+        self._store.move_to_end(key)
+        while len(self._store) > self._maxsize:
+            self._store.popitem(last=False)
+
+    def drop_prefix(self, prefix: str) -> int:
+        """丢掉某个前缀下的全部条目（同步：只在事件循环线程里调，dict 操作本身原子）。返回丢掉的条数。"""
+        keys = [k for k in self._store if str(k).startswith(prefix)]
+        for k in keys:
+            self._store.pop(k, None)
+        # 已开始的调用仍可完成，但新调用不能加入旧请求，旧结果也不能重新填充缓存。
+        for k in [k for k in self._inflight if str(k).startswith(prefix)]:
+            self._inflight.pop(k, None)
+        return len(keys)
+
+    async def get_or_fetch(
+        self,
+        key: str,
+        ttl: float,
+        fetch: Callable[[], Coroutine[Any, Any, Any]],
+    ) -> Any:
+        value = await self.get(key)
+        if value is not None:
+            return value
+        # 单飞：同一 key 的并发请求只回源一次
+        async with self._lock:
+            fut = self._inflight.get(key)
+            if fut is None:
+                fut = asyncio.get_running_loop().create_future()
+                self._inflight[key] = fut
+                creator = True
+            else:
+                creator = False
+        if not creator:
+            return await asyncio.shield(fut)
+        try:
+            value = await fetch()
+            async with self._lock:
+                if self._inflight.get(key) is fut:
+                    self._set_locked(key, value, ttl)
+            if not fut.done():
+                fut.set_result(value)
+            return value
+        except BaseException as exc:  # noqa: BLE001 - 需要唤醒所有等待者
+            if not fut.done():
+                fut.set_exception(exc)
+                # 立即消费一次异常：没有等待者时（单调用者失败场景必然如此），
+                # asyncio 会在 GC 时打印 "Future exception was never retrieved"
+                # 带完整 Traceback 的警告，上游一抖就刷屏（BUG-1，2026-09-18 验收）。
+                # 调用 exception() 即标记已检索；等待者经 shield 拿异常不受影响。
+                fut.exception()
+            raise
+        finally:
+            async with self._lock:
+                if self._inflight.get(key) is fut:
+                    self._inflight.pop(key, None)
+
+    def stats(self) -> dict:
+        total = self._hits + self._misses
+        return {
+            "size": len(self._store),
+            "hits": self._hits,
+            "misses": self._misses,
+            "hit_rate": round(self._hits / total, 3) if total else 0.0,
+        }

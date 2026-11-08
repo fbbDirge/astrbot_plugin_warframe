@@ -1,0 +1,377 @@
+# -*- coding: utf-8 -*-
+"""本地检索、遗物出处合并、分页工具的回归断言。
+
+背景：
+- 「物品 / wiki / 掉落」原先只查 warframe.market 的**可交易品**字典，
+  Forma / 赤毒 / 内融核心 这类天然查不到（搜啥啥不出）。
+- WM 兜底解析用纯子串匹配，``Forma`` 会命中 ``valence_formation``（效价炼成）。
+- 遗物列表写死「以下仅列举前 10」，长列表没有翻页。
+
+这些都属于「静默生效」的逻辑，必须靠断言锁住。
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+FAILED: list[str] = []
+
+
+def check(name: str, cond: bool, detail: str = ""):
+    print(
+        f"[{'PASS' if cond else 'FAIL'}] {name}" + (f"  -> {detail}" if detail and not cond else "")
+    )
+    if not cond:
+        FAILED.append(name)
+
+
+from core import drops as D  # noqa: E402
+from core import formatters as F  # noqa: E402
+from core import search as S  # noqa: E402
+
+# ---------------------------------------------------------------- 统一检索
+# 这些词原本一个都搜不到（WM 字典里没有）
+for q, expect in [
+    ("Forma", "Forma"),
+    ("forma", "Forma"),
+    ("赤毒", "赤毒"),
+    ("氩结晶", "氩结晶"),
+    ("膛线", "膛线"),
+    # ★ 2026-09-20 修正：以前期望「压迫点」是把词典的错误映射固化成了断言。
+    #   官方简中里 Serration = 「膛线」，Pressure Point = 「压迫点」，两者不能混。
+    ("serration", "膛线"),
+]:
+    hit = S.search(q, limit=1)
+    check(f"检索 {q} -> {expect}", bool(hit) and hit[0]["name"] == expect, str(hit[:1]))
+
+check("检索条目数可观（官方导出已并入）", len(S._index()) > 10000, str(len(S._index())))
+
+# 关键回归：forma 不得再命中 valence_formation
+names = [h["name"] for h in S.search("Forma", limit=8)]
+check("Forma 不再误命中 效价炼成", "效价炼成" not in names, str(names))
+check("Forma 结果里带官方 Forma", "Forma" in names, str(names))
+
+# 词边界：短查询不该被长串的长子串吃掉
+check("短查询不匹配内部名", S._score("forma", "valence formation") == -1)
+check("精确匹配优先级最高", S._score("forma", "forma") == 0)
+
+# ------------------------------- wiki 页面名：黑话要落到国际服官方名（2026-09-24）
+# 用户实测「wiki 摸尸」给「御魂主宰」（国服旧译）是死链：DE 官方简中**不翻译
+# 战甲名**（Nekros / Banshee 直接用英文），已翻译内容（武器/MOD/赋能）取简中。
+# 详见 tests/test_wiki_intro.py 的全量断言。
+for _slang, _want in [
+    ("音妈", "Banshee Prime"),
+    ("毒妈", "Saryn Prime"),
+    ("DJ", "Octavia Prime"),
+    ("茶妹", "Protea Prime"),
+    ("玻璃甲", "Gara Prime"),
+]:
+    _h = S.search(_slang, limit=1)
+    _pn = S.wiki_page_name(_h[0]) if _h else ""
+    check(f"★ 黑话「{_slang}」页面名 → {_want}", _pn == _want, _pn)
+check("官方条目页面名保持原样", S.wiki_page_name({"name": "Forma", "source": "官方"}) == "Forma")
+check(
+    "WM 展示名后缀（一套/蓝图）剥掉后归一到官方名",
+    S.wiki_page_name({"name": "Banshee Prime 一套"}) == "Banshee Prime",
+    S.wiki_page_name({"name": "Banshee Prime 一套"}),
+)
+check(
+    "查不到官方名时回落别名键（不返回空）",
+    bool(S.wiki_page_name({"name": "某不存在词", "en": "zzz nonexistent", "source": "别名"})),
+)
+
+# 2026-09-24 联网核对后修正的两条错映射（键是官方名的省略形式，却指向别的物品）
+import json  # noqa: E402
+
+_AL = json.loads((ROOT / "core" / "data" / "aliases.json").read_text(encoding="utf-8"))
+check(
+    "★「充沛」= 赋能·充沛（Arcane Energize），不再指向川流不息 Prime",
+    _AL["wm_items"].get("充沛") == "arcane_energize",
+    str(_AL["wm_items"].get("充沛")),
+)
+check(
+    "★「蛇发女妖」不再指向 MOD gorgon_frenzy（官方名是武器的）",
+    _AL["wm_items"].get("蛇发女妖") != "gorgon_frenzy",
+    str(_AL["wm_items"].get("蛇发女妖")),
+)
+# 2026-09-24 自查新增：瞬时狡诈（Fleeting Expertise 旧译）曾错指持久力 Prime
+# （primed_continuity，加持续），与「减持续换效率」的本身语义相反。
+check(
+    "★「瞬时狡诈」= 弹指瞬技（fleeting_expertise），不再错指持久力 Prime",
+    _AL["wm_items"].get("瞬时狡诈") == "fleeting_expertise",
+    str(_AL["wm_items"].get("瞬时狡诈")),
+)
+_h = S.search("瞬时狡诈", limit=1)
+check(
+    "★ 黑话「瞬时狡诈」页面名 → 弹指瞬技",
+    bool(_h) and S.wiki_page_name(_h[0]) == "弹指瞬技",
+    S.wiki_page_name(_h[0]) if _h else "",
+)
+# 2026-09-24 自查新增：页面名选择规则升级为「官方 MOD 名表命中 > 键最长」，
+# 命中官方名的键直接采用官方原始写法（同时修掉旧译与 Prime 缺空格两类死链源）。
+check(
+    "★ 官方名表命中优先于更长的旧译键（真空吸物 → 吸取）",
+    S.wiki_page_name({"name": "真空吸物", "source": "别名"}) == "吸取",
+    S.wiki_page_name({"name": "真空吸物", "source": "别名"}),
+)
+check(
+    "★ 官方写法带空格（持久力Prime → 持久力 Prime）",
+    S.wiki_page_name({"name": "持久力Prime", "source": "别名"}) == "持久力 Prime",
+    S.wiki_page_name({"name": "持久力Prime", "source": "别名"}),
+)
+
+# ---------------------------------------------------------------- 遗物出处
+lines = D.relic_source_lines("neo c11 relic")
+check(
+    "遗物出处可查且已合并轮次",
+    bool(lines) and all("轮）" in x or "轮" not in x for x in lines),
+    str(lines[:3]),
+)
+check(
+    "合并后按节点去重（少于原始条数）",
+    len(lines) < len(D.relic_sources("neo c11 relic", limit=200)),
+    f"{len(lines)} vs {len(D.relic_sources('neo t11 relic', limit=200))}",
+)
+check("limit 生效", len(D.relic_source_lines("neo c11 relic", limit=2)) == 2)
+check("未知遗物返回空", D.relic_source_lines("zzz zzz relic") == [])
+
+# 合并示例：同一节点的 A/B/C 轮应折成一条
+merged = D.relic_source_lines("neo c11 relic")
+check(
+    "同节点轮次合并成 A/B/C",
+    any("B/C轮" in x or "A/B/C轮" in x for x in merged),
+    str([x for x in merged if "轮" in x][:5]),
+)
+
+# ---------------------------------------------------------------- 分页
+rows = [
+    {
+        "cn": f"遗物{i}",
+        "tier": "",
+        "unvaulted": i % 2 == 0,
+        "sources": ["水星 · Lares · 防御（B/C轮）"],
+        "source_total": 9,
+    }
+    for i in range(1, 24)
+]
+t1, l1 = F.fmt_prime_relics(rows, "遗物入库", page=1, page_size=10)
+t2, l2 = F.fmt_prime_relics(rows, "遗物入库", page=2, page_size=10)
+check("遗物列表标题带页码", "第1/3页" in t1 and "第2/3页" in t2, t1)
+check("第 1 页含前 10 条", "1. [已入库] 遗物1" in l1[0], l1[0])
+check("第 2 页从第 11 条开始", l2[0].startswith("11."), l2[0])
+check("页码越界被夹回末页", "第3/3页" in F.fmt_prime_relics(rows, "x", page=99, page_size=10)[0])
+check("掉落位置已写入", any("掉落位置：" in x for x in l1), str(l1[:4]))
+
+# 杜卡德分档
+check(
+    "杜卡德档位覆盖 15/25/45/65/100",
+    all(
+        v in F._DUCAT_TIER[t]["values"]
+        for t, v in (("金", 100), ("银", 45), ("银", 65), ("铜", 15), ("铜", 25))
+    ),
+)
+
+# 入侵分页
+inv = [
+    {
+        "node": f"节点{i}",
+        "attacker": {"faction": "Grineer", "items": []},
+        "defender": {"faction": "Corpus", "items": []},
+        "completion": 50,
+        "count": 1,
+        "goal": 2,
+    }
+    for i in range(1, 15)
+]
+ta, la = F.fmt_invasions(inv, page=1, page_size=6)
+tb, lb = F.fmt_invasions(inv, page=3, page_size=6)
+# ★ 2026-10-11 第二步改版：翻页信息挪到卡首答案行「◆ 进行中：14 场（第 1/3 页…）」（注脚统一卡尾、≤3 行）
+check("入侵分页：共 3 页", "第 1/3 页" in la[0] and "14 场" in la[0], str(la[:1]))
+check(
+    "入侵第 3 页只余 2 场",
+    "第 3/3 页" in lb[0] and sum(1 for x in lb if x.startswith("◆ 节点")) == 2,
+    str(lb[:1]),
+)
+
+
+# 冷构建并发：在真实 search 入口中确定性安排第二次调用等待首个构建。
+def _index_singleflight():
+    from collections import Counter
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Event, Lock
+    from unittest.mock import patch
+
+    class ObservedLock:
+        def __init__(self):
+            self.lock = Lock()
+            self.waiting = Event()
+
+        def __enter__(self):
+            if self.lock.locked():
+                self.waiting.set()
+            self.lock.acquire()
+
+        def __exit__(self, *args):
+            self.lock.release()
+
+    reads = Counter()
+    lock = ObservedLock()
+    started = Event()
+
+    def fixture_load(path):
+        reads[path.name] += 1
+        if path == S._DE_ITEMS_FILE:
+            started.set()
+            if not lock.waiting.wait(3):
+                raise RuntimeError("没有观察到第二个入口等待")
+            return {"items": [{"zh": "测试", "en": "fixture"}]}
+        return {"wm_items": {"别名": "fixture"}, "riven_items": {"紫卡": "fixture"}}
+
+    S._index.cache_clear()
+    try:
+        with (
+            patch.object(S, "_INDEX_LOCK", lock),
+            patch.object(S, "_jload", fixture_load),
+            patch.object(S._paths, "load_json", return_value={}),
+        ):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                first = pool.submit(S.search, "测试", 1)
+                assert started.wait(3), "首个入口没有开始构建"
+                second = pool.submit(S.search, "测试", 1)
+                a, b = first.result(timeout=5), second.result(timeout=5)
+            check(
+                "并发首查只构建一份索引且检索结果一致",
+                a == b and bool(a) and S._index.cache_info().misses == 1,
+            )
+            check("单次索引构建只解析一遍别名表", reads[S._ALIAS_FILE.name] == 1)
+            S._index.cache_clear()
+            check("显式清理仍重置索引缓存", S._index.cache_info().currsize == 0)
+            S._index()
+            check("清缓存后下次调用重新构建", reads[S._DE_ITEMS_FILE.name] == 2)
+
+        S._alias_slug_index.cache_clear()
+        with patch.object(
+            S,
+            "_jload",
+            return_value={"wm_items": {"同名": "wm"}, "riven_items": {"同名": "riven"}},
+        ) as load:
+            check(
+                "slug 别名索引只读一遍且保持 wm 覆盖顺序",
+                S._alias_slug_index().get("同名") == "wm" and load.call_count == 1,
+            )
+
+        # 抛异常的构建不能遗留锁或缓存失败；随后另一个线程可重新成功构建。
+        S._index.cache_clear()
+        with patch.object(S, "_jload", side_effect=RuntimeError("fixture load failure")):
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                try:
+                    pool.submit(S._index).result(timeout=5)
+                except RuntimeError:
+                    check("索引构建异常不缓存失败结果", S._index.cache_info().currsize == 0)
+                else:
+                    check("索引构建异常不缓存失败结果", False)
+        with (
+            patch.object(S, "_jload", return_value={"items": [{"zh": "恢复", "en": "recovered"}]}),
+            patch.object(S._paths, "load_json", return_value={}),
+        ):
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                check(
+                    "索引构建失败后可跨线程重试且不死锁",
+                    bool(pool.submit(S.search, "恢复", 1).result(timeout=5)),
+                )
+
+        # clear 与构建交错时，clear 应等待旧构建完成后再清空。
+        S._index.cache_clear()
+        lock = ObservedLock()
+        started.clear()
+        with (
+            patch.object(S, "_INDEX_LOCK", lock),
+            patch.object(S, "_jload", fixture_load),
+            patch.object(S._paths, "load_json", return_value={}),
+        ):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                building = pool.submit(S._index)
+                assert started.wait(3), "首个入口没有开始构建"
+                clearing = pool.submit(S._index.cache_clear)
+                building.result(timeout=5)
+                clearing.result(timeout=5)
+            check("在途构建后清理不被旧结果重新填充", S._index.cache_info().currsize == 0)
+    finally:
+        S._index.cache_clear()
+        S._alias_slug_index.cache_clear()
+
+
+_index_singleflight()
+
+
+async def _wiki_cold_lookup_keeps_loop_running():
+    import asyncio
+    import threading
+    from types import SimpleNamespace
+    from unittest.mock import patch
+
+    from core.commands.wiki_misc import WikiMiscCommands
+    from core.parser import parse
+
+    owner = WikiMiscCommands()
+    owner.client = SimpleNamespace(wiki_clarify=lambda query: "", wiki_lookup=lambda query: None)
+    owner._wiki_reply = lambda title, *args, **kwargs: title
+    main_thread = threading.get_ident()
+    real_search = S.search
+    for text in ("wiki 测试", "wiki 测试p"):
+        entered, released = threading.Event(), threading.Event()
+        loop_progress, threads = [], []
+
+        def load(path):
+            if path == S._DE_ITEMS_FILE:
+                entered.set()
+                loop_progress.append(released.wait(1))
+                return {"items": [{"zh": "测试", "en": "fixture"}]}
+            return {}
+
+        def search(query, limit):
+            threads.append(threading.get_ident())
+            return real_search(query, limit)
+
+        async def heartbeat():
+            while not entered.is_set():
+                await asyncio.sleep(0)
+            released.set()
+
+        S._index.cache_clear()
+        tick = asyncio.create_task(heartbeat())
+        try:
+            with (
+                patch.object(S, "_jload", load),
+                patch.object(S, "search", search),
+                patch.object(S._paths, "load_json", return_value={}),
+            ):
+                result = await owner._h_wiki(parse(text), None, "pc")
+            await asyncio.wait_for(tick, 2)
+            check(
+                f"{text} 冷查与变体回退不阻塞事件循环",
+                bool(result)
+                and loop_progress == [True]
+                and len(threads) == (2 if text.endswith("p") else 1)
+                and all(ident != main_thread for ident in threads),
+            )
+        finally:
+            released.set()
+            tick.cancel()
+            await asyncio.gather(tick, return_exceptions=True)
+            S._index.cache_clear()
+            S._alias_slug_index.cache_clear()
+
+
+import asyncio  # noqa: E402
+
+asyncio.run(_wiki_cold_lookup_keeps_loop_running())
+
+if FAILED:
+    print(f"\n失败 {len(FAILED)} 项：{FAILED}")
+    sys.exit(1)
+print("\n全部通过 ✔")

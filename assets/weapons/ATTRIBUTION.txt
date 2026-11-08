@@ -1,0 +1,4 @@
+Warframe artwork © Digital Extremes. Distributed via WFCD/warframe-items.
+Source revision: 23804b64bc248069ce39adb9f52e9f546d8f343e
+Each source URL is recorded in manifest.json.
+Images resized to fit 256 × 256, preserving transparency.

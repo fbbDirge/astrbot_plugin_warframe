@@ -1,0 +1,348 @@
+# -*- coding: utf-8 -*-
+"""Baro Ki'Teer 库存「预测」（数据源：wiki 的历史上架记录）。
+
+⚠️ **这不是官方预测**。DE 从不公布下期库存，本模块做的是**统计推测**：
+   把 wiki 记载的历次上架日期整理成「到访日历 + 每件物品何时上过」，
+   然后按「距上次上架已经过去多少次到访 / 它自己的平均上架间隔」排序 ——
+   也就是**最该回归的候选**。历史上确实常有按固定节奏轮换的物品
+   （Prime MOD 那批），但也有完全不规律的，所以只给候选与依据，不打包票。
+   卡片上必须写明这是推测，让用户自己判断（项目铁律：推荐类内容要给来源）。
+
+数据由 ``scripts/build_baro_history.py`` 从 ``Module:Baro/data`` 生成。
+"""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Optional
+
+from . import paths
+
+DATA_FILE = Path(__file__).resolve().parent / "data" / "baro_history.json"
+
+_DB: Optional[dict] = None
+_NAMES: Optional[dict] = None
+
+# 类型 → 中文（Baro 的类型值来自 wiki 的 Type 字段）
+TYPE_CN = {
+    "Primed Mod (Pistol)": "主要 MOD（手枪）",
+    "Primed Mod (Rifle)": "主要 MOD（步枪）",
+    "Primed Mod (Shotgun)": "主要 MOD（霰弹枪）",
+    "Primed Mod (Melee)": "主要 MOD（近战）",
+    "Primed Mod (Archgun)": "主要 MOD（空战枪）",
+    "Primed Mod": "主要 MOD",
+    "Mod (Pistol)": "MOD（手枪）",
+    "Mod (Rifle)": "MOD（步枪）",
+    "Mod (Shotgun)": "MOD（霰弹枪）",
+    "Mod (Melee)": "MOD（近战）",
+    "Mod (Stance)": "MOD（架式）",
+    "Mod": "MOD",
+    "Weapon": "武器",
+    "Void Relic": "虚空遗物",
+    "Relic": "遗物",
+    "Decoration": "装饰",
+    "Glyph": "浮印",
+    "Somachord": "音乐片段",
+    "Color Palette": "配色",
+    "Consumable": "消耗品",
+    "Booster": "助燃剂",
+    "Bundle": "礼包",
+    "Captura Scene": "摄影棚场景",
+    "Cosmetic (Armor)": "护甲外观",
+    "Cosmetic (Warframe Armor)": "护甲外观",
+    "Cosmetic (Warframe Skin)": "战甲外观",
+    "Cosmetic (Weapon)": "武器外观",
+    "Cosmetic (Weapon Skin)": "武器外观",
+    "Cosmetic (Sentinel)": "守护外观",
+    "Cosmetic (Operator)": "指挥官外观",
+    "Cosmetic (Sigil)": "纹章",
+    "Cosmetic (Syandana)": "披饰",
+    "Cosmetic (Emblem)": "徽章",
+    "Cosmetic (Landing Craft)": "登陆艇外观",
+    "Cosmetic (Ephemera)": "幻纹",
+    "Cosmetic (Archwing)": "空战外观",
+    "Cosmetic (Orbiter)": "轨道飞行器外观",
+    "Cosmetic": "外观",
+    # ★ 2026-10-16（第十五批 B3）：wiki Module:Baro/data 里出现、此前未收录的 17 种类型（缺则卡面显示英文）。
+    #   库娃 / 恐鸟 / 原子摩托车 / 守护 / K 式悬浮板 取自 DE 官方简中词表；「空战」沿用本表既有口径。
+    "Primed Mod (Warframe)": "主要 MOD（战甲）",
+    "Primed Mod (Companion)": "主要 MOD（同伴）",
+    "Primed Mod (Archwing)": "主要 MOD（空战）",
+    "Primed Mod (Sniper)": "主要 MOD（狙击枪）",
+    "Mod (Warframe)": "MOD（战甲）",
+    "Mod (Sniper)": "MOD（狙击枪）",
+    "Mod (Bow)": "MOD（弓箭）",
+    "Weapon (Archwing)": "空战武器",
+    "Sentinel": "守护",
+    "Cosmetic (K-Drive)": "K 式悬浮板外观",
+    "Cosmetic (Kavat)": "库娃外观",
+    "Cosmetic (Kubrow)": "库狛外观",
+    "Cosmetic (MOA)": "恐鸟外观",
+    "Cosmetic (Atomicycle)": "原子摩托车外观",
+    "Emote": "表情",
+    "Quest": "任务",
+    "Lootbox": "宝箱",
+}
+# 卡片分组顺序（借鉴社区预测站的分类习惯）
+GROUP_ORDER = ("MOD", "武器", "遗物", "装饰", "外观", "其他")
+
+
+def type_cn(t: str) -> str:
+    """类型英文 → 中文（查不到就原样返回，不猜）。"""
+    return TYPE_CN.get((t or "").strip(), (t or "").strip())
+
+
+def group_of(t: str) -> str:
+    """类型 → 卡片分组。"""
+    t = (t or "").strip()
+    if "Mod" in t:
+        return "MOD"
+    if t == "Weapon" or t.startswith("Weapon ("):  # 含「Weapon (Archwing)」（第十五批 B3）
+        return "武器"
+    if "Relic" in t:
+        return "遗物"
+    if t in ("Decoration", "Somachord", "Captura Scene", "Color Palette"):
+        return "装饰"
+    if t.startswith("Cosmetic"):
+        return "外观"
+    return "其他"
+
+
+# 当期货单（DE worldState 的 ``ItemType`` 路径）→ 卡片类别：分组顺序 + 判定表。
+#
+# ★ 2026-10-16：与 :func:`group_of` 是**两套口径**，缺一不可 ——
+#   预测卡的数据源（wiki ``Module:Baro/data``）只有类型文字 ``Type``，走 group_of；
+#   当期货单的数据源（DE worldstate）只有资源路径 ``ItemType``，走 group_of_store。
+#   顺序即语义：「/upgrades/skins/」排在「/weapons/」**之前** —— 武器外观的路径是
+#   ``/Upgrades/Skins/Weapons/…``，先判 /weapons/ 会把外观错归「武器」（DeepSeek 实现时发现，Claude 调序）。
+STORE_GROUP_ORDER = ("武器", "MOD", "外观", "装饰", "遗物", "消耗品", "礼包", "其他")
+
+# (路径子串, 类别)；子串一律**小写**比较（DE 路径是 CamelCase：ShipDecos / BoosterPacks…）
+_STORE_RULES = (
+    ("/upgrades/skins/", "外观"),
+    # ★ 2026-10-16（ZCode 冒烟 + 玩家反馈分类不对）：CosmeticEnhancers 名为「外观增强」，实为
+    #   怪奇 MOD（Peculiars，wiki 类型 Mod (Warframe)）与赋能的目录 —— 原先整目录归「外观」，
+    #   当期「终劫怪奇」因此错归外观。怪奇归 MOD；该目录其余（赋能等）不再默认外观，落「其他」。
+    ("/cosmeticenhancers/peculiars/", "MOD"),
+    ("/weapons/", "武器"),
+    ("/upgrades/mods/", "MOD"),
+    ("/sentinelprecepts/", "MOD"),
+    ("/shipdecos/", "装饰"),
+    ("/avatarimages/", "装饰"),
+    ("/songitems/", "装饰"),
+    ("/captura", "装饰"),
+    ("/colourpicker", "装饰"),
+    ("/projections/", "遗物"),
+    ("/boosters/", "消耗品"),
+    ("/boosterpacks/", "消耗品"),
+    ("/restoratives/", "消耗品"),
+    ("/consumable", "消耗品"),
+    ("/packages/", "礼包"),
+    ("bundle", "礼包"),
+)
+
+
+def group_of_store(path: str) -> str:
+    """DE 商品路径（``ItemType``）→ 卡片类别（当期货单的分组芯片用）。
+
+    ★ 2026-10-16：纯函数、无数据依赖。按子串**不区分大小写**匹配，先命中先返回；
+    一个都不命中即「其他」—— 老数据 / warframestat 源没有路径、或以后 DE 新品类
+    都落这一支，不抛异常、不猜。
+    """
+    p = (path or "").lower()
+    for sub, grp in _STORE_RULES:
+        if sub in p:
+            return grp
+    return "其他"
+
+
+def names_zh() -> dict:
+    """Baro 物品的官方简中名（由 scripts/build_baro_names.py 生成）。"""
+    global _NAMES
+    if _NAMES is None:
+        try:
+            _NAMES = json.loads(
+                (DATA_FILE.parent / "baro_names_zh.json").read_text(encoding="utf-8")
+            )
+        except Exception:  # noqa: BLE001
+            _NAMES = {}
+    return _NAMES
+
+
+# 不参与轮换的物品（每次都在卖 / 特殊活动项），预测它们没意义
+_SKIP_TYPES = ("", "AlwaysAvailable", "ExtraItems")
+
+
+def load() -> dict:
+    global _DB
+    if _DB is None:
+        try:
+            # ★ 2026-10-16：运行目录优先（社区快照刷新后写在那里），没有再读包内种子 DATA_FILE
+            _DB = json.loads(paths.read_path(DATA_FILE.name).read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            _DB = {}
+    return _DB
+
+
+def reset() -> None:
+    """社区快照换新后清缓存（下次 load 重读）。"""
+    global _DB
+    _DB = None
+
+
+def visits() -> list[str]:
+    """历次到访日期（升序）。"""
+    return list(load().get("visits") or [])
+
+
+def last_visit() -> Optional[str]:
+    v = visits()
+    return v[-1] if v else None
+
+
+def snapshot_date() -> str:
+    """历史快照的抓取日期（``baro_history.json`` 的 ``fetched``）。"""
+    return str(load().get("fetched") or "")
+
+
+def _period() -> timedelta:
+    return timedelta(days=int(load().get("period_days") or 14))
+
+
+def _last_dt() -> Optional[datetime]:
+    last = last_visit()
+    if not last:
+        return None
+    try:
+        return datetime.fromisoformat(last).replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+# 「未收录」提示的宽限（2026-10-17 用户看面板反馈）：到访本身 48 h，wiki 通常到访中或结束后才补货单，
+# 服务器每日抓一次 ⇒ 到访开始后 3 天内没收录属正常，健康提示（面板 / 数据登记）不报。卡片静默计数不用宽限。
+STALE_GRACE_HOURS = 72
+
+
+def missed_visits(now: Optional[datetime] = None, grace_hours: float = 0) -> int:
+    """快照之后、到 ``now`` 为止**已开始**的到访次数（按 period_days 等距推算）。
+
+    ★ 2026-10-11：历史快照不会自动增长（上次 2026-09-18，抓于 09-24），
+    其后的 10-02 那次到访不在表里 ⇒「已静默 N 次」整体少算。用它把静默次数同步到今天。
+    ``grace_hours``：只数开始时间早于 ``now - grace_hours`` 的到访（健康提示用 STALE_GRACE_HOURS）。
+    """
+    d = _last_dt()
+    if d is None:
+        return 0
+    now = now or datetime.now(timezone.utc)
+    now = now - timedelta(hours=grace_hours)
+    if now <= d:
+        return 0
+    return int((now - d) // _period())
+
+
+def next_visit_est(now: Optional[datetime] = None, activation: str = "") -> Optional[str]:
+    """下次到访日期（``YYYY-MM-DD``）。
+
+    ① worldstate 的 ``voidTrader.activation`` 在未来（或正在到访中）⇒ 直接用它（DE 官方排期）；
+    ② 否则按「上一次 + k × period_days」**前推到不早于今天**的第一个日期。
+    ★ 2026-10-11：旧写法只加一个周期（09-18 + 14 = 10-02），快照一旧就给出**过去的日期**
+    （10-11 查看时卡面写「下次预计到访 2026-10-02」）。
+    """
+    now = now or datetime.now(timezone.utc)
+    if activation:
+        try:
+            act = datetime.fromisoformat(activation.replace("Z", "+00:00"))
+            if act.tzinfo is None:
+                act = act.replace(tzinfo=timezone.utc)
+            if act + timedelta(hours=48) > now:
+                return act.strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    d = _last_dt()
+    if d is None:
+        return None
+    nxt = d + _period() * (missed_visits(now) + 1)
+    return nxt.strftime("%Y-%m-%d")
+
+
+def predict(
+    limit: int = 12,
+    min_seen: int = 3,
+    active_within: int = 120,
+    extra_silent: Optional[int] = None,
+) -> list[dict]:
+    """最可能在下期回归的物品（按「逾期程度」降序）。
+
+    口径（全部可复算，卡片上也会写）：
+      · ``gap``    = 历史相邻上架之间的“到访次数”平均值
+      · ``silent`` = 距上次上架已过去的到访次数
+      · ``score``  = silent / gap —— >1 表示已超过它自己的平均节奏
+
+    ★ 怎么区分「该回归」与「已停售」：只看 score 会把**早就停售**的老物件
+      顶到最前（实测排第一的是「均隔 1 次却静默 23 次」的皮肤 —— 那不是
+      「快来了」，而是「不会再来了」）。所以再加两条：
+        · 停售嫌疑：``silent > 历史最大间隔 × 2`` → 剔除（这类给再高的分也没用）
+        · 只要「刚过节奏」的：``score ≤ 3.0``
+      过滤后按 score 降序，越接近 1 越说明它按自己的老节奏该来了。
+
+    过滤：至少上架 min_seen 次、且最近 active_within 次到访内活跃过
+    （否则会把 2015 年就绝版的老物件排满，没有参考意义）。
+
+    ``extra_silent``：快照之后又过去的到访次数（默认按今天现算 :func:`missed_visits`），
+    计入每件物品的静默次数 —— 快照里不可能有这些到访的上架记录，视为都没上。
+    """
+    db = load()
+    vs = db.get("visits") or []
+    items = db.get("items") or {}
+    if not vs or not items:
+        return []
+    if extra_silent is None:
+        extra_silent = missed_visits()
+    now_i = len(vs) - 1 + max(0, int(extra_silent))
+    out: list[dict] = []
+    for name, rec in items.items():
+        if (rec.get("t") or "") in _SKIP_TYPES:
+            continue
+        vidx = sorted(set(rec.get("v") or []))
+        if len(vidx) < min_seen:
+            continue
+        last_i = vidx[-1]
+        silent = now_i - last_i
+        if silent <= 0 or silent > active_within:
+            continue
+        gaps = [b - a for a, b in zip(vidx, vidx[1:]) if b > a]
+        if not gaps:
+            continue
+        gap = sum(gaps) / len(gaps)
+        if gap <= 0:
+            continue
+        score = silent / gap
+        # 停售嫌疑：静默时长是它自己历史最长间隔的两倍以上
+        if silent > max(gaps) * 2 and score > 3.0:
+            continue
+        if score > 3.0:
+            continue
+        t_en = rec.get("t") or ""
+        out.append(
+            {
+                "name": name,
+                "name_cn": names_zh().get(name, ""),
+                "type": t_en,
+                "type_cn": type_cn(t_en),
+                "group": group_of(t_en),
+                "ducats": rec.get("d") or 0,
+                "credits": rec.get("c") or 0,
+                "last": vs[last_i],
+                "silent": silent,
+                "gap": round(gap, 1),
+                "max_gap": max(gaps),  # 历史最长间隔（停售嫌疑的判据，测试要复算）
+                "score": round(score, 2),
+                "times": len(vidx),
+            }
+        )
+    # 越接近 1 越「按节奏该来」；同分时更常上架的优先
+    out.sort(key=lambda r: (abs(r["score"] - 1.0), -r["times"], r["name"]))
+    return out[:limit]

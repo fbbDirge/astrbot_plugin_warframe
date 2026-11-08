@@ -1,0 +1,15 @@
+# Compact market archive; all sources remain available through git clone.
+/previews export-ignore
+/tests export-ignore
+/upstream_tests export-ignore
+/scripts export-ignore
+/dist export-ignore
+/.github export-ignore
+/assets/fonts/NotoSansSC.ttf export-ignore
+/assets/weapons/*.png export-ignore
+/assets/equipment/*.png export-ignore
+/assets/bounties/*.png export-ignore
+/assets/components/*.png export-ignore
+/assets/icons/*.png export-ignore
+
+/core/data/fonts/NotoSansCJKsc-Subset-Bold.otf export-ignore

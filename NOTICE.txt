@@ -1,0 +1,13 @@
+This derivative plugin incorporates Warframe-SDJK-Bot by skyti1437 (GPL-3.0).
+https://github.com/skyti1437/Warframe-SDJK-Bot
+Pinned commit: 4fed72a68e80aa075b592367f5b7c3efcd9bdf4c
+Source is integrated in core/ and runtime.py; reference tests in upstream_tests/.
+Pinned provenance and local modifications are recorded in UPSTREAM.json.
+Combined program distributed under GPL-3.0; game artwork and bundled fonts retain their separate notices.
+
+Derivative release notice (2026-11-08):
+This is an independently maintained modified version, not an official release
+of skyti1437/Warframe-SDJK-Bot. Original author: skyti1437 (Sky).
+Local integration and presentation changes: Amy.
+The source code remains under GPL-3.0. Existing upstream copyright,
+third-party data, game artwork and font notices are retained.

@@ -1,0 +1,19 @@
+Warframe faction, Void Relic, Platinum and damage-type artwork: Digital Extremes.
+Source: WARFRAME Wiki (https://wiki.warframe.com/).
+Individual source image and file-description URLs are recorded in sources.json.
+These game assets are not covered by the plugin code or WFCD MIT license.
+Bundled for identification in this unofficial Warframe companion; no endorsement implied.
+Downloaded 2026-11-07; original PNG files retained.
+
+murmur: https://wiki.warframe.com/w/File:MurmurIcon(xWhite).png
+techrot: https://wiki.warframe.com/w/File:TechrotIcon(xWhite).png
+scaldra: https://wiki.warframe.com/w/File:ScaldraIcon(xWhite).png
+credits: https://wiki.warframe.com/w/File:Credits64.png
+endo: https://wiki.warframe.com/w/File:Endo64.png
+kuva: https://wiki.warframe.com/w/File:Kuva.png
+narmer: https://wiki.warframe.com/w/File:IconNarmer(xWhite).png
+duviri: https://wiki.warframe.com/w/File:DuviriIcon.png
+ducats: https://wiki.warframe.com/w/File:Ducats_vector(xBlack).png
+void: https://wiki.warframe.com/w/File:DmgVoidSmall64.png
+tau: https://wiki.warframe.com/w/File:DmgTauSmall64.png
+true: https://wiki.warframe.com/w/File:DmgTrueSmall64.png

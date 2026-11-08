@@ -1,0 +1,63 @@
+{
+  "source": "https://wiki.warframe.com/w/The_Circuit",
+  "epoch": "2023-05-01T00:00:00+00:00",
+  "anchor_week": 1,
+  "period_hours": 168,
+  "weeks": [
+    [
+      "Excalibur",
+      "Trinity",
+      "Ember"
+    ],
+    [
+      "Loki",
+      "Mag",
+      "Rhino"
+    ],
+    [
+      "Ash",
+      "Frost",
+      "Nyx"
+    ],
+    [
+      "Saryn",
+      "Vauban",
+      "Nova"
+    ],
+    [
+      "Nekros",
+      "Valkyr",
+      "Oberon"
+    ],
+    [
+      "Hydroid",
+      "Mirage",
+      "Limbo"
+    ],
+    [
+      "Mesa",
+      "Chroma",
+      "Atlas"
+    ],
+    [
+      "Ivara",
+      "Inaros",
+      "Titania"
+    ],
+    [
+      "Nidus",
+      "Octavia",
+      "Harrow"
+    ],
+    [
+      "Gara",
+      "Khora",
+      "Revenant"
+    ],
+    [
+      "Garuda",
+      "Baruuk",
+      "Hildryn"
+    ]
+  ]
+}

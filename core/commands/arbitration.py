@@ -1,0 +1,369 @@
+# -*- coding: utf-8 -*-
+"""仲裁指令（D3 自 main.py 迁入，方法体逐字未改）。
+
+覆盖路由键 2 项：arbitration / arbtable；类属性 _ARB_TYPES / _ARB_RATING /
+_ARB_TYPES_STR 随域迁出（经 Mixin MRO 供 self._ARB_* 寻址，取值不变）。
+附：D2 区间尾界曾误切本域两行筛选关键词注释，本笔自 D1 提交原文恢复。
+子包纪律：不 import astrbot（事件对象鸭子类型）。
+"""
+
+from __future__ import annotations
+
+
+from .. import arbi as _arbi
+from .. import formatters as fmt
+from .base import Reply, err_card
+
+# 仲裁的任务类型 / 派系 / 节点渲染：**唯一实现**在 core/arbi.py
+# （「仲裁」查询指令与「蹲 仲裁」推送共用；2026-09-19 收敛，避免两套口径漂移）。
+_arb_mission = _arbi.mission_of
+_arb_faction = _arbi.faction_of
+_ARB_FACTION_FIX = _arbi._FACTION_FIX  # 兼容旧引用
+
+
+class ArbitrationCommands:
+    """Mixin：仲裁 handler（挂载于 main.WarframeSDJK）。"""
+
+    # 仲裁筛选关键词 -> arbi.wf.wiki 的 missionNameZh 规范值
+    # （该站中文表把 Infested Salvage 写作「INFESTED 资源回收」，比对前需去前缀）
+    _ARB_TYPES = {
+        "生存": "生存",
+        "防御": "防御",
+        "镜像防御": "镜像防御",
+        "拦截": "拦截",
+        "挖掘": "挖掘",
+        "叛逃": "叛逃",
+        "回收": "资源回收",
+        "资源回收": "资源回收",
+        "中断": "中断",
+        "歼灭": "歼灭",
+        "捕获": "捕获",
+        "虚空洪流": "虚空洪流",
+        "虚空覆涌": "虚空覆涌",
+        "虚空决战": "虚空决战",
+        "联结生存": "联结生存",
+        "元素转换": "元素转换",
+    }
+    _ARB_RATING = {"高效": ("S", "A+", "A"), "传奇": ("S",)}
+    _ARB_TYPES_STR = (
+        "生存 / 防御 / 镜像防御 / 拦截 / 挖掘 / 叛逃 / 回收 / 中断 /"
+        " 歼灭 / 捕获 / 虚空洪流 / 虚空覆涌 / 虚空决战 / 联结生存 / 元素转换"
+    )
+
+    async def _h_arbitration(self, parsed, event, platform) -> Reply:
+        """当前仲裁 / 按类型筛选未来排期（arbi.wf.wiki 官方数据）。"""
+        import time as _t
+        from datetime import datetime, timezone, timedelta
+
+        toks = list(parsed.content or [])
+        if parsed.preset:
+            toks.insert(0, parsed.preset)
+        want_types = {self._ARB_TYPES[t] for t in toks if t in self._ARB_TYPES}
+        want_ratings = next((self._ARB_RATING[t] for t in toks if t in self._ARB_RATING), ())
+        today_only = any(t in ("今天", "今日") for t in toks)
+        filtered = bool(want_types or want_ratings or today_only)
+
+        if not filtered:  # 默认：当前 + 下一小时
+            return await self._arb_now(platform)
+
+        sched, nodes, tier_of = await self._arb_fetch()
+        seq, step, start = sched["seq"], sched.get("stepSec", 3600), sched["startTs"]
+        idx0 = int((_t.time() - start) // step)
+        if idx0 < 0 or idx0 >= len(seq):
+            return err_card(
+                _arbi.expired_hint(sched), "稍后再查，等数据源更新排期表后恢复", title="仲裁排期"
+            )
+        bj = timezone(timedelta(hours=8))
+        now_bj = datetime.now(bj)
+        end_bj = (
+            now_bj.replace(hour=23, minute=59, second=59)
+            if today_only
+            else now_bj + timedelta(days=14)
+        )
+        rows = []
+        for h in range(0, min(24 * 15, len(seq) - idx0)):
+            key = sched["nodes"][seq[idx0 + h]]
+            n = nodes.get(key, {})
+            mt = _arb_mission(n)
+            tv = tier_of.get(key, "")
+            if tv == "未评级":
+                tv = ""
+            t = datetime.fromtimestamp(start + (idx0 + h) * step, tz=timezone.utc).astimezone(bj)
+            if t > end_bj:
+                break
+            if want_types and mt not in want_types:
+                continue
+            if want_ratings and tv not in want_ratings:
+                continue
+            # ★ 2026-09-27 列对齐：排期卡改走渲染层的按列绘制 ⇒ 这里存**分列
+            #   单元格**（[节点（星球）, 类型, 派系, [评级]]），不再拼整行字符串。
+            rows.append((t, _arbi.node_cells(nodes, key, tier_of), tv))
+        if not rows:
+            return err_card(
+                "该筛选条件下未来 14 天内没有仲裁场次",
+                "放宽或更换筛选词重发",
+                ("可筛选类型", self._ARB_TYPES_STR),
+                ("评级筛选", "高效（S/A+/A） / 传奇（S）"),
+                title="仲裁排期",
+            )
+        page_size = self.page_size
+        total = len(rows)
+        pages = max(1, (total + page_size - 1) // page_size)
+        page = max(1, min(parsed.page or 1, pages))
+        chunk = rows[(page - 1) * page_size : page * page_size]
+        # 时间列 + 节点/类型/派系/评级 各占一列（全角空格分隔，渲染层按列对齐）
+        fdesc = (
+            "、".join(
+                [
+                    *(t for t in toks if t in self._ARB_TYPES),
+                    *(
+                        ("高效" if want_ratings == self._ARB_RATING["高效"] else "传奇")
+                        for _ in [0]
+                        if want_ratings
+                    ),
+                    *(["今天"] if today_only else []),
+                ]
+            )
+            or "全部"
+        )
+        S = "　"
+        lines = [
+            f"◆ 筛选：{fdesc}｜共 {total} 场（北京时间 UTC+8）",
+            "◆ 仲裁排期",
+            f"{S}时间{S}节点（星球）{S}类型{S}派系{S}评级",
+            *[
+                "· " + S.join([f"{t.month}月{t.day}日 {t.hour:02d}时", *cells])
+                for t, cells, _tv in chunk
+            ],
+            _arbi.TIER_NOTE,
+            *(
+                [_arbi.LOW_NOTE]
+                if any(_arbi.LOW_MARK in "".join(c) for _t, c, _tv in chunk)
+                else []
+            ),
+            "★ 实测值（尤其「生存 / 中断」）吃队伍熟练度，普通队伍未必打得到",
+        ]
+        title = f"仲裁排期 · {fdesc}（第{page}/{pages}页，共{total}场）"
+        return Reply(title, lines, footer=fmt.fmt_platform_footer(platform, "arbi.wf.wiki"))
+
+    async def _arb_fetch(self) -> tuple[dict, dict, dict]:
+        """拉 arbi.wf.wiki 三张表：排期序列 / 节点中文表 / 站点评级。
+
+        数据源说明（用户可核对）：
+          · arbys.schedule.v2.json —— 确定性的逐小时排期（官方数据推导，非随机）
+          · arbys.nodes.zh.json    —— 节点/星球/任务类型/派系/等级的中文名
+          · tierlist.default.json  —— 社区站点评级（S/A+/A/A-/B/C）
+        """
+        return await _arbi.fetch_tables(self.client)
+
+    @staticmethod
+    def _arb_node_line(nodes: dict, key: str, tier_of: dict) -> str:
+        """把节点渲染成一行：节点（星球） · 类型 · 派系 · 评级。
+
+        Args:
+            nodes: 节点字典（key -> 节点数据）。
+            key: 目标节点 key。
+            tier_of: 节点 -> 评级。
+
+        Notes:
+            arbi 数据里的 ``minEnemyLevel/maxEnemyLevel`` 是**敌人等级区间**（不是
+            「原始难度」之类的概念 —— 仲裁根本没有那种说法），但很多用户看着
+            「Lv 6-11」会以为和之前那条「高效 / 传奇」筛选是一回事，反而起干扰，
+            砍掉。
+        """
+        return _arbi.node_line(nodes, key, tier_of)
+
+    async def _arb_now(self, platform) -> Reply:
+        """当前仲裁 + 下一小时（含节点/星球/类型/派系/等级/站点评级 + 数据源说明）。"""
+        import time as _t
+
+        from datetime import datetime, timedelta, timezone
+
+        sched, nodes, tier_of = await self._arb_fetch()
+        seq = sched["seq"]
+        # ★ 2026-10-11：走 arbi.key_at —— 排期表到期后给提示，不再 `% len(seq)` 回绕到表头
+        try:
+            key_now, idx, start, step = _arbi.key_at(sched, _t.time())
+        except _arbi.ScheduleExpired:
+            return err_card(
+                _arbi.expired_hint(sched), "稍后再查，等数据源更新排期表后恢复", title="仲裁"
+            )
+        key_nxt = sched["nodes"][seq[idx + 1]] if idx + 1 < len(seq) else ""
+        n = nodes.get(key_now) or {}
+        bj = timezone(timedelta(hours=8))
+        t0 = datetime.fromtimestamp(start + idx * step, tz=bj)
+        t1 = datetime.fromtimestamp(start + (idx + 1) * step, tz=bj)
+
+        # ★ 2026-10-04 修 bug：实测表改按**节点 ID** 查。
+        #   旧写法 `f"{nameZh}|{missionType.replace('MT_','').title()}"` 拼 key ——
+        #   arbi 的 missionType 是内部代号（MT_TERRITORY/MT_PURIFY/MT_ARTIFACT…），
+        #   与旧表的英文类型名（Interception/Infested Salvage/Disruption…）对不上
+        #   ⇒ 17 个节点的「生息效率」行**永远不显示**（命中率仅 44/88）。
+        #   实测表与 schedule/nodes/tierlist 三表同源同键（SolNodeXXX/ClanNodeXX）。
+        tv = (tier_of.get(key_now) or "").strip()
+        mrec = _arbi.measured_of(key_now)
+        src = _arbi.tier_source(key_now, tier_of)
+        if tv in ("", "未评级"):
+            rate = "评级：未评级"
+        elif src == "arbi":
+            rate = f"评级：{tv}（arbi 社区评级）"
+        elif _arbi.low_sample(key_now, tier_of):
+            rate = f"评级：{tv}（社区实测中位 · 样本少）"
+        else:
+            rate = f"评级：{tv}（社区实测中位）"
+        if mrec.get("median") is not None:
+            rate += f"　生息效率 {mrec['median']}/小时（n={mrec.get('n', 0)}，社区实测中位数）"
+
+        S = "　"
+        # ★ 2026-10-22：下一小时的评级**带社区实测中位数**（与时间表同口径）。
+        nxt_cells = _arbi.node_cells(nodes, key_nxt, tier_of, with_median=True) if key_nxt else []
+        left = fmt.countdown(t1.astimezone(timezone.utc).isoformat())
+        # ★ 2026-10-22：新增「下次高效」—— 从**下一场起**往后找第一个 S/A+/A（与「仲裁 高效」
+        #   同一口径）。下一场本身就是高效时就直接是它（与上一行重复，属预期）。
+        _hit = _arbi.next_efficient(sched, tier_of, idx + 1)
+        if not _hit:
+            eff_line = "◆ 下次高效：排期内暂无（未来排期里没有 S / A+ / A 的场次）"
+        else:
+            _ei, _ek = _hit
+            _et = datetime.fromtimestamp(start + _ei * step, tz=bj)
+            _ecells = _arbi.node_cells(nodes, _ek, tier_of, with_median=True)
+            _eleft = fmt.countdown(
+                datetime.fromtimestamp(start + _ei * step, tz=timezone.utc).isoformat()
+            )
+            eff_line = (
+                f"◆ 下次高效：{_et.day}日{_et.hour:02d}时（北京）"
+                + S.join(["", *_ecells])
+                + f"｜还有 {_eleft}"
+            )
+        lines = [
+            f"◆ 当前仲裁：{n.get('nameZh', '?')}"
+            + (f"（{n.get('systemNameZh')}）" if n.get("systemNameZh") else "")
+            + f"{S}{_arb_mission(n)}{S}{_arb_faction(n) or '?'}",
+            f"◆ {rate}",
+            f"◆ 本场时段：{t0:%H:%M}–{t1:%H:%M}（北京时间）｜剩余 {left}",
+            "◆ 下一小时：" + (S.join(nxt_cells[:4]) if nxt_cells else "（排期表已到末尾）"),
+            eff_line,
+            "※ 筛选：发「仲裁 类型 / 高效 / 传奇 / 今天」，类型 " + self._ARB_TYPES_STR,
+            _arbi.TIER_NOTE + "（实测非官方，仅供参考）",
+            *([_arbi.LOW_NOTE] if nxt_cells and _arbi.LOW_MARK in "".join(nxt_cells) else []),
+            "★ 实测值（尤其「生存 / 中断」）来自上传记录的高水平队伍，普通队伍未必打得到",
+        ]
+        from ..viewmodel import DataLines
+        def task_record(label, key, when):
+            node = nodes.get(key) or {}
+            return {"label":label, "node":node.get("nameZh") or "—",
+                    "system":node.get("systemNameZh") or "", "mission":_arb_mission(node),
+                    "faction":_arb_faction(node), "rating":_arbi.tier_label_with_median(key, tier_of),
+                    "time":when}
+        records = [task_record("当前仲裁", key_now, f"{t0:%H:%M}–{t1:%H:%M}｜剩余 {left}")]
+        if key_nxt:
+            records.append(task_record("下一小时", key_nxt, f"{t1:%d}日 {t1:%H:%M} 开始"))
+        if _hit:
+            records.append(task_record("下次高效", _ek, f"{_et:%d}日 {_et:%H:%M}｜还有 {_eleft}"))
+        lines = DataLines(lines, domain="arbitration_now", records=records,
+                         meta={"rating_detail":rate, "next_missing":not bool(key_nxt), "efficient_missing":not bool(_hit)})
+        return Reply(
+            "当前仲裁",
+            lines,
+            footer=fmt.fmt_platform_footer(platform, "排期·节点·等级 arbi.wf.wiki"),
+        )
+
+    async def _h_arbtable(self, parsed, event, platform) -> Reply:
+        """仲裁时间表：arbi.wf.wiki 数据（中文节点+派系+站点评级，含实测回落）。"""
+        import time as _t
+        from datetime import datetime, timezone, timedelta
+
+        # ★ 2026-10-04：改走共用入口 `_arb_fetch()` —— 它返回**三级回落**后的
+        #   tier_of（arbi 官方 → 社区实测中位 → 未评级）。此前这里自己拉三张表，
+        #   实测档回落会漏掉这张卡（指令 §2.4 的"自动受益"假设在此处不成立）。
+        sched, nodes, node_tier = await self._arb_fetch()
+        start, step = sched["startTs"], sched.get("stepSec", 3600)
+        seq = sched["seq"]
+        idx0 = int((_t.time() - start) // step)
+        if idx0 < 0 or idx0 >= len(seq):
+            return err_card(
+                _arbi.expired_hint(sched), "稍后再查，等数据源更新排期表后恢复", title="仲裁时间表"
+            )
+        # ★ 2026-10-11：「仲裁表 生存」按任务类型筛选（帮助卡写了「可筛类型」，旧实现
+        #   完全忽略参数 ⇒ 照发得到的是全表）。类型词与「仲裁」指令同一张表。
+        toks = list(getattr(parsed, "content", None) or [])
+        if getattr(parsed, "preset", None):
+            toks.insert(0, parsed.preset)
+        want_types = {self._ARB_TYPES[t] for t in toks if t in self._ARB_TYPES}
+        bad = [t for t in toks if t not in self._ARB_TYPES]
+        rows = []
+        for h in range(0, min(24 * 14, len(seq) - idx0)):  # 逐小时，14 天
+            key = sched["nodes"][seq[idx0 + h]]
+            n = nodes.get(key, {})
+            name = n.get("nameZh", "?")
+            system = n.get("systemNameZh", "")
+            mtype = _arb_mission(n)
+            fac = _arb_faction(n)
+            # ★ 2026-10-22：评级后带该节点**社区实测每小时生息中位数**（如「A 612」）；
+            #   无实测样本的节点只给档位（见 arbi.tier_label_with_median 的说明）。
+            tv = _arbi.tier_label_with_median(key, node_tier)
+            t = datetime.fromtimestamp(start + (idx0 + h) * step, tz=timezone.utc) + timedelta(
+                hours=8
+            )
+            # ★ 2026-10-02 裂列修复：存**结构化单元格**，输出时才按全角空格拼行。
+            #   不变量：渲染层分列口径（render.py 的 _split_cells / 预扫描 /
+            #   _table_mode 列对齐）**只认全角空格 `　`** ⇒ 单元格内允许 ASCII
+            #   空格，但绝不可把 ASCII 空格当列分隔符。旧写法「ASCII 空格 join →
+            #   split」会把含空格的节点名（V Prime / Tyana Pass / Outer Terminus，
+            #   88 个仲裁节点中 3 个）劈成两列，其后各列整体右移、末列溢出。
+            if want_types and mtype not in want_types:
+                continue
+            # ★ 2026-10-22：行元组末位带上节点 key（图例判「本页有没有带中位数的行」用；
+            #   `r[5]` 仍是评级列，不动既有下标口径）。
+            rows.append((t, name, system, mtype, fac, tv, key))
+        if bad and not want_types:
+            return err_card(
+                f"仲裁表：不认识的筛选词「{'、'.join(bad)}」",
+                "从可筛选类型里选词重发，例如「仲裁表 生存」",
+                ("可筛选类型", self._ARB_TYPES_STR),
+                title="仲裁时间表",
+            )
+        if not rows:
+            return err_card(
+                "该类型未来 14 天内没有仲裁场次",
+                "换一个类型重发",
+                ("可筛选类型", self._ARB_TYPES_STR),
+                title="仲裁时间表",
+            )
+        size = 15
+        total = len(rows)
+        pages = max(1, (total + size - 1) // size)
+        page = min(max(1, parsed.page or 1), pages)
+        page_rows = rows[(page - 1) * size : page * size]
+        over = (parsed.page or 1) > pages
+        # 时间 + 节点 + 星球 + 类型 + 派系 + [评级]：节点与星球**各占一列**
+        # （不合并成「V Prime（金星）」——合并列是「仲裁排期」卡的写法）
+        S = "　"
+        body = [
+            "· "
+            + S.join((f"{t.day}日{t.hour:02d}时", name, system, mtype, fac, tv))
+            for t, name, system, mtype, fac, tv, _k in page_rows
+        ]
+        chunk = [
+            f"◆ 范围：未来 14 天共 {total} 场（北京时间 UTC+8）",
+            "◆ 仲裁时间表",
+            f"{S}时间{S}节点{S}星球{S}类型{S}派系{S}评级",
+            *body,
+        ]
+        if over:
+            chunk.append(f"※ 只有 {pages} 页，已显示最后一页")
+        chunk.append(_arbi.TIER_NOTE)  # 评级列下方标评分范围（2026-10-16 维护者要求）
+        # ★ 2026-10-22：本卡评级列带了实测中位数 ⇒ 图例补一句说明那个数字是什么。
+        #   只在**本页真有带中位数的行**时加，免得纯官方档位页多一句废话。
+        if any(_arbi.measured_of(_r[6]).get("median") is not None for _r in page_rows):
+            chunk.append(_arbi.TIER_MEDIAN_NOTE)
+        if any(r[5].endswith(_arbi.LOW_MARK) for r in page_rows):
+            chunk.append(_arbi.LOW_NOTE)
+        # ★ 2026-10-11：时间列是北京时间 —— 标在标题上（正文行全是列对齐的数据行）
+        fdesc = "、".join(t for t in toks if t in self._ARB_TYPES)
+        title = (
+            f"仲裁时间表·北京时间 · {fdesc}（第{page}/{pages}页，共{total}条）"
+            if fdesc
+            else f"仲裁时间表·北京时间（第{page}/{pages}页，共{total}条）"
+        )
+        return Reply(title, chunk, footer=fmt.fmt_platform_footer(platform))
