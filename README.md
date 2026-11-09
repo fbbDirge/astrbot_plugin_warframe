@@ -1,4 +1,4 @@
-# AstrBot Warframe 助手 v0.7.22
+# AstrBot Warframe 助手 v0.7.23
 
 > **二次开发声明**：本项目基于 [skyti1437/Warframe-SDJK-Bot](https://github.com/skyti1437/Warframe-SDJK-Bot) 修改与整合，原作者为 **skyti1437（Sky）**。当前集成基线为上游 v1.2.9，提交 `4fed72a68e80aa075b592367f5b7c3efcd9bdf4c`，并非上游最新版本的完整同步。本项目保留上游署名及 GPL-3.0 许可证；由 Amy 维护独立的图片样式、主题配置、图标缓存、市场检索和本地适配。与上游项目及 Digital Extremes 无官方隶属或背书关系。详细修改记录见 [UPSTREAM.json](UPSTREAM.json) 与 [NOTICE.txt](NOTICE.txt)。
 
@@ -18,7 +18,7 @@
 
 ## 安装或升级
 
-1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.22.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
+1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.23.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
 2. 升级时替换整个插件源码目录，避免残留 v0.6 的旧模块。个人数据保存在 `data/plugin_data/astrbot_plugin_warframe/`，不要删除该数据目录。
 3. 在 AstrBot 所用 Python 环境安装根目录 `requirements.txt` 并重载插件。依赖允许 Pillow 13，不要求降级 AstrBot Core。
 4. 发送 `帮助` 或 `wf 帮助`；再测试 `wm 猴子`、`裂缝`、`遗物 古纪A1`。默认国际服 PC，支持 `-ps/-xb/-sw`。
@@ -54,7 +54,7 @@ xh 布拉玛
 
 ## 国服兼容（WeGame）
 
-临时查询：`裂缝 -cn`、`钢铁裂缝 -cn`、`突击 -cn`、`平原 -cn`、`赏金 -cn`、`警报 -cn`、`入侵 -cn`、`奸商 -cn`。群管理员可发送 `默认平台 国服`；恢复国际服发送 `默认平台 pc`。插件全局默认平台也可配置为 `cn`。
+临时查询：`裂缝 -cn`、`钢铁裂缝 -cn`、`突击 -cn`、`平原 -cn`、`赏金 -cn`、`警报 -cn`、`入侵 -cn`、`奸商 -cn`。日常指令无需前缀：直接发送 `裂缝`、`突击`、`wm 猴子`。群管理员发送 `切换国服` 或 `切换国际服` 即可切换当前群；也兼容 `默认平台 国服` / `默认平台 pc`。插件全局默认平台也可配置为 `cn`。
 
 数据来自 [WeGame 世界状态页面](https://www.wegame.com.cn/act/xjzj/xjzj20220330/index.html)，国服与国际服缓存隔离；图片标明国服，接口失败或数据过期会报错，不使用国际服实时数据补齐。现支持 15 类查询：裂缝、突击、执刑官、平原周期、赏金、警报、入侵、午夜电波、奸商、每日特惠、限时活动、商城礼包、虚空风暴、舰队建设、武形秘仪。已有本地地图与图标表用于补充显示；部分国服专用译名或奖励图标可能仍未匹配。
 

@@ -7,7 +7,8 @@ from .core.parser import ALIAS_TO_COMMAND, Parsed, parse
 ADMIN_WORDS={'默认平台','平台','开启','关闭','状态','锚点'}
 EXTRA_ALIASES={'玄骇':'xh','赤毒玄骸':'xh','wml':'xh','分析紫卡':'analysis','子卡倾向':'disposition',
     '夜灵电波':'nightwave','夜灵电台':'nightwave','最新新闻':'news','虚空商人':'voidtrader','物品wiki':'wiki'}
-ROUTE_WORDS=set(ALIAS_TO_COMMAND)|ADMIN_WORDS|set(EXTRA_ALIASES)
+SERVER_SWITCHES={'切换国服':'cn','切换国际服':'pc'}
+ROUTE_WORDS=set(ALIAS_TO_COMMAND)|ADMIN_WORDS|set(EXTRA_ALIASES)|set(SERVER_SWITCHES)
 
 @dataclass
 class Request:
@@ -19,6 +20,8 @@ class Request:
 def route(text,platform='pc'):
     if text.lower().startswith('wf') and (len(text)==2 or text[2].isspace()):
         text=text[2:].strip() or '帮助'
+    if text.strip() in SERVER_SWITCHES:
+        return Request('admin',admin_text='.默认平台 '+SERVER_SWITCHES[text.strip()])
     suffix=re.fullmatch(r'(.+?)\s+(洗卡推荐|紫卡推荐)(?:\s+(.*))?',text)
     if suffix:text=suffix[2]+' '+suffix[1]+(' '+suffix[3] if suffix[3] else '')
     head=text.split(maxsplit=1)[0].lower() if text else ''

@@ -1,7 +1,7 @@
 name: astrbot_plugin_warframe
 display_name: Warframe 星际战甲助手
 desc: 基于 skyti1437/Warframe-SDJK-Bot 二次开发；国际服世界状态、市场、遗物、伤害计算、OCR 与订阅，独立图片布局与个人主题
-version: v0.7.22
+version: v0.7.23
 author: Amy（集成） / skyti1437（SDJK 上游）
 license: GPL-3.0
 repo: https://github.com/fbbDirge/astrbot_plugin_warframe

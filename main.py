@@ -10,7 +10,7 @@ from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, StarTools, register
 from .cards import Card
 from .client import ApiClient, QueryError
-from .commands import normalize_prefix
+from .commands import normalize_prefix, effective_prefixes
 from .routing import route
 from .settings import GameConfig
 from .presentation import present
@@ -19,7 +19,7 @@ from .service import WarframeService
 from .renderer import CardRenderer
 from .theme import ThemeStore, theme_from
 
-@register('astrbot_plugin_warframe', 'Amy', 'Warframe 查询、计算、OCR 与订阅', '0.7.22')
+@register('astrbot_plugin_warframe', 'Amy', 'Warframe 查询、计算、OCR 与订阅', '0.7.23')
 class WarframePlugin(Star):
     def __init__(self,context:Context,config:AstrBotConfig):
         super().__init__(context)
@@ -107,8 +107,8 @@ class WarframePlugin(Star):
         user=json.dumps([event.get_platform_id(),event.get_sender_id()],ensure_ascii=False)
         try:
             personal=self.themes.get(user)
-            prefixes=personal.get('command_prefixes',self.config.get('command_prefixes',['','/','.']))
-            normalized=normalize_prefix(event.message_str,prefixes,self.config.get('bare_commands',True) or 'command_prefixes' in personal)
+            prefixes,bare=effective_prefixes(self.config,personal)
+            normalized=normalize_prefix(event.message_str,prefixes,bare)
             if normalized is None:return
             words=normalized.split()
             control=len(words)>=2 and words[0].lower()=='wf' and words[1] in {'主题','配色','字号','背景','前缀'}

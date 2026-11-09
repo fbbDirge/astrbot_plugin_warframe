@@ -39,6 +39,17 @@ class Command:
     riven_layout: str | None = None
 
 
+def effective_prefixes(config, personal):
+    """Global bare_commands enables bare input; personal prefixes are explicit overrides."""
+    if 'command_prefixes' in personal:
+        return list(personal['command_prefixes']), True
+    prefixes=list(config.get('command_prefixes',['','/','.']))
+    bare=config.get('bare_commands',True)
+    if bare and '' not in prefixes:
+        prefixes.append('')
+    return prefixes, bare
+
+
 def normalize_prefix(text, prefixes=None, bare=True):
     text = text.strip()
     # Fixed recovery/control entry is always available.
