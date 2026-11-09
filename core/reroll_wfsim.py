@@ -7,6 +7,7 @@ import re
 import time
 from datetime import datetime, timezone, timedelta
 from functools import lru_cache
+from collections import Counter
 from pathlib import Path
 from . import paths
 from .commands.base import Reply
@@ -80,40 +81,74 @@ def read_cache(path):
 def stamp(ts):
     return datetime.fromtimestamp(ts,timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M（北京时间）')
 
+def top_combinations(group):
+    """Rank within a ruler/mode and count unique stat shapes, not duplicate builds."""
+    rows=[]
+    for r in group.get('rivens') or []:
+        try:score=float(r.get('score'))
+        except (TypeError,ValueError):continue
+        ids=r.get('stat_ids') or {}
+        pos=ids.get('bonuses') or []
+        neg=ids.get('malus')
+        if not math.isfinite(score) or score<=0 or not pos or not all(isinstance(x,str) for x in pos):continue
+        if neg is not None and not isinstance(neg,str):continue
+        if r.get('mode') and group.get('mode') and r['mode']!=group['mode']:continue
+        rows.append((score,r,tuple(sorted(set(pos))),neg))
+    seen=set();selected=[]
+    for _,r,pos,neg in sorted(rows,key=lambda x:-x[0]):
+        key=(pos,neg)
+        if key in seen:continue
+        seen.add(key);selected.append((pos,neg))
+        if len(selected)==20:break
+    return selected
+
+
+def summarize_group(group):
+    selected=top_combinations(group);n=len(selected)
+    pos=Counter(x for p,_ in selected for x in p)
+    neg=Counter(x for _,x in selected if x)
+    return n,pos,neg
+
+
 def report(data, stale=False):
-    from ..localization import translate
     result=data['result'];weapon=data.get('weapon',{})
     title=(weapon.get('zh') or data['query'])+' · 洗卡推荐'
-    lines=['◆ 来源：WFSim 已模拟紫卡组合', '◆ 数据状态：'+('接口失败，历史缓存（非实时）' if stale else '已缓存模拟结果'),
+    lines=['◆ 来源：WFSim 前 20 个优选组合分析','◆ 数据状态：'+('接口失败，历史缓存（非实时）' if stale else '已缓存模拟结果'),
            '◆ 获取时间：'+stamp(data['sampled_at'])]
-    groups=result.get('groups',[])
     usable=False
-    for g in groups:
-        rows=g.get('rivens') or []
-        if not rows:continue
+    label=lambda x:_riven_stat_cn(STAT_IDS.get(str(x),str(x)),weapon.get('riven_type',''),weapon.get('group',''))
+    for g in result.get('groups',[]):
+        n,pos,neg=summarize_group(g)
+        if not n:continue
         usable=True
         mode={'base':'普通','incarnon':'灵化','cycle':'普通／灵化循环'}.get(g.get('mode'),g.get('mode') or '未标注模式')
         ruler=str(g.get('ruler') or g.get('ruler_id') or '未标注场景')
         for en,zh in [('Standard Single Target','标准单体'),('Standard Multi Target','标准群体'),('100% headshots, aiming','100% 爆头、瞄准'),('Standard conditions','标准条件'),('Lv ','等级 '),(' SP',' 钢铁')]:ruler=ruler.replace(en,zh)
-        lines+=['◆ 模拟场景：'+ruler,'◆ 武器模式：'+str(mode)]
-        # Rankings only compare within this ruler/mode, never across different fights.
-        for i,r in enumerate(rows[:3],1):
-            ids=r.get('stat_ids') or {}
-            pos=ids.get('bonuses') or r.get('bonuses') or []
-            neg=ids.get('malus') or r.get('malus')
-            label=lambda x:_riven_stat_cn(STAT_IDS.get(str(x),str(x)),weapon.get('riven_type',''),weapon.get('group',''))
-            gain=r.get('gain')
-            valid=isinstance(gain,(int,float)) and not isinstance(gain,bool) and math.isfinite(gain) and g.get('riven_free')
-            lines+=['◆ 优选组合 '+str(i),'　项目　内容',
-                    '· 正面词条　'+' / '.join('▲'+label(x) for x in pos),
-                    '· 负面词条　'+('▼'+label(neg) if neg else '无'),
-                    '· 配装整体提升　'+(f'{gain*100:+.1f}%' if valid else '无同场景基准，暂不计算'),
-                    '· 配套 MOD　'+' / '.join(mod_names().get(str(x).casefold(),translate(x)) for x in r.get('mods',[])),
-                    '· 模拟记录时间　'+record_time(r.get('measured_at'))]
-        lines+=['※ 提升比较同场景、同模式的无紫卡最优配装；包含配套 MOD 变化，不是单词条收益。']
-    if not usable:lines+=['◆ 暂无推荐：WFSim 尚无此武器／场景的已模拟紫卡组合，不使用 WM 价格或其他武器冒充。']
-    lines+=['※ 仅覆盖已提交并计算的组合，不代表穷尽所有词条；负面需结合上述模式和配装判断。']
-    return Reply(title,lines,footer='WFSim 模拟结果 · 国际服数据参考\n场景说明：https://wfsim.app/method')
+        lines+=['◆ 模拟场景：'+ruler,'◆ 武器模式：'+str(mode),'◆ 分析组合：'+str(n)+' / 20 个去重组合'+('（样本不足，仅供参考）' if n<20 else '')]
+        good={x for x,c in pos.items() if c/n>=.15}
+        categories=[('正面推荐',[(x,c,True) for x,c in pos.items() if x in good]),
+                    ('负面候选（仅限本模式）',[(x,c,False) for x,c in neg.items() if c/n>=.15]),
+                    ('不建议优先选择（低频正面）',[(x,c,True) for x,c in pos.items() if x not in good]),
+                    ('负面慎选（正面高频）',[(x,c,False) for x,c in pos.items() if c/n>=.35 and not neg[x]]),
+                    ('低频负面 · 待判断',[(x,c,False) for x,c in neg.items() if c/n<.15])]
+        for heading,rows in categories:
+            if not rows:continue
+            lines+=['◆ '+heading,'　档位　词条　依据']
+            for x,c,positive in sorted(rows,key=lambda r:(-r[1],r[0])):
+                if heading.startswith('负面慎选'):
+                    tier='慎选';reason='对应正面在优选组合中常见；负面风险需核对'
+                elif heading.startswith('不建议'):
+                    tier='低频';reason='少数组合采用，不代表有害'
+                elif n<5 or heading.startswith('低频'):
+                    tier='待判断';reason='组合证据有限'
+                else:
+                    tier='S' if c/n>=.60 else 'A' if c/n>=.35 else 'B'
+                    reason='优选组合中的'+('正面' if positive else '负面')+'候选'
+                lines+=['· '+'　'.join([tier,('▲' if positive else '▼')+label(x),reason])]
+        lines+=['※ S/A/B 按组合出现比例≥60%/35%/15%分档，是候选优先级，不是单词条伤害收益。',
+                '※ 未出现的词条没有判为有害；低频不等于无效，负面候选需结合本场景与配装。']
+    if not usable:lines+=['◆ 暂无推荐：WFSim 尚无此武器／场景的有效模拟组合。']
+    return Reply(title,lines,footer='WFSim 模拟组合归纳 · 不同模式分别分析\n只分析已计算的组合，不能证明全局最优；国服仅作国际服数据参考。')
 
 async def recommend(client, query, platform='pc', api_key=''):
     query=query.strip()

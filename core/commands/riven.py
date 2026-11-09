@@ -598,11 +598,13 @@ class RivenCommands:
         typed = self._riven_text_input(parsed)
         if typed.weapon and (typed.positive or typed.negative):
             return await self._finish_riven_analysis(typed, None, platform, can_actions, started)
-        # —— 图片识别路径 ——
-        if not self._event_has_image(event):
+        # —— 图片识别路径（含明确引用的消息，不搜索聊天历史） ——
+        from ..riven_reply import image_event
+        source_event = await image_event(event)
+        if not self._event_has_image(source_event):
             reply = err_card(
                 "没有给出武器名和词条数值，也没有附紫卡截图",
-                "按用法补全重发；也可直接发「紫卡分析 + 紫卡截图」",
+                "可直接发「紫卡分析 + 紫卡截图」，或引用带紫卡图片的消息发送「紫卡分析」",
                 ("用法", "紫卡分析 武器名 词条数值…（负词条加「负」前缀）"),
                 "· 示例　紫卡分析 欧玛 暴伤82.8 范围1.6 攻速45.8 负滑暴81.3",
                 title="紫卡分析",
@@ -626,7 +628,7 @@ class RivenCommands:
         _busy_key = object()
         self._ocr_busy.add(_busy_key)
         try:
-            imgs = await self._image_data_urls(event)
+            imgs = await self._image_data_urls(source_event)
             if not imgs:
                 return Reply(raw_text="⚠️ 图片下载失败，请重发一次截图")
             data = await self._extract_riven_from_image(imgs[0])

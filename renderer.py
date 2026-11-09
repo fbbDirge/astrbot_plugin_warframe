@@ -327,7 +327,7 @@ class CardRenderer:
             return (.08,.32,.25,.35)
         if tuple(columns) == ('词条','数值','评分'):
             return (.48,.28,.24)
-        if tuple(columns) == ('档位','词条','适用条件'):
+        if tuple(columns) in {('档位','词条','适用条件'), ('档位','词条','依据')}:
             return (.12,.32,.56)
         n = len(columns)
         if n <= 1:
