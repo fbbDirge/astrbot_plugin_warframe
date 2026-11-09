@@ -7,7 +7,10 @@ from .client import QueryError
 
 ARBITRATION_COLORS = {'arb_s':'#B45309', 'arb_a_plus':'#7C3AED', 'arb_a':'#047857', 'arb_a_minus':'#2563EB', 'arb_f':'#BE123C', 'arb_unrated':'#64748B'}
 
+RIVEN_QUALITY_COLORS = {'roll_s':'#B45309','roll_a':'#047857','roll_b':'#2563EB','roll_c':'#C2410C','roll_d':'#BE123C','roll_unknown':'#64748B'}
+
 COLORS = {
+    **RIVEN_QUALITY_COLORS,
     **ARBITRATION_COLORS,
     'item_name':'#0369A1','rarity':'#A16207','drop_chance':'#047857','damage':'#C2410C','faction':'#64748B',
     'riven_stat':'#7C3AED', 'riven_range':'#0369A1', 'riven_negative':'#BE185D', 'riven_grade':'#047857',
@@ -22,6 +25,8 @@ FIELDS = {'物品名称':'item_name','稀有度':'rarity','掉率':'drop_chance'
           '地图':'fissure_map', '地图类型':'fissure_type', '任务类型':'fissure_type'}
 
 FIELDS.update(dict(zip(('仲裁S','仲裁A+','仲裁A','仲裁A-','仲裁F','仲裁未评级'), ARBITRATION_COLORS)))
+
+FIELDS.update(dict(zip(('紫卡S','紫卡A','紫卡B','紫卡C','紫卡D','紫卡待核对'), RIVEN_QUALITY_COLORS)))
 
 THEME_HELP_ROWS = [
     [('字段配色', 'title'), ('wf 配色 价格 #BE185D\nwf 配色 用户名 #2563EB', 'wm_price'), ('按 #RRGGBB 修改指定字段颜色', 'text')],

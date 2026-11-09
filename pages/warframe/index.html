@@ -1656,7 +1656,7 @@
     state.vIsoR = vIso();  // 「留空」选项的含义随隔离状态变化，记下渲染时用的口径
     const all = Object.fromEntries(state.settings.groups.flatMap((g) => g.fields).map((f) => [f.key, f]));
     const rows = (keys) => keys.filter((k) => all[k]).map((k) => fieldRow(all[k], V_TITLE[k] || "", V_ROUTE[k] || ""));
-    $("vRivenChan").replaceChildren(...rows(V_RIVEN));
+    $("vRivenChan").textContent = "紫卡截图仅使用本地 RapidOCR。请在本地 OCR 区域安装并启用，或发送“一键安装本地OCR”。旧的大模型和 OCR API 配置不再生效。";
     $("vScanChan").replaceChildren(...rows(V_SCAN));
     $("vBehBody").replaceChildren(...rows(V_BEHAVIOR));
     $("vLegacyFields").replaceChildren(...rows(["vision_provider_id"]));

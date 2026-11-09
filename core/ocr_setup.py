@@ -26,10 +26,7 @@ async def handle(runtime, event, command):
             message = f"{state['progress']}% · {state['message']}" if state['running'] else message
         status = local.status()
         return Reply(raw_text='本地 OCR：' + ('已启用' if status['enabled'] else '未启用')
-                     + '\n' + (message or state['message'])
-                     + ('\n独立 OCR API 当前优先，请先关闭其开关。' if runtime.cfg.get('riven_http_ocr_enabled') else ''))
-    if runtime.cfg.get('riven_http_ocr_enabled'):
-        return Reply(raw_text='请先在插件配置中关闭“独立 OCR API”，再发送“一键安装本地OCR”，避免安装后仍走 API。')
+                     + '\n' + (message or state['message']))
     if task is not None and not task.done():
         return Reply(raw_text='本地 OCR 正在安装或检查，请发送“本地OCR状态”查看进度。')
     status = local.status()

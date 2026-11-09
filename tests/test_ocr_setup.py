@@ -51,11 +51,6 @@ class OCRSetupTests(IsolatedAsyncioTestCase):
         reply = await handle(self.runtime, SimpleNamespace(), '安装本地OCR')
         self.assertIn('管理员', reply.raw_text)
         self.installer.start.assert_not_awaited()
-        self.runtime.cfg['riven_http_ocr_enabled'] = True
-        reply = await handle(self.runtime, self.event, '安装本地OCR')
-        self.assertIn('关闭', reply.raw_text)
-        self.installer.start.assert_not_awaited()
-        self.runtime.cfg.clear()
         self.installer.start.side_effect = None
         self.installer.start.return_value = dict(accepted=False, message='平台不支持')
         reply = await handle(self.runtime, self.event, '安装本地OCR')

@@ -4555,6 +4555,8 @@ def fmt_riven_analysis(
     from . import riven_analysis as RA
     from .parser import RIVEN_STAT_ZH
 
+    from .riven_grade import quality, label
+    scores = []
     zh = dict(RIVEN_DISPLAY_ZH)
     if cls == "melee":
         zh["melee_damage"] = "近战伤害"
@@ -4582,7 +4584,8 @@ def fmt_riven_analysis(
         (f"◆ 词条（{n_pos} 正 {n_neg} 负" if n_neg else f"◆ 词条（{n_pos} 正")
         + (f"，{hidden} 条未揭示）" if hidden else "）")
     )
-    lines.append("　词条　区间　距中　区间位")
+    summary_index = len(lines) - 1
+    lines.append("　词条　区间　距中　区间位　评分")
     for sid0, v in stats_pos:
         sid = _sid(sid0)
         lo, hi = RA.stat_range(
@@ -4597,13 +4600,15 @@ def fmt_riven_analysis(
             if _inv
             else f"▲{zh.get(sid, sid)} +{RA.fmt_value(sid, v)}"
         )
+        score = quality(v, lo, hi, negative=False)
+        scores.append(score)
         if lo is None:
             lines.append(f"· {_head}　该词条无官方基值（wiki 未收录），无法算区间")
             continue
         dev = RA.deviation_pct(v, lo, hi)
         pos_pct = RA.range_position(v, lo, hi)
         lines.append(
-            "· " + "　".join([_head, _range_txt(RA, sid, lo, hi), f"{dev:+.1f}%", f"{pos_pct}%"])
+            "· " + "　".join([_head, _range_txt(RA, sid, lo, hi), f"{dev:+.1f}%", f"{pos_pct}%", label(score)])
         )
     for sid0, v in stats_neg:
         sid = _sid(sid0)
@@ -4619,6 +4624,8 @@ def fmt_riven_analysis(
             if _inv
             else f"▼{zh.get(sid, sid)} -{RA.fmt_value(sid, v)}"
         )
+        score = quality(v, lo, hi, negative=True)
+        scores.append(score)
         if lo is None:
             lines.append(f"· {_head}　该词条无官方基值（wiki 未收录），无法算区间")
             continue
@@ -4628,10 +4635,13 @@ def fmt_riven_analysis(
         #   把浅负当深负卖。区间位本身就是「幅度接近上限的程度」，
         #   直接用 pos_pct：0%=最浅、100%=最满。
         lines.append(
-            "· " + "　".join([_head, _range_txt(RA, sid, lo, hi), "幅度位", f"{pos_pct}%"])
+            "· " + "　".join([_head, _range_txt(RA, sid, lo, hi), "幅度位", f"{pos_pct}%", label(score)])
         )
     for _ in range(hidden):
         lines.append("· ？？？　未揭示（融合选定后再分析）　—　—")
+    complete = not hidden and not warns and not verdict and len(scores) == n_pos + n_neg and scores and all(x is not None for x in scores)
+    overall = sum(scores)/len(scores) if complete else None
+    lines.insert(summary_index, "◆ 数值评分：" + label(overall))
     notes = []
     if splice:
         lines += _riven_splice_lines(RA, splice, cls, notes, limit=splice_limit)
@@ -4651,9 +4661,10 @@ def fmt_riven_analysis(
         )
     # 注脚压到每类一行（手机上整段注释曾占 5–6 行）；详细机制在「紫卡融合」卡与帮助里
     lines.append(
-        "※ 距中为正 = 高卷；负词条看幅度位，幅度越大越友好；"
+        "※ 距中为正 = 高卷；负词条幅度越小评分越高；"
         "区间 = DE 基值 × 倾向 × 词条数系数 × 0.9~1.1"
     )
+    lines.append("※ 数值评分：正词条取区间位置，负词条取 100−区间位置，综合分等权平均；S≥90 / A≥75 / B≥50 / C≥25 / D<25。仅评数值，不评配装、负词条偏好或售价；未揭示、缺基值或异常数值不评综合分。")
     lines += notes
     return ("紫卡分析", lines)
 

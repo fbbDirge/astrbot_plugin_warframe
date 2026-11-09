@@ -30,6 +30,11 @@ def clean(text):
     return text.replace('Warframe SDJKBOT','Warframe 助手').replace('SDJKBOT','Warframe 助手')
 
 
+def roll_role(value):
+    match=re.match(r'^([SABCD])\s+\d',str(value))
+    return 'roll_'+match[1].lower() if match else 'roll_unknown'
+
+
 def cell(value,header='',default='text'):
     raw=str(value); text=clean(raw).strip()
     role=ROLE_HEADERS.get(header,default)
@@ -60,6 +65,7 @@ def cell(value,header='',default='text'):
         if icon:return IconText(text,icon),role
     if header=='奖励' and text.startswith('Forma '):text=text.replace('Forma ','福马 ',1)
     if role=='wm_price':text=re.sub(r'(?<=\d)p\b',' 白金',text)
+    if header in {'评分','数值评分'}:role=roll_role(text)
     return text,role
 
 
@@ -74,7 +80,15 @@ def table(title,headers,rows):
     count=max([len(headers),*[len(r) for r in rows]])
     headers=list(headers)+['补充信息']*max(0,count-len(headers))
     return Card('',title=title,columns=tuple(headers),rows=[
-        [arbitration_cell(row[i] if i<len(row) else '',h,headers) for i,h in enumerate(headers)] for row in rows])
+        [quality_cell(row,i,h,headers) for i,h in enumerate(headers)] for row in rows])
+
+
+def quality_cell(row, i, header, headers):
+    text, role = arbitration_cell(row[i] if i < len(row) else '', header, headers)
+    if '评分' in headers and header in {'词条','距中','区间位','评分'}:
+        index = headers.index('评分')
+        role = roll_role(row[index] if index < len(row) else '')
+    return text, role
 
 
 def arbitration_cell(value, header, headers):

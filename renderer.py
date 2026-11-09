@@ -23,7 +23,6 @@ ICON_DIR = Path(__file__).parent / 'assets/icons'
 ICON_NAMES = {*PLANET_ASSETS, 'regal_aya', *('reward_category_'+v for v in ('scene','glyph','cosmetic','decoration','bundle','music','item')), 'bounty_document', *REWARD_ASSETS, *CYCLE_ICONS.values(), *STAT_ICONS.values(), 'forma', 'moonflesh','void', 'tau', 'true', 'narmer', 'duviri', 'murmur', 'techrot', 'scaldra', *CURRENCY_ICONS.values(), 'platinum', *ELEMENT_ICONS.values(), 'grineer', 'corpus', 'infested', 'sentient', 'orokin', 'lith', 'meso', 'neo', 'axi', 'requiem'}
 
 
-@lru_cache(maxsize=256)
 def load_icon(name, size):
     if name.startswith('blueprint:'):
         base=load_icon(name.removeprefix('blueprint:'),max(16,size-6))
@@ -54,22 +53,29 @@ def load_icon(name, size):
     else:
         return None
     try:
-        with Image.open(image_path(path)) as source:
-            icon = ImageOps.contain(source.convert('RGBA'), (size, size))
-            if name == 'ducats':
-                # Wiki provides a black monochrome symbol; retain alpha on the dark badge.
-                light = Image.new('RGBA', icon.size, (255, 255, 255, 255))
-                light.putalpha(icon.getchannel('A'))
-                icon = light
-            return icon
+        resolved = image_path(path)
+        return _read_icon(str(resolved), size, name, resolved.stat().st_mtime_ns)
     except (OSError, ValueError):
         return None
+
+
+@lru_cache(maxsize=256)
+def _read_icon(path, size, name, mtime):
+    # Cache successful reads only; missing/corrupt assets can recover after refresh.
+    with Image.open(path) as source:
+        icon = ImageOps.contain(source.convert('RGBA'), (size, size))
+        if name == 'ducats':
+            light = Image.new('RGBA', icon.size, (255, 255, 255, 255))
+            light.putalpha(icon.getchannel('A'))
+            icon = light
+        return icon
 
 
 
 PILL_ROLES = {
     'tier_lith', 'tier_meso', 'tier_neo', 'tier_axi', 'tier_requiem', 'tier_omnia',
     'riven_grade', 'fissure_type', 'rarity',
+    'roll_s','roll_a','roll_b','roll_c','roll_d','roll_unknown',
     'arb_s', 'arb_a_plus', 'arb_a', 'arb_a_minus', 'arb_f', 'arb_unrated',
 }
 
@@ -244,7 +250,7 @@ class CardRenderer:
         for raw in str(text).split('\n'):
             line = ''
             # Keep Latin words and numbers together unless a token exceeds a column.
-            for token in re.findall(r'[A-Za-z0-9_]+(?:[.,%-][A-Za-z0-9_]+)*|[^A-Za-z0-9_]', raw):
+            for token in re.findall(r'[+−-]?\d+(?:\.\d+)?(?:%|m|s)?|[A-Za-z0-9_]+(?:[.,%-][A-Za-z0-9_]+)*|[^A-Za-z0-9_]', raw):
                 if line and token in '）)，。；：':
                     line += token
                     continue
@@ -315,6 +321,8 @@ class CardRenderer:
 
     @staticmethod
     def _column_ratios(columns, rows=None):
+        if tuple(columns) == ('词条','区间','距中','区间位','评分'):
+            return (.36,.28,.11,.10,.15)
         n = len(columns)
         if n <= 1:
             return (1.0,)
@@ -706,7 +714,7 @@ class CardRenderer:
             # Auto-inferred colorful category pill next to brand capsule
             cat_label, cat_fg, cat_bg, cat_bd = '◆ 智库视图', '#0284C7', (224, 242, 254), (14, 165, 233)
             if any(k in title for k in ('紫卡', 'WMR', '词条', '洗卡', '倾向')):
-                cat_label, cat_fg, cat_bg, cat_bd = '❖ 紫卡中枢', '#7C3AED', (243, 232, 255), (139, 92, 246)
+                cat_label, cat_fg, cat_bg, cat_bd = '紫卡中枢', '#7C3AED', (243, 232, 255), (139, 92, 246)
             elif any(k in title for k in ('在售', '收购', '市场', 'WM', '卖家', '赤毒', '信条')):
                 cat_label, cat_fg, cat_bg, cat_bd = '❖ 交易终端', '#059669', (209, 250, 229), (16, 185, 129)
             elif any(k in title for k in ('裂隙', '裂缝', '遗物', '虚空')):
@@ -885,7 +893,7 @@ class CardRenderer:
                 name_face = pill_font if compact_mode else bold_font
                 val_face = badge_font if compact_mode else pill_font
                 hex_sz = max(24, f_opt_h - 2) if compact_mode else max(28, f_opt_h + 2)
-                m_sv = re.match(r'^(.+?)\s+([+-]?\d[\d.]*%?(?:\([^)]+\))?)$', rest)
+                m_sv = re.match(r'^(.+?)\s+([+-]?\d[\d.]*(?:%|m|s|米|秒)?(?:\([^)]+\))?)$', rest)
                 if m_sv:
                     s_name, s_val = m_sv.group(1).strip(), m_sv.group(2).strip()
                     nw = int(name_face.getlength(s_name))
@@ -1141,7 +1149,7 @@ class CardRenderer:
                                 hex_sz = max(28, f_opt_h + 2)
                                 if cur_x + hex_sz + 8 + int(font.getlength(rest.split()[0])) <= cx + w - 8:
                                     cur_x += _draw_hex_badge(d, cur_x, opt_y + (f_opt_h - hex_sz) // 2, hex_sz, '负' if is_neg else '正', badge_font, is_neg=is_neg)
-                                m_sv = re.match(r'^(.+?)\s+([+-]?\d[\d.]*%?(?:\([^)]+\))?)$', rest)
+                                m_sv = re.match(r'^(.+?)\s+([+-]?\d[\d.]*(?:%|m|s|米|秒)?(?:\([^)]+\))?)$', rest)
                                 if m_sv:
                                     s_name, s_val = m_sv.group(1).strip(), m_sv.group(2).strip()
                                     nw = int(bold_font.getlength(s_name))
@@ -1154,6 +1162,10 @@ class CardRenderer:
                                         v_bg = (255, 228, 230, 240) if is_neg else (209, 250, 229, 240)
                                         v_bd = (244, 63, 94, 185) if is_neg else (16, 185, 129, 185)
                                         v_fg = '#BE123C' if is_neg else '#047857'
+                                        if role.startswith('roll_'):
+                                            v_fg = fill_color
+                                            rgb = _rgb(v_fg)
+                                            v_bg, v_bd = (*rgb,26), (*rgb,160)
                                         d.rounded_rectangle((vx, vy, vx + vw, vy + vh), radius=8, fill=v_bg, outline=v_bd, width=1)
                                         _draw_centered(d, (vx, vy, vx + vw, vy + vh), s_val, pill_font, v_fg)
                                         continue
@@ -1163,7 +1175,7 @@ class CardRenderer:
                             # 5d. Standalone Signed Value / Deviation Pill (e.g. +162.5%, -75.5%, +8.938%, -3.700%, +120%)
                             if not line_icons[col_idx][i] and re.fullmatch(r'[+-]\d[\d.]*%?', stripped):
                                 is_neg_v = stripped.startswith('-')
-                                v_fg = fill_color if role in {'riven_stat', 'riven_negative', 'damage'} else ('#BE123C' if is_neg_v else '#047857')
+                                v_fg = fill_color if role.startswith('roll_') or role in {'riven_stat', 'riven_negative', 'damage'} else ('#BE123C' if is_neg_v else '#047857')
                                 v_rgb = _rgb(v_fg)
                                 vw = min(avail_w, int(bold_font.getlength(stripped)) + 22)
                                 vh = f_opt_h + 8

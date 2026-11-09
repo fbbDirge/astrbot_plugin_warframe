@@ -21,6 +21,7 @@ RESOURCE_ICONS={'Forma':'forma','福马':'forma','Forma Blueprint':'forma','福�
 NUMBER = r'[+−-]?\d[\d,]*(?:\.\d+)?%?'
 
 def line_icon(text, role='text'):
+    if role.startswith('roll_'):role='riven_stat'
     if role in {'fissure_map','text','title'}:
         from .planet_icons import planet_icon
         planet=planet_icon(text)

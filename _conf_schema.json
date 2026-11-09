@@ -215,33 +215,6 @@
         "_special": "select_provider",
         "hint": "用于兼容旧配置：紫卡主读或识卡未单独设置渠道时沿用本项。指定后兼容路径只使用该渠道，取不到不回落；留空则自动挑选：先按内置候选（zhipu/glm-4v-flash、siliconflow 的 Qwen3-VL-8B / 30B）取已添加的，再加上渠道 id 含 vl / vision / 4v / 4o 的渠道。需要紫卡与配卡截图分别选模型时，请设置各自的专用渠道。迁移前（兼容模式）留空的专用项仍按本项继承；在后台「识图 → 渠道隔离」预览并主动确认迁移后，紫卡与识卡不再使用本项，旧值保留以便回滚。"
       },
-      "riven_single_ocr": {
-        "description": "紫卡使用单个 OCR 渠道，按需复读",
-        "type": "bool",
-        "default": false,
-        "hint": "启用后，紫卡首读只向指定的紫卡主读渠道提交原图。业务校验需要时，同渠道再读增强图，仍有疑问时按位置复读。建议选择千问视觉 OCR 等兼容图像对话接口的渠道。本地紫卡 OCR 已启用时优先使用本地。"
-      },
-      "vision_provider_id_riven": {
-        "description": "紫卡主读专用多模态模型 id（留空：迁移前沿用兼容主渠道，迁移确认后停止）",
-        "type": "string",
-        "default": "",
-        "_special": "select_provider",
-        "hint": "建议使用千问（Qwen）小型视觉模型，词条窄读可搭配千问 OCR；模型负责识图，校验与分析由插件完成。只影响紫卡识别，不影响配卡「识卡」。模型需要读清中文小字、卡面首行的官方武器名或模块部件名（含变体前缀；后面的拉丁部分是紫卡词缀，不属于武器名）、词条名称、正负号、小数与百分号，并按现有提示输出可解析的结构；可选通过模型 API 调用的 OCR 类模型或通用多模态模型，按实际输出能力选择，不按参数量设门槛。这里选的是模型渠道，与本地 OCR 引擎无关（本地紫卡 OCR 在后台「识图 → 紫卡识别」单独配置，默认关闭）。主读每次只用一个渠道，不竞速。指定后主读只用该渠道，取不到不回落（主读没有可用渠道；独立配置的窄读仍可执行）；留空：迁移前沿用兼容主渠道；迁移确认后紫卡识别停止，不借用其它渠道。词条窄读可在下一项另选渠道。"
-      },
-      "vision_provider_id_line": {
-        "description": "紫卡词条窄读可选渠道（留空=与紫卡主读相同）",
-        "type": "string",
-        "default": "",
-        "_special": "select_provider",
-        "hint": "按现有提示逐行照抄词条，保留正负号、小数、百分号与词条极性，避免漏行或改字。需能返回可解析的逐行词条文本。留空时沿用紫卡主读渠道（迁移前紫卡主读专用项也为空时再沿用兼容主渠道）。迁移前指定后取不到时回落紫卡主读；迁移确认后指定的窄读取不到不回落。"
-      },
-      "vision_provider_id_line_recheck": {
-        "description": "紫卡分歧复读可选渠道（留空关闭）",
-        "type": "string",
-        "default": "",
-        "_special": "select_provider",
-        "hint": "主读完整但与窄读不一致时，最多增加一次同图同提示词复读。仅完整复读与主读逐项一致且未缩短原观察条数时采用；保留原窄读及冲突证据。不按模型名称自动选择渠道，指定渠道不可用时保留待核对结果。"
-      },
       "vision_provider_id_scan": {
         "description": "配卡识别「识卡」专用多模态模型 id（留空：迁移前沿用兼容主渠道，迁移确认后停止）",
         "type": "string",
@@ -320,29 +293,6 @@
         "type": "bool",
         "default": true,
         "hint": "默认启用独立视觉路由；仅使用明确配置的识卡/紫卡提供商。"
-      },
-      "riven_http_ocr_enabled": {
-        "description": "紫卡使用独立 OCR HTTP 接口",
-        "type": "bool",
-        "default": false,
-        "hint": "开启后紫卡截图优先走此接口，不调用本地 OCR 或视觉模型；失败明确报错，不自动切换渠道。不影响配卡识卡。"
-      },
-      "riven_http_ocr_url": {
-        "description": "独立 OCR API 地址",
-        "type": "string",
-        "default": "https://uapis.cn/api/v1/image/ocr",
-        "hint": "兼容 UAPI：HTTPS POST multipart/form-data，file 上传图片，need_location 固定 false。"
-      },
-      "riven_http_ocr_key": {
-        "description": "独立 OCR API Key",
-        "type": "string",
-        "default": "",
-        "hint": "仅填写密钥，不含 Bearer 前缀；保存在 AstrBot 配置中，勿分享配置文件。"
-      },
-      "riven_http_ocr_timeout": {
-        "description": "独立 OCR API 超时（秒）",
-        "type": "int",
-        "default": 60
       }
     }
   },

@@ -10,9 +10,10 @@ STAT_ICONS={key:'stat_'+key for key in STAT_LABELS}
 
 @lru_cache(maxsize=1)
 def aliases():
+    from .core.formatters import RIVEN_DISPLAY_ZH
     result={}
     for key,icon in STAT_ICONS.items():
-        for name in {*RIVEN_STAT_ALIASES.get(key,()), RIVEN_STAT_ZH.get(key,''),key}:
+        for name in {*RIVEN_STAT_ALIASES.get(key,()), RIVEN_STAT_ZH.get(key,''),RIVEN_DISPLAY_ZH.get(key,''),key}:
             if name:result[name.casefold()]=icon
     result.update({
         '暴击倍率':STAT_ICONS['crit_damage'],
@@ -29,7 +30,8 @@ def stat_icon(text):
     text=re.sub(r'^(?:[正负]面?\s*[·:]?\s*|[+−-]\s*(?=[^\d]))','',text).strip()
     # Full labels only; descriptive parentheses do not change the stat identity.
     text=re.sub(r'[（(](?:重击时.*|弓类.*)[）)]','',text).strip()
-    number=r'[+−-]?\d[\d,]*(?:\.\d+)?[%×x]?'
+    text=re.sub(r'[（(]卡面[+−-]号[·・]正面[）)]$|[（(]卡面[+−-]号[·・]负面[）)]$', '', text).strip()
+    number=r'[+−-]?\d[\d,]*(?:\.\d+)?(?:%|米|秒|m|s|×|x)?'
     text=re.sub(r'^'+number+r'\s*','',text)
     text=re.sub(r'\s*[:：]?\s*'+number+r'$','',text).strip()
     hit=aliases().get(text.casefold(),'')

@@ -628,39 +628,14 @@ class RivenCommands:
             imgs = await self._image_data_urls(event)
             if not imgs:
                 return Reply(raw_text="⚠️ 图片下载失败，请重发一次截图")
-            if (getattr(self, "cfg", None) or {}).get("riven_http_ocr_enabled") is True:
-                from ..http_ocr import read_riven
-                try:
-                    data = await read_riven(imgs[0], self.cfg)
-                except ValueError as exc:
-                    self._vision_refund(_last, _sender, _stamp)
-                    return err_card(str(exc), title="紫卡 OCR API")
-            elif self._use_single_riven_ocr():
-                from .. import riven_ocr_reader as reader
-
-                async def validate(observation):
-                    return await self._finish_riven_analysis(
-                        typed, observation, platform, can_actions, started, check_only=True
-                    )
-
-                # 单模型模式须显式配置紫卡主读，绝不自动枚举或借用其它任务渠道。
-                provider_id = self._vision_route_value("vision_provider_id_riven")
-                provider = self._try_get_provider(provider_id) if provider_id else None
-                data, reason = await reader.read(
-                    provider, imgs[0], validate, self._RIVEN_LINE_PROMPT
-                )
-                if reason:
-                    self._vision_refund(_last, _sender, _stamp)
-                    return Reply(raw_text=reason)
-            else:
-                data = await self._extract_riven_from_image(imgs[0])
+            data = await self._extract_riven_from_image(imgs[0])
         finally:
             self._ocr_busy.discard(_busy_key)
         if not data:
             if _sender:  # 识别失败返还冷却（同识卡口径）
                 self._vision_refund(_last, _sender, _stamp)
             return err_card(
-                "图片识别失败（vision 渠道不可用或未配）",
+                "本地紫卡 OCR 未启用或识别失败，请管理员发送“一键安装本地OCR”",
                 "请按文字格式发送：紫卡分析 武器名 暴伤82.8 范围1.6 负滑暴81.3",
                 title="紫卡分析",
             )
