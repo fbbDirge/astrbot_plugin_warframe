@@ -323,6 +323,8 @@ class CardRenderer:
     def _column_ratios(columns, rows=None):
         if tuple(columns) == ('词条','区间','距中','区间位','评分'):
             return (.36,.28,.11,.10,.15)
+        if tuple(columns) == ('档位','词条','挂牌价差','对照样本'):
+            return (.08,.32,.25,.35)
         n = len(columns)
         if n <= 1:
             return (1.0,)

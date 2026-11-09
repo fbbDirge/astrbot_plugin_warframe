@@ -13,7 +13,7 @@ ROLE_HEADERS={
     '商品':'item_name','物品':'item_name','星球':'fissure_map','地区':'fissure_map','地区信息':'fissure_map',
     '在售':'wm_price','收购':'wm_price','价格':'wm_price','白金':'wm_price','单价':'wm_price','合计':'wm_price','一口价':'wm_price',
     '卖家':'wm_user','买家':'wm_user','玩家':'wm_user','用户':'wm_user','数量':'wm_quantity',
-    '加权占比':'drop_chance','挂牌中位数':'wm_price','正词条 / 负词条':'riven_stat','元素':'damage','限制':'damage','词条':'riven_stat','属性':'riven_stat','区间':'riven_range','理论区间':'riven_range',
+    '挂牌价差':'wm_price','加权占比':'drop_chance','挂牌中位数':'wm_price','正词条 / 负词条':'riven_stat','元素':'damage','限制':'damage','词条':'riven_stat','属性':'riven_stat','区间':'riven_range','理论区间':'riven_range',
     '距中':'riven_grade','区间位':'riven_grade','评级':'riven_grade',
     '地图 / 星球':'fissure_map','任务类型':'fissure_type','节点':'fissure_map','地图':'fissure_map','地点':'fissure_map','类型':'fissure_type','任务':'fissure_type',
     '剩余':'muted','时间':'muted','状态':'muted','信誉':'muted','等级':'wm_quantity',

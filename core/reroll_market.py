@@ -7,6 +7,7 @@ from statistics import median
 from . import paths
 from .commands.base import Reply
 from .formatters import _riven_stat_cn
+from .reroll_categories import classify
 
 TTL=600
 MIN_SAMPLE=20
@@ -53,6 +54,21 @@ def snapshot(path,slug,platform):
                 if any(not isinstance(row.get(k),list) or not all(isinstance(v,str) for v in row[k]) for k in ('positive','negative')):return None
                 price=row.get('median')
                 if price is not None and (type(price) not in (int,float) or not math.isfinite(price) or price<=0):return None
+    categories=stats.get('categories')
+    if categories is not None:
+        if not isinstance(categories,list):return None
+        for row in categories:
+            if not isinstance(row,dict) or not isinstance(row.get('stat'),str):return None
+            if row.get('polarity') not in {'pos','neg'} or row.get('category') not in {'unknown','conflicting','unfavorable','positive','ordinary_positive','negative_candidate','ordinary_negative'}:return None
+            if any(type(row.get(k))!=int or row[k]<0 for k in ('count','sellers')):return None
+            if row.get('tier') not in (None,'T0','T1','T2'):return None
+            for k in ('delta','pct'):
+                v=row.get(k)
+                if v is not None and (type(v) not in (int,float) or not math.isfinite(v)):return None
+            if not isinstance(row.get('comparisons'),list):return None
+            for c in row['comparisons']:
+                if not isinstance(c,dict) or not isinstance(c.get('cohort'),str):return None
+                if any(type(c.get(k))!=int or c[k]<0 for k in ('rank','with_sellers','without_sellers')):return None
     return data
 
 def summarize(auctions,slug):
@@ -104,7 +120,7 @@ def summarize(auctions,slug):
         c['median']=median(prices) if len(prices)>=3 and c['price_sellers']>=3 else None
         output.append(c)
     return {'returned':len(unique),'valid':len(rows),'excluded':len(unique)-len(rows),'sellers':len(seller_counts),
-            'positive':ranking(True),'negative':ranking(False),'combos':sorted(output,key=lambda c:(-c['share'],-c['count']))}
+            'categories':classify(rows),'positive':ranking(True),'negative':ranking(False),'combos':sorted(output,key=lambda c:(-c['share'],-c['count']))}
 
 def report(asked,weapon,data,state,mode='',write_failed=False):
     stats=data['stats'];name=asked.get('zh') or asked.get('en') or data['slug']
@@ -118,18 +134,38 @@ def report(asked,weapon,data,state,mode='',write_failed=False):
     enough=stats['valid']>=MIN_SAMPLE and stats['sellers']>=MIN_SELLERS
     if not enough:lines+=['◆ 样本不足：至少 20 张、5 位卖家才形成统计参考；以下仅展示观察值。']
     label=lambda stat:_riven_stat_cn(stat,weapon.get('riven_type',''),weapon.get('group',''))
-    for key,title in [('positive','常见正词条'),('negative','常见负词条')]:
-        lines+=['◆ '+title,S+S.join(['结构','词条','张数','加权占比'])]
-        shown=Counter()
-        for r in stats[key]:
-            if shown[r['cohort']]>=4:continue
-            shown[r['cohort']]+=1
-            lines+=['· '+S.join([r['cohort'],label(r['stat']),str(r['count']),f"{r['share']:.1%}"])]
-        if not stats[key]:lines+=['· 暂无有效样本']
+    categories = stats.get('categories')
+    if categories is None:
+        lines += ['◆ 词条分类待更新', '· 此历史缓存尚未包含价差统计，发送“'+name+' 洗卡推荐 刷新”重新采样。']
+    else:
+        lines += ['※ 分类依据：同等级、同正负结构内，比较带/不带词条的卖家报价中位数；每位卖家先取中位价，两边重叠卖家排除。',
+                  '※ 每边至少 5 个有效报价、3 位卖家；跨组按较小卖家数加权。价差仅是关联，其他词条与数值品质仍可能影响结果。']
+        definitions = [('positive','正面推荐 · 市场溢价分档'),
+                       ('ordinary_positive','普通正面 · 价差不明显'),
+                       ('negative_candidate','负面候选 · 市场溢价'),
+                       ('ordinary_negative','普通负面 · 价差不明显'),
+                       ('unfavorable','不利词条 · 市场折价'),
+                       ('conflicting','争议词条 · 分组结论相反'),
+                       ('unknown','待判断 · 样本不足')]
+        for category, title in definitions:
+            selected = [r for r in categories if r['category'] == category]
+            if not selected: continue
+            lines += ['◆ '+title,S+S.join(['档位','词条','挂牌价差','对照样本'])]
+            for r in selected:
+                sign = '▲' if r['polarity'] == 'pos' else '▼'
+                tier = r.get('tier') or '—'
+                delta = '—' if r['pct'] is None else f"{r['delta']:+.1f} 白金 / {r['pct']:+.1f}%"
+                samples = '；'.join(f"{c['cohort']} {c['rank']}级：{c['with_sellers']}/{c['without_sellers']}卖家" for c in r['comparisons'])
+                if not samples:samples=f"观察 {r['count']} 张 / {r['sellers']} 卖家，无足够对照"
+                lines += ['· '+S.join([tier,sign+label(r['stat']),delta,samples])]
+        if not categories:lines += ['◆ 词条分类', '· 暂无有效词条样本']
+        lines += ['※ T0≥40% / T1≥20% / T2≥10% 溢价；≤−10% 为不利，介于其间为普通。分档是本插件的市场参考规则，不是游戏强度等级。',
+                  '※ 对照样本为“带词条 / 不带词条”的独立卖家数。负面候选不等于无害负面；不利项不等于所有配装的致命项。',
+                  '※ 本页未计算击杀效率，没有据此生成伤害收益或战斗推荐。']
     lines+=['◆ 常见组合与挂牌参考',S+S.join(['结构 / 等级','正词条 / 负词条','样本 / 占比','挂牌中位数'])]
     shown=Counter()
     for r in stats['combos']:
-        if shown[r['cohort']]>=3:continue
+        if shown[r['cohort']]>=1:continue
         shown[r['cohort']]+=1
         attrs=' / '.join(label(x) for x in r['positive'])+'\n负面：'+(' / '.join(label(x) for x in r['negative']) or '无')
         price=f"{r['median']:g} 白金" if r['median'] is not None else '价格样本不足'
@@ -158,7 +194,7 @@ async def market_recommend(client,query,platform):
     if mapping_ok:
         asked,weapon=mapping['asked'],mapping['weapon']
         old=snapshot(_path('snapshots',_key(platform+'|'+weapon.get('url_name',''))),weapon.get('url_name',''),platform)
-        if old and not refresh and time.time()-old['sampled_at']<TTL:return report(asked,weapon,old,'缓存命中（10 分钟有效期）',mode)
+        if old and 'categories' in old['stats'] and not refresh and time.time()-old['sampled_at']<TTL:return report(asked,weapon,old,'缓存命中（10 分钟有效期）',mode)
     try:
         async with asyncio.timeout(25):
             asked=await client.resolve_riven_weapon(query)
@@ -175,7 +211,7 @@ async def market_recommend(client,query,platform):
     lock=_LOCKS.setdefault(str(path),asyncio.Lock())
     async with lock:
         old=snapshot(path,slug,platform)
-        if old and not refresh and time.time()-old['sampled_at']<TTL:return report(asked,weapon,old,'缓存命中（10 分钟有效期）',mode)
+        if old and 'categories' in old['stats'] and not refresh and time.time()-old['sampled_at']<TTL:return report(asked,weapon,old,'缓存命中（10 分钟有效期）',mode)
         try:
             async with asyncio.timeout(45):
                 auctions=await client.wm_riven_auctions(slug,platform,sorts=('price_asc','price_desc'),require_all_sorts=True,retries=0,timeout=15)
