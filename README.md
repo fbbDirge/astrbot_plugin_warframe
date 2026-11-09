@@ -1,4 +1,4 @@
-# AstrBot Warframe 助手 v0.7.20
+# AstrBot Warframe 助手 v0.7.21
 
 > **二次开发声明**：本项目基于 [skyti1437/Warframe-SDJK-Bot](https://github.com/skyti1437/Warframe-SDJK-Bot) 修改与整合，原作者为 **skyti1437（Sky）**。当前集成基线为上游 v1.2.9，提交 `4fed72a68e80aa075b592367f5b7c3efcd9bdf4c`，并非上游最新版本的完整同步。本项目保留上游署名及 GPL-3.0 许可证；由 Amy 维护独立的图片样式、主题配置、图标缓存、市场检索和本地适配。与上游项目及 Digital Extremes 无官方隶属或背书关系。详细修改记录见 [UPSTREAM.json](UPSTREAM.json) 与 [NOTICE.txt](NOTICE.txt)。
 
@@ -18,7 +18,7 @@
 
 ## 安装或升级
 
-1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.20.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
+1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.21.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
 2. 升级时替换整个插件源码目录，避免残留 v0.6 的旧模块。个人数据保存在 `data/plugin_data/astrbot_plugin_warframe/`，不要删除该数据目录。
 3. 在 AstrBot 所用 Python 环境安装根目录 `requirements.txt` 并重载插件。依赖允许 Pillow 13，不要求降级 AstrBot Core。
 4. 发送 `帮助` 或 `wf 帮助`；再测试 `wm 猴子`、`裂缝`、`遗物 古纪A1`。默认国际服 PC，支持 `-ps/-xb/-sw`。
@@ -51,6 +51,14 @@ xh 布拉玛
 ```
 
 `wm` 查询战甲、武器、普通 MOD 和其他可交易物品。武器或战甲不写部件时按可交易整套匹配，指定系统、机体、枪管等时查单件；保留猴子、女枪、奶妈等俗称及 `measprime`、`ahsprim` 明确错拼。`wmr` 查询紫卡，`wr` 是同功能别名，单词条和多词条均可筛选；多词条默认全部匹配，只有明确追加 `近似` 才允许放宽。查询只读，不替用户购买或出价。
+
+## 独立 OCR API（紫卡）
+
+在 AstrBot 插件配置的「游戏服务、OCR、订阅与数据源」中开启「紫卡使用独立 OCR HTTP 接口」，填写 API Key。默认地址为 `https://uapis.cn/api/v1/image/ocr`，超时默认 60 秒。
+
+按 [UAPI 文档](https://uapis.cn/docs/api-reference/post-image-ocr) 使用 HTTPS POST、Bearer 鉴权和 multipart `file` 上传（最大 10MB），固定发送 `need_location=false`。兼容返回 `plain_text`、`text` 或 `words_result[].words`。密钥仅存运行配置，不要提交到源码仓库。
+
+开启后「紫卡分析 + 截图」优先使用此 API，不调用视觉大模型或本地 OCR，失败明确报错，不自动切换渠道。词条与武器仍经过原有业务校验；异常、漏字或不确定数值需要核对，不能保证每张图片都可自动分析。配卡「识卡」仍使用原有视觉渠道。
 
 ## 图片与个人设置
 

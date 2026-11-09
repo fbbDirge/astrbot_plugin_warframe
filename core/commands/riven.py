@@ -628,7 +628,14 @@ class RivenCommands:
             imgs = await self._image_data_urls(event)
             if not imgs:
                 return Reply(raw_text="⚠️ 图片下载失败，请重发一次截图")
-            if self._use_single_riven_ocr():
+            if (getattr(self, "cfg", None) or {}).get("riven_http_ocr_enabled") is True:
+                from ..http_ocr import read_riven
+                try:
+                    data = await read_riven(imgs[0], self.cfg)
+                except ValueError as exc:
+                    self._vision_refund(_last, _sender, _stamp)
+                    return err_card(str(exc), title="紫卡 OCR API")
+            elif self._use_single_riven_ocr():
                 from .. import riven_ocr_reader as reader
 
                 async def validate(observation):
