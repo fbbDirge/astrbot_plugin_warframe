@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import copy
+import ast
 import difflib
 import itertools
 import json
@@ -372,6 +373,18 @@ def coordinate_text_lines(text: str) -> list[str]:
             # 部分坐标文本在行首保留一个标记字符；仅在五个坐标与正文
             # 都完整时解包，不补正文、不修截断 JSON，也不剥词条中的符号。
             candidate = line.strip().removeprefix("<")
+            # Models may wrap a complete coordinate record in a tuple/list.
+            # Literal parsing never executes model output; require exactly five
+            # valid coordinates and one verbatim string before accepting it.
+            if candidate.startswith(("(", "[")) and len(candidate) < 16384:
+                try:
+                    record = ast.literal_eval(candidate)
+                except (ValueError, SyntaxError, TypeError, RecursionError):
+                    record = None
+                if (isinstance(record, (tuple, list)) and len(record) == 6
+                        and isinstance(record[5], str) and record[5].strip()
+                        and coordinate_aabb(record[:5])):
+                    candidate = ",".join(map(str, record[:5])) + "," + record[5]
             parts = candidate.split(",", 5)
             if len(parts) == 6 and parts[5].strip() and coordinate_aabb(parts[:5]):
                 lines.append(candidate)
@@ -380,6 +393,9 @@ def coordinate_text_lines(text: str) -> list[str]:
         return lines
     if not isinstance(items, list):
         return raw.splitlines()
+    if (len(items) == 6 and isinstance(items[5], str) and items[5].strip()
+            and coordinate_aabb(items[:5])):
+        return [",".join(map(str, items[:5])) + "," + items[5]]
     lines = []
     for item in items:
         if not isinstance(item, dict) or not isinstance(item.get("text"), str):

@@ -661,7 +661,7 @@ class VisionCommands:
     # 卡片区域、单位、数值换算与一致性由代码判断；无模型名或具体卡片示例。
     _RIVEN_JSON_PROMPT = '读取这张 Warframe 紫卡，只转录卡面原文，输出一行合法 JSON：{"weapon":"卡面武器名或部件名，看不清用null","stat_lines":["一条完整词条原文"]}。\nweapon 保留卡面印出的变体和 Prime，不含后面的拉丁词缀，不加主要/次要后缀。stat_lines 从上到下逐条记录当前卡面的词条，保留每条数值的正负号、小数、百分号、米/秒单位、x或×倍率及名称限定语；换行续文合在同一条。\n锁定图标只是图标，图标旁的词条仍要完整转录；不把图标抄成数字或字母。未揭示词条用问号保留位置。看不清的字符写问号，不猜数。卡片之外的预览、配装面板、聊天、按钮不属于本卡词条。段位、容量、洗练次数不属于词条。\n每条词条只出现一次，不拆成名称和值两个字段，不做正负面判断、数值换算、武器分析或配装建议。'
 
-    _RIVEN_LINE_PROMPT = "Read all the text in the image. Return each text line as cx,cy,width,height,angle,text. The first five values describe a rotated rectangle: center x, center y, side width, side height, and rotation angle in degrees. Normalize the center and side lengths to 0-1000; angle is in [-90,90]. Preserve the recognized text after the coordinates. Include visible words and Arabic numerals, even faint text. Do not transcribe icons, borders, rank pips or decorative marks as characters. Keep text from each separate region on separate lines. Do not calculate or infer missing text."
+    _RIVEN_LINE_PROMPT = "Read all the text in the image. Return each text line as cx,cy,width,height,angle,text. The first five values describe a rotated rectangle: center x, center y, side width, side height, and rotation angle in degrees. Normalize the center and side lengths to 0-1000; angle is in [-90,90]. Preserve the recognized text after the coordinates. Include visible words and Arabic numerals, even faint text. Do not transcribe icons, borders, rank pips or decorative marks as characters. Keep text from each separate region on separate lines. Do not calculate or infer missing text. Transcribe verbatim in the original language: never translate Latin weapon names or Riven suffixes into Chinese. Use plain CSV lines without surrounding parentheses, brackets or quotation marks."
 
     @classmethod
     def _adapt_riven_transcription(cls, observed: dict) -> dict:
@@ -847,7 +847,7 @@ class VisionCommands:
             return None
         recheck_evidence = None
         recheck_id = self._cfg_str("vision_provider_id_line_recheck")
-        if data and recheck_id:
+        if data and (recheck_id or provs):
             from .. import riven_analysis as RA
             from ..parser import RIVEN_STAT_ZH
 
@@ -871,10 +871,10 @@ class VisionCommands:
                 RA.count_candidates(len(semantic_pos), len(semantic_neg), 0)
             ) and raw_count == len(main_signature)
             needs_recheck = not legal or signature(lp, ln) != main_signature
-            provider = (
-                self._try_get_provider(recheck_id) if main_complete and needs_recheck else None
-            )
-            if provider and all(_prov_id(provider) != _prov_id(p) for p in line_provs):
+            provider = None
+            if main_complete and needs_recheck:
+                provider = self._try_get_provider(recheck_id) if recheck_id else provs[0]
+            if provider and (not recheck_id or all(_prov_id(provider) != _prov_id(p) for p in line_provs)):
                 checked = await self._vision_race_json(
                     self._RIVEN_LINE_PROMPT,
                     image_url,

@@ -1035,7 +1035,15 @@ class RivenCommands:
                     splice_input_incomplete = True
                     selection.update(selected=None, reason="unparsed_suspected_line")
             if splice_input_incomplete:
-                return pending_image("有词条名称、数值或原文行未确认，请核对后重发。")
+                reason = recognition.get("stat_selection", {}).get("reason")
+                details = {
+                    "cross_route_conflict": "两次识别的词条数值或正负号不一致，请重发清晰卡面。",
+                    "unparsed_suspected_line": "逐行识别含有无法解析的内容（可能是标题被翻译或词条缺字），请重发清晰卡面。",
+                    "numeric_precision_unknown": "识别结果的数值精度不明确，请核对小数位后重发。",
+                    "unknown_semantic_unresolved": "存在未识别的词条名称或数值，请核对后重发。",
+                }
+                logger.info("[sdjk] 紫卡分析待核对：%s", reason or "incomplete_observation")
+                return pending_image(details.get(reason, "有词条名称、数值或原文行未确认，请核对后重发。"))
             if not (stats_pos or stats_neg):
                 return pending_image("没有读出可确认的词条，请核对后重发。")
             if not weapon_name:

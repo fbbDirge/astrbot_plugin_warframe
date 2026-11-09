@@ -19,7 +19,7 @@ from .service import WarframeService
 from .renderer import CardRenderer
 from .theme import ThemeStore, theme_from
 
-@register('astrbot_plugin_warframe', 'Amy', 'Warframe 查询、计算、OCR 与订阅', '0.7.23')
+@register('astrbot_plugin_warframe', 'Amy', 'Warframe 查询、计算、OCR 与订阅', '0.7.24')
 class WarframePlugin(Star):
     def __init__(self,context:Context,config:AstrBotConfig):
         super().__init__(context)
