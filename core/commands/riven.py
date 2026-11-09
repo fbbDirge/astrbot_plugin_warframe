@@ -85,8 +85,9 @@ def riven_read_selection(single_ocr, local_status=_LOCAL_STATUS_ABSENT) -> str:
 
 class RivenCommands:
     async def _h_reroll_recommend(self, parsed, event, platform) -> Reply:
-        from ..reroll_market import market_recommend
-        return await market_recommend(self.client, parsed.content_str, platform)
+        from ..reroll_wfsim import recommend
+        return await recommend(self.client, parsed.content_str, platform,
+                               api_key=str(getattr(self, "cfg", {}).get("wfsim_api_key") or "").strip())
 
     """Mixin：紫卡分析 / 倾向 / 玄骸拍卖 handler（挂载于 main.WarframeSDJK）。"""
 

@@ -67,9 +67,12 @@ class MarketTests(unittest.IsolatedAsyncioTestCase):
         for text in ['托里德 洗卡推荐 -ps','托里德 洗卡推荐 刷新','洗卡推荐 托里德']:
             request=route(normalize_prefix(text));self.assertEqual(request.key,'reroll')
         req=route('洗卡推荐 托里德')
-        r=await RivenCommands._h_reroll_recommend(SimpleNamespace(client=self.client),req.parsed,None,'pc')
-        self.assertIn('托里德',r.title);self.assertIn('推荐档位',''.join(r.lines));self.assertNotIn('挂牌价差',''.join(r.lines));self.assertNotIn('常见组合与挂牌参考',''.join(r.lines))
-        self.client.wm_riven_auctions.assert_awaited_once()
+        from wf_plugin.core.commands.base import Reply
+        with patch('wf_plugin.core.reroll_wfsim.recommend',AsyncMock(return_value=Reply('WFSim',[]))) as recommend:
+            r=await RivenCommands._h_reroll_recommend(SimpleNamespace(client=self.client,cfg={'wfsim_api_key':'test'}),req.parsed,None,'pc')
+            recommend.assert_awaited_once_with(self.client,req.parsed.content_str,'pc',api_key='test')
+        self.client.wm_riven_auctions.assert_not_awaited()
+
 
 class StrictSamplingTests(unittest.IsolatedAsyncioTestCase):
     async def test_second_direction_failure_is_not_full_sample(self):

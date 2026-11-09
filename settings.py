@@ -12,6 +12,7 @@ class GameConfig(dict):
         self['default_platform']={'ps4':'ps','xb1':'xb','swi':'sw'}.get(parent.get('default_platform'),parent.get('default_platform','pc'))
         self['page_size']=parent.get('page_size',10)
         self['render_mode']='image'
+        self['wfsim_api_key']=parent.get('wfsim_api_key','')
         configured=parent.get('game') or parent.get('sdjk') or {}
         self['vision_routes_isolated']=configured.get('vision_routes_isolated',True)
         common=self.get('vision_provider_id') or parent.get('riven_vision_provider','')

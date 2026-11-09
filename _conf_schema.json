@@ -350,5 +350,10 @@
     "description": "仲裁 未评级 评级颜色 #RRGGBB",
     "type": "string",
     "default": "#64748B"
+  },
+  "wfsim_api_key": {
+    "description": "WFSim API 密钥（可留空，匿名可查询；仅用于洗卡推荐）",
+    "type": "string",
+    "default": ""
   }
 }
