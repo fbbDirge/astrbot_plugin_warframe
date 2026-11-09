@@ -343,6 +343,10 @@ class CardRenderer:
         if tuple(columns)==('商品','价格','每周限购'):return (.62,.29,.09)
         if tuple(columns)==('奖励','稀有度','几率'):return (.58,.21,.21)
         if tuple(columns)==('名称','详情','详情'):return (.24,.26,.50)
+        if tuple(columns) == ('词条', '区间', '距中', '区间位'):
+            return (.40, .32, .14, .14)
+        if tuple(columns) == ('匹配词条', '最低', '在线最低', '中位'):
+            return (.44, .20, .20, .16)
         if n > 4:
             return tuple(1 / n for _ in columns)
         first = columns[0]

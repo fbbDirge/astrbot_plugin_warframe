@@ -423,6 +423,7 @@ HELP_NOTES: dict[str, list[str]] = {
     "资料与推送": [
         "帮助 = 本页；状态 = 运行状态、版本与订阅数（需群管理员）；wf 主题 = 个人样式",
         "群管理：.默认平台 / .开启 / .关闭 推送 / .状态（点号开头，需群管理员）",
+        "本地识别：一键安装本地OCR / 本地OCR状态（需 AstrBot 管理员，无需前缀）",
         "平台后缀 -pc / -ps / -xb / -sw（国际服）/ -cn（国服世界状态）；默认平台 国服 可切换",
         "「赤毒」虹吸数据源已停摆，发它会给出替代查询；「蹲 取消」不带词 = 自己发起的全部（群管 = 全群）",
     ],
@@ -1191,6 +1192,10 @@ class GameRuntime(
                 await task
                 return True
 
+            setup_task = getattr(self, "_ocr_setup_task", None)
+            if setup_task is not None and not setup_task.done():
+                setup_task.cancel()
+                await asyncio.gather(setup_task, return_exceptions=True)
             bridge = getattr(self, "_messaging", None)
             local_ocr = getattr(self, "local_ocr", None)
             if local_ocr is not None:
@@ -1456,6 +1461,10 @@ class GameRuntime(
             return None
         cmd, args = tokens[0], tokens[1:]
         umo = event.unified_msg_origin
+
+        if cmd in ("一键安装本地OCR", "安装本地OCR", "本地OCR状态"):
+            from .core.ocr_setup import handle
+            return await handle(self, event, cmd)
 
         if cmd in ("默认平台", "平台"):
             if not self._is_admin(event):

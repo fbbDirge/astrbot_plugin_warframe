@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from .client import QueryError
 from .core.parser import ALIAS_TO_COMMAND, Parsed, parse
 
-ADMIN_WORDS={'默认平台','平台','开启','关闭','状态','锚点'}
+ADMIN_WORDS={'默认平台','平台','开启','关闭','状态','锚点','一键安装本地OCR','安装本地OCR','本地OCR状态'}
 EXTRA_ALIASES={'玄骇':'xh','赤毒玄骸':'xh','wml':'xh','分析紫卡':'analysis','子卡倾向':'disposition',
     '夜灵电波':'nightwave','夜灵电台':'nightwave','最新新闻':'news','虚空商人':'voidtrader','物品wiki':'wiki'}
 SERVER_SWITCHES={'切换国服':'cn','切换国际服':'pc'}
-ROUTE_WORDS=set(ALIAS_TO_COMMAND)|ADMIN_WORDS|set(EXTRA_ALIASES)|set(SERVER_SWITCHES)
+ROUTE_WORDS=set(ALIAS_TO_COMMAND)|{word.lower() for word in ADMIN_WORDS}|set(EXTRA_ALIASES)|set(SERVER_SWITCHES)
 
 @dataclass
 class Request:
@@ -25,8 +25,9 @@ def route(text,platform='pc'):
     suffix=re.fullmatch(r'(.+?)\s+(洗卡推荐|紫卡推荐)(?:\s+(.*))?',text)
     if suffix:text=suffix[2]+' '+suffix[1]+(' '+suffix[3] if suffix[3] else '')
     head=text.split(maxsplit=1)[0].lower() if text else ''
+    head=next((word for word in ADMIN_WORDS if word.lower()==head),head)
     if head in ADMIN_WORDS and head!='状态':
-        return Request('admin',admin_text='.'+text)
+        return Request('admin',admin_text='.'+head+(' '+text.split(maxsplit=1)[1] if len(text.split(maxsplit=1))>1 else ''))
     parsed=parse(text,extra_commands=EXTRA_ALIASES)
     if parsed.command:
         if parsed.command in {'analysis','disposition'} and re.search(r'-(?:rank|dispo)=',text):

@@ -3285,7 +3285,7 @@ def _riven_stat_cn(url_name: str, riven_type: str = "", group: str = "") -> str:
     canon = to_canon.get(url_name, url_name)
     if canon == "fire_rate" and _is_melee_weapon(riven_type, group):
         canon = "attack_speed"
-    return RIVEN_STAT_ZH.get(canon, url_name.replace("_", " "))
+    return RIVEN_DISPLAY_ZH.get(canon, url_name.replace("_", " "))
 
 
 def _riven_rolls(a: dict) -> int:
@@ -4465,7 +4465,7 @@ def fmt_riven_ranges(
             if lo is None:
                 continue
             # 未确认的物理词条：名字照普通色，只把「?」压暗（⟦n⟧ = INK_DIM）
-            zh = RIVEN_STAT_ZH.get(sid, sid) + ("⟦n⟧?⟦/n⟧" if sid in unconfirmed else "")
+            zh = RIVEN_DISPLAY_ZH.get(sid, sid) + ("⟦n⟧?⟦/n⟧" if sid in unconfirmed else "")
             rows.append([zh] + [_cell(sid, c, negative=is_neg) for c in sec])
         if not rows:
             continue
@@ -4502,7 +4502,7 @@ def fmt_riven_ranges(
         # ★ 2026-10-25（Astra 评估）：抽样没见过 ≠ 刷不出 —— 标 ? 照列并写明样本时间
         lines.append(
             "※ 带 ? 的 "
-            + " / ".join(RIVEN_STAT_ZH.get(x, x) for x in sorted(_unseen))
+            + " / ".join(RIVEN_DISPLAY_ZH.get(x, x) for x in sorted(_unseen))
             + f"：warframe.market 挂单抽样（{survey.get('surveyed') or '时间未知'}，"
             f"{survey.get('n') or '?'} 条）里没见过，可能只是样本里没有或样本早于热修，按「未确认」照列"
         )
@@ -4555,7 +4555,9 @@ def fmt_riven_analysis(
     from . import riven_analysis as RA
     from .parser import RIVEN_STAT_ZH
 
-    zh = RIVEN_STAT_ZH
+    zh = dict(RIVEN_DISPLAY_ZH)
+    if cls == "melee":
+        zh["melee_damage"] = "近战伤害"
     if stat_multipliers:
         infos = list(infos or []) + [
             "武器机制："
@@ -4688,7 +4690,7 @@ def _riven_short(sid: str, cls: str) -> str:
 
     if cls == "melee" and sid == "fire_rate":
         sid = "attack_speed"
-    return RIVEN_STAT_ZH.get(sid, sid)
+    return "近战伤害" if cls == "melee" and sid == "melee_damage" else RIVEN_DISPLAY_ZH.get(sid, sid)
 
 
 def _splice_value(RA, sid: str, v: float) -> str:
@@ -4974,6 +4976,19 @@ _SPLICE_FULL_ZH = {
     "melee_parry_angle": "招架角度",
     "melee_slam_damage": "震地攻击伤害",
 }
+# Display names are independent of input shorthand aliases.
+from .parser import RIVEN_STAT_ZH as _RIVEN_INPUT_ZH
+RIVEN_DISPLAY_ZH = {
+    **_RIVEN_INPUT_ZH, **_SPLICE_FULL_ZH,
+    "melee_damage": "伤害", "crit_damage": "暴击伤害",
+    "fire_rate": "射速", "status_duration": "异常状态持续时间",
+    "initial_combo": "初始连击", "finisher_damage": "处决伤害",
+    "slide_crit": "滑行攻击暴击几率", "slash_damage": "切割伤害",
+    "impact_damage": "冲击伤害", "puncture_damage": "穿刺伤害",
+    "projectile_speed": "投射物速度", "punch_through": "穿透深度",
+    "combo_gain_chance": "获得连击数的几率",
+}
+
 # 「伤害」是同一个词条 id：枪械卡面写「伤害」、近战写「近战伤害」
 _SPLICE_DAMAGE_ZH = {"gun": "伤害", "melee": "近战伤害", "any": "伤害 / 近战伤害"}
 
@@ -4995,7 +5010,7 @@ def fmt_riven_splice(
             if cls:
                 kind = "melee" if cls == "melee" else "gun"
             return _SPLICE_DAMAGE_ZH[kind]
-        return _SPLICE_FULL_ZH.get(sid) or RIVEN_STAT_ZH.get(sid, sid)
+        return _SPLICE_FULL_ZH.get(sid) or RIVEN_DISPLAY_ZH.get(sid, sid)
 
     groups = (
         ("通用 · 所有武器", "any", lambda r: "melee" in r[3] and "rifle" in r[3]),

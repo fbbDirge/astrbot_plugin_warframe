@@ -1,4 +1,4 @@
-# AstrBot Warframe 助手 v0.7.24
+# AstrBot Warframe 助手 v0.7.25
 
 > **二次开发声明**：本项目基于 [skyti1437/Warframe-SDJK-Bot](https://github.com/skyti1437/Warframe-SDJK-Bot) 修改与整合，原作者为 **skyti1437（Sky）**。当前集成基线为上游 v1.2.9，提交 `4fed72a68e80aa075b592367f5b7c3efcd9bdf4c`，并非上游最新版本的完整同步。本项目保留上游署名及 GPL-3.0 许可证；由 Amy 维护独立的图片样式、主题配置、图标缓存、市场检索和本地适配。与上游项目及 Digital Extremes 无官方隶属或背书关系。详细修改记录见 [UPSTREAM.json](UPSTREAM.json) 与 [NOTICE.txt](NOTICE.txt)。
 
@@ -18,7 +18,7 @@
 
 ## 安装或升级
 
-1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.24.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
+1. 可从 AstrBot 的 GitHub 仓库安装入口安装本项目，或使用 `dist/astrbot_plugin_warframe-v0.7.25.zip`。解压后的 `astrbot_plugin_warframe` 放入 AstrBot 的 `data/plugins/`；`main.py` 必须直接位于插件目录中。
 2. 升级时替换整个插件源码目录，避免残留 v0.6 的旧模块。个人数据保存在 `data/plugin_data/astrbot_plugin_warframe/`，不要删除该数据目录。
 3. 在 AstrBot 所用 Python 环境安装根目录 `requirements.txt` 并重载插件。依赖允许 Pillow 13，不要求降级 AstrBot Core。
 4. 发送 `帮助` 或 `wf 帮助`；再测试 `wm 猴子`、`裂缝`、`遗物 古纪A1`。默认国际服 PC，支持 `-ps/-xb/-sw`。
@@ -97,6 +97,31 @@ wf 主题 重置
 在插件配置 `game.vision_provider_id_riven`、`game.vision_provider_id_scan` 指定 AstrBot 中支持图片的提供商；`game.vision_provider_id` 可为二者共同默认，原 `riven_vision_provider` 也兼容。未配置时不自动枚举其他聊天模型发送图片。
 
 可选本地紫卡 OCR 使用 RapidOCR + ONNX Runtime，通过独立进程运行；在管理页部署、检测并启用。不会随插件安装自动下载权重。自动安装器面向 Linux x86_64 / CPython 3.12，其他环境需要准备独立解释器和模型。本地模式失败不自动改用云端。
+
+### 新用户：一键安装本地 OCR
+
+插件安装完成后**不会自动下载 RapidOCR 或模型**。如需无需大模型的截图分析，由 **AstrBot 管理员**（不是普通群管理员）在聊天中发送：
+
+```text
+一键安装本地OCR
+本地OCR状态
+```
+
+第一条命令在后台下载校验依赖和模型，创建独立 Python 环境，检查成功后自动启用；第二条查看进度、失败原因或完成状态。重复发送安装命令不会并行重复安装。安装期间不要重启插件。命令不要求 `/` 或 `.` 前缀（如设置了个人前缀则遵循个人设置）。
+
+- 自动部署支持 **Linux x86_64、CPython 3.12**，以 AstrBot 实际运行环境为准。
+- 使用 CPU，无需显卡；建议 4 核、整机 8GB 内存，留出约 2GB 可用内存及至少 2GB 磁盘余量用于安装。
+- 依赖和模型保存在插件持久化数据目录的 `game/riven-ocr/`，配置在 `game/riven_ocr.json`，更新插件保留；不安装到 AstrBot 核心 Python 环境。
+- 如果已开启独立 OCR API，请先关闭该开关，再执行安装命令。未支持的系统请在管理页面手动指定兼容的独立解释器和模型。
+- 当前本地 OCR 按单任务独立进程执行，忙时提示稍后重试；识别失败不会自动调用大模型或 API。
+
+状态显示“已启用”后，在**同一条消息中**发送 `紫卡分析` 并附单张清晰紫卡截图。输出使用完整属性名称，如“暴击几率”“弱点伤害”“多重射击”；输入仍支持“暴击”“弱点伤”“多重”等简称。没有截图也可使用文字分析：
+
+```text
+紫卡分析 托里德 暴击162.5 病毒110.3 基伤172 负多重75.5
+```
+
+如果不安装本地 OCR，可配置支持图片的大模型，或使用上文的独立 OCR API。任何识别方式都有可能读错；不确定或冲突的字段会要求核对。服务器实测的一张托里德截图本地识别约 7.4 秒，这不是所有图片的速度保证。
 
 ## 订阅和管理
 
