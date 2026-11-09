@@ -447,6 +447,11 @@ class CardRenderer:
         return theme.get(role, theme['text'])
 
     def render(self, result, theme):
+        if '紫卡分析' in getattr(result, 'title', '') and self.WIDTH < 2400:
+            # A per-call renderer keeps concurrent queries at their own widths.
+            wide = CardRenderer(self.output)
+            wide.WIDTH = 2400
+            return wide.render(result, theme)
         if getattr(result,'kind','')=='incarnon_detail':
             from .incarnon_card import render
             return render(self,result,theme)
