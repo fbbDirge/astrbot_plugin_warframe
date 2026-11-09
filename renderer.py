@@ -325,6 +325,10 @@ class CardRenderer:
             return (.36,.28,.11,.10,.15)
         if tuple(columns) == ('档位','词条','挂牌价差','对照样本'):
             return (.08,.32,.25,.35)
+        if tuple(columns) == ('词条','数值','评分'):
+            return (.48,.28,.24)
+        if tuple(columns) == ('档位','词条','适用条件'):
+            return (.12,.32,.56)
         n = len(columns)
         if n <= 1:
             return (1.0,)
@@ -1716,7 +1720,10 @@ class CardRenderer:
         tiles=[];brand=None;panel_x=8;x=self.MARGIN+panel_x;first_header_h=152
         seen_cols=set()
         for index,block in enumerate(report.blocks):
-            part=Card('',title=(report.title if index==0 else block.title),columns=block.columns,
+            first_title = report.title
+            if index == 0 and block.title.startswith('挂单 '):
+                first_title += '｜' + block.title
+            part=Card('',title=(first_title if index==0 else block.title),columns=block.columns,
                       rows=block.rows,footer=block.footer,chart=block.chart)
             if index==0:
                 part.artwork=report.artwork

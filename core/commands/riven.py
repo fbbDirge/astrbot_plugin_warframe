@@ -85,8 +85,8 @@ def riven_read_selection(single_ocr, local_status=_LOCAL_STATUS_ABSENT) -> str:
 
 class RivenCommands:
     async def _h_reroll_recommend(self, parsed, event, platform) -> Reply:
-        from ..reroll_market import market_recommend
-        return await market_recommend(self.client, parsed.content_str, platform)
+        from ..reroll_rules import recommend
+        return await recommend(self.client, parsed.content_str, platform)
 
     """Mixin：紫卡分析 / 倾向 / 玄骸拍卖 handler（挂载于 main.WarframeSDJK）。"""
 
@@ -1603,8 +1603,16 @@ class RivenCommands:
                 # 集合相等并核对总条数，排除多词条、重复词条和错误极性。
                 if has_p == pos_set and has_n == neg_set:
                     pool.append(auction)
+            from ..riven_listings import select
             summary = self.client.riven_buyout_summary(pool)
+            entries = select(pool, mw["url_name"], pos, neg)
+            canon = {}
+            for sid in pos_ids + neg_ids:
+                for url in self.client.normalize_riven_stats([sid], rtype):
+                    canon[url] = sid
             summary.update(match)
+            summary.update(listings=entries, stat_ids=canon,
+                           stat_multipliers=RA.weapon_stat_multipliers(weapon))
             return summary
 
         try:

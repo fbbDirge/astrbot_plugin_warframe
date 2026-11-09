@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parent
 SKIP = {'__pycache__', '.pytest_cache', '.git', '.venv', 'node_modules', '.DS_Store'}
 
 def build():
-    destination = ROOT / 'dist/astrbot_plugin_warframe-v0.7.29.zip'
+    destination = ROOT / 'dist/astrbot_plugin_warframe-v0.7.30.zip'
     destination.parent.mkdir(exist_ok=True)
     files = [p for p in ROOT.iterdir() if p.is_file() and (p.suffix in {'.py', '.json', '.yaml', '.md', '.txt'} or p.name == 'LICENSE')]
     for directory in ('assets', 'pages', 'core', 'scripts', 'upstream_tests', 'tests', 'previews'):

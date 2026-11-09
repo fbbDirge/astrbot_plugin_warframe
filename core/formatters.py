@@ -4917,22 +4917,41 @@ def _riven_price_lines(price: dict, cls: str, notes: list) -> list[str]:
     if price.get("error"):
         return ["◆ 同词条挂单：warframe.market 暂时查不到，稍后重试", f"· 匹配词条：{cond}"]
 
-    def _p(v):
-        return f"{v:g}p" if v is not None else "—"
-
-    out = ["◆ 同词条挂单（一口价）", "　匹配词条　最低　在线最低　中位"]
-    n = price.get("sample_count") or 0
-    if n:
-        out.append(
-            f"· {cond}　{_p(price.get('low'))}　{_p(price.get('online_low'))}"
-            f"　{_p(price.get('median'))}（{n} 条）"
-        )
-    else:
-        out.append(f"· {cond}　本次未找到完全同词条样本　—　—")
-    notes.append(
-        "※ 同词条挂单：正负词条名称与条数全同（不比数值、洗数）；"
-        "warframe.market 一口价，非成交价；中位取低价样本（最多 20 条）"
-    )
+    from . import riven_analysis as RA
+    from .riven_grade import quality, label
+    import math
+    listings = price.get('listings') or []
+    if not listings:
+        return ['◆ 同词条挂单', '· 本次未找到可展示的同词条有效一口价挂单', f'· 匹配词条：{cond}']
+    out = ['◆ 同词条低价挂单（最多 5 张）']
+    ids = price.get('stat_ids') or {}
+    for index, auction in enumerate(listings[:5], 1):
+        item=auction['item'];owner=auction.get('owner') or {}
+        rank=item.get('mod_rank');known_rank=type(rank) is int and 0<=rank<=8
+        rank_text=f'{rank}级' if known_rank else '等级未知'
+        user=str(owner.get('ingame_name') or '未提供')
+        status={'ingame':'游戏中','online':'在线','offline':'离线'}.get(owner.get('status'),'状态未知')
+        out += [f"◆ 挂单 {index} · {auction['buyout_price']:g} 白金｜{rank_text}｜{user}（{status}）",
+                '　词条　数值　评分']
+        attrs=item.get('attributes') or []
+        n_pos=sum(a['positive'] for a in attrs);n_neg=len(attrs)-n_pos
+        for at in sorted(attrs,key=lambda a:not a['positive']):
+            sid=ids.get(at['url_name'],at['url_name'])
+            if cls=='melee' and sid=='fire_rate':sid='attack_speed'
+            negative=not at['positive'];raw=at.get('value')
+            value=abs(raw) if type(raw) in (int,float) and math.isfinite(raw) else None
+            sign='-' if negative != RA.is_inverted(sid) else '+'
+            display=sign+RA.fmt_value(sid,value) if value is not None else '数值缺失'
+            score=None
+            if known_rank and value is not None:
+                lo,hi=RA.stat_range(sid,cls,RA.UNIFIED_DISPOSITION,n_pos,n_neg,
+                                    negative=negative,stat_multipliers=price.get('stat_multipliers'))
+                if lo is not None:
+                    factor=(rank+1)/9
+                    score=quality(value,lo*factor,hi*factor,negative=negative)
+            out += ['· '+'　'.join([('▼' if negative else '▲')+_riven_short(sid,cls),display,label(score)])]
+    notes.append('※ 同词条＝同 WM 武器家族、正负词条名称和数量完全一致，不要求数值或洗数相同；有效一口价按升序取前 5 张，含离线挂单，非成交价。')
+    notes.append('※ 挂单显示原始数值；评分按所查询武器的当前区间及挂单等级换算，缺失等级、未知属性或超出区间则待核对。')
     return out
 
 

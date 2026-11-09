@@ -68,7 +68,8 @@ class MarketTests(unittest.IsolatedAsyncioTestCase):
             request=route(normalize_prefix(text));self.assertEqual(request.key,'reroll')
         req=route('洗卡推荐 托里德')
         r=await RivenCommands._h_reroll_recommend(SimpleNamespace(client=self.client),req.parsed,None,'pc')
-        self.assertIn('托里德',r.title);self.assertIn('WM',''.join(r.lines))
+        self.assertIn('托里德',r.title);self.assertIn('正面推荐',''.join(r.lines))
+        self.client.wm_riven_auctions.assert_not_awaited()
 
 class StrictSamplingTests(unittest.IsolatedAsyncioTestCase):
     async def test_second_direction_failure_is_not_full_sample(self):

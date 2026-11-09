@@ -85,7 +85,7 @@ def table(title,headers,rows):
 
 def quality_cell(row, i, header, headers):
     text, role = arbitration_cell(row[i] if i < len(row) else '', header, headers)
-    if '评分' in headers and header in {'词条','距中','区间位','评分'}:
+    if '评分' in headers and header in {'词条','数值','距中','区间位','评分'}:
         index = headers.index('评分')
         role = roll_role(row[index] if index < len(row) else '')
     return text, role
