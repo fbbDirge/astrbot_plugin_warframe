@@ -127,58 +127,29 @@ def report(asked,weapon,data,state,mode='',write_failed=False):
     family=weapon.get('zh') or weapon.get('en') or data['slug']
     stamp=datetime.fromtimestamp(data['sampled_at'],timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S')
     age=max(0,int((time.time()-data['sampled_at'])//60))
-    lines=[f'◆ WM 紫卡家族：{family}',f'◆ 数据状态：{state}',f'◆ 采样时间：{stamp}（北京时间，约 {age} 分钟前）',
-           f"◆ 样本：有效 {stats['valid']} 张 / {stats['sellers']} 位卖家；去重返回 {stats['returned']} 张，排除 {stats['excluded']} 张",
-           '※ 抽样范围：价格升序＋降序合并；接口可能截断，不代表全市场。',
-           '※ 占比按卖家降权：每位卖家在整个样本中的总权重为 1；同组内计算占比。']
-    enough=stats['valid']>=MIN_SAMPLE and stats['sellers']>=MIN_SELLERS
-    if not enough:lines+=['◆ 样本不足：至少 20 张、5 位卖家才形成统计参考；以下仅展示观察值。']
+    lines=[f'◆ 武器：{family}',f'◆ 数据状态：{state}',f'◆ 更新时间：{stamp}（北京时间，约 {age} 分钟前）']
     label=lambda stat:_riven_stat_cn(stat,weapon.get('riven_type',''),weapon.get('group',''))
-    categories = stats.get('categories')
+    categories=stats.get('categories')
     if categories is None:
-        lines += ['◆ 词条分类待更新', '· 此历史缓存尚未包含价差统计，发送“'+name+' 洗卡推荐 刷新”重新采样。']
+        lines+=['◆ 词条分类待更新','· 历史缓存缺少价差统计，请发送“'+name+' 洗卡推荐 刷新”。']
     else:
-        lines += ['※ 分类依据：同等级、同正负结构内，比较带/不带词条的卖家报价中位数；每位卖家先取中位价，两边重叠卖家排除。',
-                  '※ 每边至少 5 个有效报价、3 位卖家；跨组按较小卖家数加权。价差仅是关联，其他词条与数值品质仍可能影响结果。']
-        definitions = [('positive','正面推荐 · 市场溢价分档'),
-                       ('ordinary_positive','普通正面 · 价差不明显'),
-                       ('negative_candidate','负面候选 · 市场溢价'),
-                       ('ordinary_negative','普通负面 · 价差不明显'),
-                       ('unfavorable','不利词条 · 市场折价'),
-                       ('conflicting','争议词条 · 分组结论相反'),
-                       ('unknown','待判断 · 样本不足')]
-        for category, title in definitions:
-            selected = [r for r in categories if r['category'] == category]
-            if not selected: continue
-            lines += ['◆ '+title,S+S.join(['档位','词条','挂牌价差','对照样本'])]
+        definitions=[('positive','正面推荐'),('negative_candidate','负面候选'),
+                     ('ordinary_positive','普通正面'),('ordinary_negative','普通负面'),
+                     ('unfavorable','不利词条'),('conflicting','争议词条'),('unknown','待判断 · 样本不足')]
+        for category,title in definitions:
+            selected=sorted((r for r in categories if r['category']==category),key=lambda r:-(r.get('pct') or 0))
+            if not selected:continue
+            lines+=['◆ '+title,S+S.join(['档位','词条'])]
             for r in selected:
-                sign = '▲' if r['polarity'] == 'pos' else '▼'
-                tier = {'T0':'S','T1':'A','T2':'B'}.get(r.get('tier'),r.get('tier')) or '—'
-                delta = '—' if r['pct'] is None else f"{r['delta']:+.1f} 白金 / {r['pct']:+.1f}%"
-                samples = '；'.join(f"{c['cohort']} {c['rank']}级：{c['with_sellers']}/{c['without_sellers']}卖家" for c in r['comparisons'])
-                if not samples:samples=f"观察 {r['count']} 张 / {r['sellers']} 卖家，无足够对照"
-                lines += ['· '+S.join([tier,sign+label(r['stat']),delta,samples])]
-        if not categories:lines += ['◆ 词条分类', '· 暂无有效词条样本']
-        lines += ['※ S≥40% / A≥20% / B≥10% 溢价；≤−10% 为不利，介于其间为普通。分档是本插件的市场参考规则，不是游戏强度等级。',
-                  '※ 对照样本为“带词条 / 不带词条”的独立卖家数。负面候选不等于无害负面；不利项不等于所有配装的致命项。',
-                  '※ 本页未计算击杀效率，没有据此生成伤害收益或战斗推荐。']
-    lines+=['◆ 常见组合与挂牌参考',S+S.join(['结构 / 等级','正词条 / 负词条','样本 / 占比','挂牌中位数'])]
-    shown=Counter()
-    for r in stats['combos']:
-        if shown[r['cohort']]>=1:continue
-        shown[r['cohort']]+=1
-        attrs=' / '.join(label(x) for x in r['positive'])+'\n负面：'+(' / '.join(label(x) for x in r['negative']) or '无')
-        price=f"{r['median']:g} 白金" if r['median'] is not None else '价格样本不足'
-        lines+=['· '+S.join([f"{r['cohort']}·{r['rank']}级",attrs.replace('\n','；'),f"{r['count']}张 / {r['share']:.0%}",price+f"（{r['price_n']}单）"])]
-    if not stats['combos']:lines+=['· 暂无有效组合']
-    lines+=['◆ 如何用来选洗卡方向',
-            '· 常见组合可作为挑选目标的候选，再按你的暴击路线与触发机制、元素组合及增益判断；不能只按出现次数决定。',
-            '· 常见负面不等于无害负面；应检查它是否影响当前武器与打法。',
-            '· 挂牌中位数仅对相同正负词条、结构、等级分组；数值品质仍不同，既不是成交价，也不是收益预测。',
-            '· 标价必须为有效正数；无买断价的挂单只计词条。少于 3 个价格或 3 位卖家的组合不展示中位价。']
+                tier={'T0':'S','T1':'A','T2':'B'}.get(r.get('tier'),r.get('tier')) or '—'
+                if category=='negative_candidate':tier='S' if r['pct']>=40 else 'A' if r['pct']>=20 else 'B'
+                lines+=['· '+S.join([tier,('▲' if r['polarity']=='pos' else '▼')+label(r['stat'])])]
+        if not categories:lines+=['◆ 词条分类','· 暂无有效词条样本']
+        lines+=['※ S / A / B 为市场分析推荐档位，不代表伤害收益；负面候选仍需结合配装判断。']
+
     if mode:lines+=['※ '+mode+'用途：WM 挂单没有打法标签，本统计未按该用途筛选。']
     if write_failed:lines+=['※ 本次数据已获取，但持久缓存写入失败。']
-    return Reply(name+' · 洗卡推荐',lines,footer='来源：warframe.market 紫卡公开挂单 · 平台 '+data['platform']+'\n常见＝在售供给，不代表最好用或畅销；最新返回也可能命中 WM 客户端的短时缓存。')
+    return Reply(name+' · 洗卡推荐',lines,footer='推荐依据：WM 挂单价格分析 · 平台 '+data['platform'])
 
 async def market_recommend(client,query,platform):
     from .commands.market import riven_market_weapon

@@ -41,7 +41,7 @@ class MarketTests(unittest.IsolatedAsyncioTestCase):
         self.family.stop();paths.set_run_dir(self.previous);self.tmp.cleanup()
     async def test_live_cache_expired_fallback_and_platform(self):
         reply=await market_recommend(self.client,'托里德','pc')
-        self.assertIn('25 张',''.join(reply.lines));self.assertIn('本次查询成功',''.join(reply.lines))
+        self.assertNotIn('25 张',''.join(reply.lines));self.assertIn('本次查询成功',''.join(reply.lines))
         self.client.wm_riven_auctions.assert_awaited_once()
         self.assertTrue(self.client.wm_riven_auctions.call_args.kwargs['require_all_sorts'])
         self.client.resolve_riven_weapon.side_effect=RuntimeError('offline')
@@ -59,7 +59,7 @@ class MarketTests(unittest.IsolatedAsyncioTestCase):
         await asyncio.gather(*(market_recommend(self.client,'托里德','pc') for _ in range(3)))
         self.assertEqual(self.client.wm_riven_auctions.await_count,1)
         self.client.wm_riven_auctions.return_value=[]
-        r=await market_recommend(self.client,'托里德 刷新','pc');self.assertIn('有效 0 张',''.join(r.lines))
+        r=await market_recommend(self.client,'托里德 刷新','pc');self.assertIn('暂无有效词条样本',''.join(r.lines))
         p=_path('snapshots',_key('pc|torid'));p.write_text('broken')
         self.client.wm_riven_auctions.side_effect=RuntimeError('429')
         r=await market_recommend(self.client,'托里德','pc');self.assertIn('数据暂不可用',r.title)
@@ -68,8 +68,8 @@ class MarketTests(unittest.IsolatedAsyncioTestCase):
             request=route(normalize_prefix(text));self.assertEqual(request.key,'reroll')
         req=route('洗卡推荐 托里德')
         r=await RivenCommands._h_reroll_recommend(SimpleNamespace(client=self.client),req.parsed,None,'pc')
-        self.assertIn('托里德',r.title);self.assertIn('正面推荐',''.join(r.lines))
-        self.client.wm_riven_auctions.assert_not_awaited()
+        self.assertIn('托里德',r.title);self.assertIn('推荐档位',''.join(r.lines));self.assertNotIn('挂牌价差',''.join(r.lines));self.assertNotIn('常见组合与挂牌参考',''.join(r.lines))
+        self.client.wm_riven_auctions.assert_awaited_once()
 
 class StrictSamplingTests(unittest.IsolatedAsyncioTestCase):
     async def test_second_direction_failure_is_not_full_sample(self):
