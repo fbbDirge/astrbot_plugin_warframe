@@ -61,7 +61,7 @@ def snapshot(path,slug,platform):
             if not isinstance(row,dict) or not isinstance(row.get('stat'),str):return None
             if row.get('polarity') not in {'pos','neg'} or row.get('category') not in {'unknown','conflicting','unfavorable','positive','ordinary_positive','negative_candidate','ordinary_negative'}:return None
             if any(type(row.get(k))!=int or row[k]<0 for k in ('count','sellers')):return None
-            if row.get('tier') not in (None,'T0','T1','T2'):return None
+            if row.get('tier') not in (None,'S','A','B','T0','T1','T2'):return None
             for k in ('delta','pct'):
                 v=row.get(k)
                 if v is not None and (type(v) not in (int,float) or not math.isfinite(v)):return None
@@ -153,13 +153,13 @@ def report(asked,weapon,data,state,mode='',write_failed=False):
             lines += ['◆ '+title,S+S.join(['档位','词条','挂牌价差','对照样本'])]
             for r in selected:
                 sign = '▲' if r['polarity'] == 'pos' else '▼'
-                tier = r.get('tier') or '—'
+                tier = {'T0':'S','T1':'A','T2':'B'}.get(r.get('tier'),r.get('tier')) or '—'
                 delta = '—' if r['pct'] is None else f"{r['delta']:+.1f} 白金 / {r['pct']:+.1f}%"
                 samples = '；'.join(f"{c['cohort']} {c['rank']}级：{c['with_sellers']}/{c['without_sellers']}卖家" for c in r['comparisons'])
                 if not samples:samples=f"观察 {r['count']} 张 / {r['sellers']} 卖家，无足够对照"
                 lines += ['· '+S.join([tier,sign+label(r['stat']),delta,samples])]
         if not categories:lines += ['◆ 词条分类', '· 暂无有效词条样本']
-        lines += ['※ T0≥40% / T1≥20% / T2≥10% 溢价；≤−10% 为不利，介于其间为普通。分档是本插件的市场参考规则，不是游戏强度等级。',
+        lines += ['※ S≥40% / A≥20% / B≥10% 溢价；≤−10% 为不利，介于其间为普通。分档是本插件的市场参考规则，不是游戏强度等级。',
                   '※ 对照样本为“带词条 / 不带词条”的独立卖家数。负面候选不等于无害负面；不利项不等于所有配装的致命项。',
                   '※ 本页未计算击杀效率，没有据此生成伤害收益或战斗推荐。']
     lines+=['◆ 常见组合与挂牌参考',S+S.join(['结构 / 等级','正词条 / 负词条','样本 / 占比','挂牌中位数'])]

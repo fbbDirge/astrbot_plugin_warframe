@@ -60,6 +60,6 @@ def classify(rows):
                 category = 'negative_candidate' if pct >= 10 else 'ordinary_negative'
             result.update(category=category, delta=delta, pct=pct)
             if category == 'positive':
-                result['tier'] = 'T0' if pct >= 40 else 'T1' if pct >= 20 else 'T2'
+                result['tier'] = 'S' if pct >= 40 else 'A' if pct >= 20 else 'B'
         output.append(result)
     return sorted(output, key=lambda r: (r['category'], -(r['pct'] or 0), r['stat']))

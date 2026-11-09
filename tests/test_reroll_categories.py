@@ -12,7 +12,7 @@ class CategoryTests(unittest.TestCase):
     def test_positive_negative_and_unfavorable(self):
         data=summarize(self.rows(),'torid')
         positive=self.lookup(data,'critical_chance')
-        self.assertEqual((positive['tier'],positive['pct']),('T0',50))
+        self.assertEqual((positive['tier'],positive['pct']),('S',50))
         self.assertEqual(self.lookup(data,'zoom')['category'],'negative_candidate')
         self.assertEqual(self.lookup(data,'recoil')['category'],'unfavorable')
         self.assertEqual(self.lookup(data,'damage')['category'],'unknown')
