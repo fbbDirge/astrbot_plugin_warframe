@@ -102,7 +102,7 @@ class RotationCommands:
         data = await self.client.syndicate_missions(platform)
         # oracle 补「扎里曼 / 实验室 / 1999」的节点与挑战（DE 侧 Jobs 恒为空）；
         # 客户端内置 15 分钟缓存 + 3.5s 硬超时，拿不到就降级为只列等级，不拖主流程。
-        cycle = await self.client.bounty_cycle()
+        cycle = {} if platform == "cn" else await self.client.bounty_cycle()
         title, lines = fmt.fmt_bounties(data, keyword, cycle)
         if (parsed.page or 1) > 1:
             # ★ 2026-10-11：赏金卡不分页，-N 无效 —— 明说，不静默

@@ -423,7 +423,7 @@ HELP_NOTES: dict[str, list[str]] = {
     "资料与推送": [
         "帮助 = 本页；状态 = 运行状态、版本与订阅数（需群管理员）；wf 主题 = 个人样式",
         "群管理：.默认平台 / .开启 / .关闭 推送 / .状态（点号开头，需群管理员）",
-        "平台后缀 -pc / -ps / -xb / -sw：四平台数据已互通，统一显示「国际服」",
+        "平台后缀 -pc / -ps / -xb / -sw（国际服）/ -cn（国服世界状态）；默认平台 国服 可切换",
         "「赤毒」虹吸数据源已停摆，发它会给出替代查询；「蹲 取消」不带词 = 自己发起的全部（群管 = 全群）",
     ],
 }
@@ -1463,7 +1463,7 @@ class GameRuntime(
             if args:
                 plat = normalize_platform(args[0])
                 if not plat:
-                    return Reply(raw_text="用法：.默认平台 pc/ps/xb/sw")
+                    return Reply(raw_text="用法：.默认平台 pc/ps/xb/sw/cn（国服）")
                 await self.groups.set_platform(umo, plat)
                 return Reply(
                     raw_text=f"✅ 本群默认平台已设为 {PLATFORM_DISPLAY[plat]}"
@@ -1475,6 +1475,8 @@ class GameRuntime(
             )
 
         if cmd in ("开启", "关闭"):
+            if cmd == "开启" and "推送" in args and self.groups.platform(umo) == "cn":
+                return Reply(raw_text="国服暂支持手动查询，订阅推送尚未开放。")
             if not self._is_admin(event):
                 return Reply(raw_text="⛔ 该指令需要群管理员权限")
             if not args or args[0] not in ("推送", "聊天"):

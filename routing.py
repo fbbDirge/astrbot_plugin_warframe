@@ -41,7 +41,6 @@ def route(text,platform='pc'):
         parsed.content=content
         # Preserve the original WM flags in the unified market grammar.
         for flag in flags:
-            if flag=='-cn':raise QueryError('暂不支持国服，请使用国际服平台参数。')
             if flag=='-buy' and parsed.command=='wm':parsed.content.append('收购')
             elif flag=='-all' and parsed.command=='wr':parsed.content.append('离线')
             elif re.fullmatch(r'-rank=\d+',flag) and parsed.command in {'wm','wr'}:

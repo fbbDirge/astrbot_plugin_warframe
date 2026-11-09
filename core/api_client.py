@@ -1691,6 +1691,7 @@ class WarframeClient:
         timeout: Optional[float] = None,
         follow_redirects: Optional[bool] = None,
         validator: Optional[Callable[[Any], None]] = None,
+        json_encoding: Optional[str] = None,
     ) -> Any:
         key = cache_key or (
             url
@@ -1790,13 +1791,13 @@ class WarframeClient:
                         except httpx.HTTPStatusError as exc:
                             raise WarframeAPIError("DE 世界状态访问被拒绝（HTTP 403）") from exc
                     resp.raise_for_status()
-                    data = resp.json()
+                    data = json.loads(resp.content.decode(json_encoding)) if json_encoding else resp.json()
                     if validator is not None:
                         validator(data)
                     return data
                 except WarframeAPIError:
                     raise
-                except (httpx.HTTPError, json.JSONDecodeError) as exc:
+                except (httpx.HTTPError, json.JSONDecodeError, UnicodeDecodeError) as exc:
                     last_exc = exc
                     if attempt < retries:
                         if wm_rate_limit:
@@ -2082,6 +2083,9 @@ class WarframeClient:
     async def worldstate(
         self, platform: str, endpoint: str, ttl: float = TTL_WORLDSTATE_FAST
     ) -> Any:
+        if platform == "cn":
+            from .china_worldstate import endpoint as china_endpoint
+            return await china_endpoint(self, endpoint)
         if self.worldsource == "de":
             bundle = await self._resilient_de_bundle(platform)
             if endpoint in ("kuva", "arbitration", "steelPath") and not bundle.get(endpoint):

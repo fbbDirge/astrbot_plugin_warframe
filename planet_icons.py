@@ -11,7 +11,7 @@ for key,aliases in {
  'ceres':('谷神星','Ceres'),'jupiter':('木星','Jupiter'),'europa':('欧罗巴','Europa'),
  'saturn':('土星','Saturn'),'uranus':('天王星','Uranus'),'neptune':('海王星','Neptune'),
  'pluto':('冥王星','Pluto'),'eris':('阋神星','鬩神星','Eris'),'sedna':('赛德娜','Sedna'),
- 'lua':('月球','Lua','月球 Lua'),'kuvafortress':('赤毒要塞','Kuva Fortress'),
+ 'lua':('月球','Lua','月球 Lua'),'kuvafortress':('赤毒要塞','库瓦要塞','Kuva Fortress'),
  'void':('虚空','Void'),'zariman':('扎里曼','扎里曼号','Zariman','Zariman Ten Zero'),
  'veil':('面纱比邻星域','面纱','Veil','Veil Proxima'),
  'hollvania':('霍瓦尼亚','Höllvania','Hollvania')}.items():

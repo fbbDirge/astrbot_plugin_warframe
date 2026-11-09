@@ -34,8 +34,9 @@ from typing import Iterable, Optional
 # Warframe 已全面跨平台互通（crossplay），PC/PS/XBOX/NS 四个国际服入口
 # 拿到的是**同一份世界状态数据**，价格库也早已打通。因此展示层统一合并成
 # 「国际服」，只在请求 warframe.market 时保留原始平台码（价格库仍分平台）。
-PLATFORMS = ("pc", "ps", "xb", "sw")
+PLATFORMS = ("pc", "ps", "xb", "sw", "cn")
 PLATFORM_ALIASES = {
+    "cn": "cn", "国服": "cn", "wegame": "cn", "国际服": "pc",
     "pc": "pc",
     "ps": "ps",
     "ps4": "ps",
@@ -48,7 +49,7 @@ PLATFORM_ALIASES = {
     "switch": "sw",
     "任天堂": "sw",
 }
-PLATFORM_DISPLAY = {"pc": "国际服", "ps": "国际服", "xb": "国际服", "sw": "国际服"}
+PLATFORM_DISPLAY = {"cn": "国服 WeGame", "pc": "国际服", "ps": "国际服", "xb": "国际服", "sw": "国际服"}
 
 _MODIFIER_RE = re.compile(r"^-(?P<body>[A-Za-z0-9]+)$")
 
@@ -280,7 +281,7 @@ def parse(message: str, *, extra_commands: Optional[dict[str, str]] = None) -> P
         m = _MODIFIER_RE.match(tok)
         if m:
             body = m.group("body").lower()
-            if body in ("pc", "ps", "xb", "sw"):
+            if body in PLATFORMS:
                 res.platform = body
                 res.modifiers.append(tok)
             elif body == "w":

@@ -1169,6 +1169,8 @@ class PushDaemon:
         基线按「平台 × 事件类型」独立：某类型本轮无人订阅 ⇒ 丢弃其基线，
         之后再有人订阅的那一轮只建基线不推（不灌存量）。
         """
+        if platform == "cn":
+            return []  # 国服订阅尚未验证，不生成国际服排期推送。
         wanted = {s.event for s in subs if s.platform == platform}
         out: list[tuple[str, str, str]] = []
         matched = self._matched = {}  # 事件key -> 命中的 sub.sid（仅筛选类事件）

@@ -19,7 +19,7 @@ from .service import WarframeService
 from .renderer import CardRenderer
 from .theme import ThemeStore, theme_from
 
-@register('astrbot_plugin_warframe', 'Amy', 'Warframe 查询、计算、OCR 与订阅', '0.7.21')
+@register('astrbot_plugin_warframe', 'Amy', 'Warframe 查询、计算、OCR 与订阅', '0.7.22')
 class WarframePlugin(Star):
     def __init__(self,context:Context,config:AstrBotConfig):
         super().__init__(context)
@@ -69,7 +69,12 @@ class WarframePlugin(Star):
 
     async def query(self,request,event):
         """Invoke one native domain handler; all handlers return application data."""
-        if request.key=='detail':return [await self.service.run(request.parsed)]
+        if request.key=='detail':
+            runtime=await self.get_runtime()
+            platform=request.parsed.platform
+            if platform=='cn':
+                raise QueryError('此扩展查询暂未接入国服，请使用国服世界状态指令。')
+            return [await self.service.run(request.parsed)]
         runtime=await self.get_runtime()
         from .core.api_client import WarframeAPIError,public_error_text
         from .core.commands import Reply
@@ -78,9 +83,18 @@ class WarframePlugin(Star):
             else:
                 parsed=request.parsed
                 platform=parsed.platform or runtime.groups.platform(event.unified_msg_origin)
+                if platform=='cn':
+                    from .core.china_worldstate import command_error
+                    reason=command_error(request.key, parsed.content)
+                    if reason:raise WarframeAPIError(reason)
                 reply=await runtime._routes[request.key](parsed,event,platform)
                 if reply is not None:
+                    if platform=='cn':
+                        reply.title=(reply.title or '查询结果')+' · 国服'
+                        reply.footer=(reply.footer+'\n' if reply.footer else '')+'国服数据来自 WeGame；未提供的内容不使用国际服补齐。'
                     reply.actions=runtime._reply_actions(reply,parsed)
+                    if platform=='cn':
+                        reply.actions=[replace(a,send=a.send+' -cn') if a.mode!='copy' and '-cn' not in a.send.split() else a for a in reply.actions]
                     reply.actions=[replace(a,send='wf '+a.send.lstrip('.'))
                                    if a.mode!='copy' and not a.send.lower().startswith('wf ')
                                    else a for a in reply.actions]
@@ -98,7 +112,7 @@ class WarframePlugin(Star):
             if normalized is None:return
             words=normalized.split()
             control=len(words)>=2 and words[0].lower()=='wf' and words[1] in {'主题','配色','字号','背景','前缀'}
-            request=None if control else route(normalized,self.config.get('default_platform','pc'))
+            request=None if control else route(normalized,(await self.get_runtime()).groups.platform(event.unified_msg_origin))
             if not control and request is None:return
             event.stop_event()
             now=time.monotonic();cooldown=max(0,int(self.config.get('cooldown',2)))

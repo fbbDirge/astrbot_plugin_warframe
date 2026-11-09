@@ -38,7 +38,12 @@ class DailyCommands:
             ]
         )
         cycles = [r for r in res if isinstance(r, dict)]
+        if platform == "cn" and not cycles:
+            from ..api_client import WarframeAPIError
+            raise WarframeAPIError("国服平原周期暂不可用，请稍后重试")
         title, lines = fmt.fmt_cetus(*cycles)
+        if platform == "cn":
+            lines.append("国服源未提供的周期不展示；仅列出本次成功获取的周期。")
         return Reply(title, lines, footer=fmt.fmt_platform_footer(platform))
 
     @staticmethod
