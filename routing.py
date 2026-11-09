@@ -18,6 +18,7 @@ class Request:
 
 
 def route(text,platform='pc'):
+    text=text.replace('扎利曼号','扎里曼').replace('扎利曼','扎里曼').replace('扎里曼号','扎里曼')
     if text.lower().startswith('wf') and (len(text)==2 or text[2].isspace()):
         text=text[2:].strip() or '帮助'
     if text.strip() in SERVER_SWITCHES:

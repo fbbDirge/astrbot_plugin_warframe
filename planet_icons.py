@@ -12,7 +12,7 @@ for key,aliases in {
  'saturn':('土星','Saturn'),'uranus':('天王星','Uranus'),'neptune':('海王星','Neptune'),
  'pluto':('冥王星','Pluto'),'eris':('阋神星','鬩神星','Eris'),'sedna':('赛德娜','Sedna'),
  'lua':('月球','Lua','月球 Lua'),'kuvafortress':('赤毒要塞','库瓦要塞','Kuva Fortress'),
- 'void':('虚空','Void'),'zariman':('扎里曼','扎里曼号','Zariman','Zariman Ten Zero'),
+ 'void':('虚空','Void'),'zariman':('扎利曼','扎利曼号','扎里曼','扎里曼号','Zariman','Zariman Ten Zero'),
  'veil':('面纱比邻星域','面纱','Veil','Veil Proxima'),
  'hollvania':('霍瓦尼亚','Höllvania','Hollvania')}.items():
  for alias in aliases:
@@ -20,7 +20,7 @@ for key,aliases in {
   if key in {'earth','venus','saturn','uranus','neptune','pluto'}:
    PLANETS[(alias+(' Proxima' if alias.isascii() else '比邻星域')).casefold()]='planet_'+key
 for alias in ('霍瓦尼亚','Höllvania','Hollvania'):PLANETS[alias.casefold()]='planet_earth'
-PLANETS.update({'双衍王境':'cycle_duviri','duviri':'cycle_duviri','解剖圣所':'planet_deimos','羽化之穹（扎里曼）':'planet_zariman'})
+PLANETS.update({'双衍王境':'cycle_duviri','duviri':'cycle_duviri','解剖圣所':'planet_deimos','羽化之穹（扎里曼）':'planet_zariman','羽化之穹（扎利曼）':'planet_zariman'})
 PLANET_ASSETS=set(PLANETS.values())
 
 @lru_cache(maxsize=1)

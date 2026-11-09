@@ -7,7 +7,7 @@ import re
 from .cards import Card, IconText
 from .core.render import parse_ranges, parse_chart, _expand_tents_line, display_footer
 from .world_icons import RELICS, FACTIONS
-from .localization import translate
+from .localization import translate, display_place_names
 
 ROLE_HEADERS={
     '商品':'item_name','物品':'item_name','星球':'fissure_map','地区':'fissure_map','地区信息':'fissure_map',
@@ -24,10 +24,13 @@ TIER_ROLES={'古纪':'tier_lith','前纪':'tier_meso','中纪':'tier_neo','后�
 MARK_ROLES={'v':'riven_stat','r':'riven_negative','g':'wm_quantity','m':'wm_price','c':'fissure_map','b':'wm_user'}
 
 
-def clean(text):
+def clean(text, normalize_place=True):
     text=re.sub(r'⟦pol:([^⟧]+)⟧',lambda m:'极性 '+m[1],str(text))
     text=re.sub(r'⟦/?[^⟧]+⟧','',text)
-    return text.replace('Warframe SDJKBOT','Warframe 助手').replace('SDJKBOT','Warframe 助手')
+    text=text.replace('Warframe SDJKBOT','Warframe 助手').replace('SDJKBOT','Warframe 助手')
+    if normalize_place and 'http' not in text and not text.lstrip().startswith(('/w ', '◆ 挂单 ', '挂单 ')):
+        text=display_place_names(text)
+    return text
 
 
 def roll_role(value):
@@ -36,7 +39,7 @@ def roll_role(value):
 
 
 def cell(value,header='',default='text'):
-    raw=str(value); text=clean(raw).strip()
+    raw=str(value); text=clean(raw, normalize_place=header not in {'卖家','买家','用户名','玩家','用户'}).strip()
     role=ROLE_HEADERS.get(header,default)
     if re.fullmatch(r'[23]\+[01]',header):role='riven_range'
     if any(k in header for k in ('最低价','最高价','一口价')):role='wm_price'

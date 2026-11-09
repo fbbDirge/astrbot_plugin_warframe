@@ -51,7 +51,7 @@ def effective_prefixes(config, personal):
 
 
 def normalize_prefix(text, prefixes=None, bare=True):
-    text = text.strip()
+    text = text.strip().replace('扎利曼号','扎里曼').replace('扎利曼','扎里曼').replace('扎里曼号','扎里曼')
     # Fixed recovery/control entry is always available.
     if re.match(r'(?i)^/?wf(?:\s|$)', text):
         return text.removeprefix('/')

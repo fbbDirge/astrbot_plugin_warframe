@@ -21,7 +21,7 @@ OVERRIDES = {
     'Phobos': '火卫一', 'Deimos': '火卫二', 'Ceres': '谷神星', 'Jupiter': '木星',
     'Europa': '欧罗巴', 'Saturn': '土星', 'Uranus': '天王星', 'Neptune': '海王星',
     'Pluto': '冥王星', 'Eris': '阋神星', 'Sedna': '赛德娜', 'Void': '虚空',
-    'Lua': '月球', 'Kuva Fortress': '赤毒要塞', 'Zariman': '扎里曼',
+    'Lua': '月球', 'Kuva Fortress': '赤毒要塞', 'Zariman': '扎利曼',
 }
 DISPLAY_FIELDS = {'node', 'victimNode', 'location', 'missionType', 'type', 'typeKey',
                   'item', 'items', 'name', 'boss', 'modifier', 'enemy', 'faction',
@@ -41,14 +41,18 @@ def strip_item_tags(value):
     return re.sub(r'^\s*(?:<ARCHWING>\s*)+', '', str(value), flags=re.I).strip()
 
 
+def display_place_names(value):
+    return str(value).replace('扎里曼号','扎利曼').replace('扎利曼号','扎利曼').replace('扎里曼','扎利曼')
+
+
 def translate(value):
     text = strip_item_tags(value)
     # Split node/planet before dictionary lookup; official node names often stay Latin.
     match = re.fullmatch(r'(.+?)\s*[（(]([^()（）]+)[）)]', text)
     if match:
         node, planet = match.groups()
-        return f'{dictionary().get(node.strip().casefold(), node.strip())}（{translate(planet)}）'
-    return dictionary().get(text.casefold(), text).replace('鬩神星', '阋神星')
+        return display_place_names(f'{dictionary().get(node.strip().casefold(), node.strip())}（{translate(planet)}）')
+    return display_place_names(dictionary().get(text.casefold(), text).replace('鬩神星', '阋神星'))
 
 
 def localize_world(value, field=''):

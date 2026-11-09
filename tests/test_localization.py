@@ -20,6 +20,17 @@ def alerts_fixture():
 
 
 class LocalizationTests(unittest.TestCase):
+    def test_zariman_display_and_legacy_aliases(self):
+        from wf_plugin.presentation import clean, cell
+        from wf_plugin.planet_icons import planet_icon
+        from wf_plugin.commands import normalize_prefix
+        for name in ['Zariman', '扎里曼', '扎里曼号', '扎利曼号', '扎利曼']:
+            self.assertEqual(translate(name), '扎利曼')
+            self.assertEqual(planet_icon(translate(name)), 'planet_zariman')
+        self.assertEqual(clean('赏金 扎里曼号'), '赏金 扎利曼')
+        self.assertEqual(normalize_prefix('赏金 扎利曼'), normalize_prefix('赏金 扎里曼号'))
+        self.assertEqual(cell('扎利曼号', '卖家')[0], '扎利曼号')
+
     def test_screenshot_alerts(self):
         data = alerts_fixture()
         original = copy.deepcopy(data)
